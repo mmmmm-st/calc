@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>乗り打ち計算</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <h1>乗り打ち計算</h1>
+
+  <p>人数、回収枚数、交換率を入れてください。</p>
+
+  <label>人数 <input id="people" type="number" min="1" value="3"></label><br><br>
+  <label>回収枚数 <input id="coins" type="number" min="0" value="1200"></label><br><br>
+  <label>交換率(1枚あたり円) <input id="rate" type="number" min="1" value="20"></label><br><br>
+
+  <button id="calc">計算する</button>
+
+  <pre id="result"></pre>
+
+  <script>
+    const LIFF_ID = "2010062599-fM2vPvTM";
+
+    function formatYen(n) {
+      return new Intl.NumberFormat("ja-JP").format(Math.round(n)) + "円";
+    }
+
+    async function main() {
+      await liff.init({ liffId: LIFF_ID });
+
+      document.getElementById("calc").addEventListener("click", async () => {
+        const people = Number(document.getElementById("people").value);
+        const coins = Number(document.getElementById("coins").value);
+        const rate = Number(document.getElementById("rate").value);
+
+        if (!Number.isInteger(people) || people <= 0) {
+          alert("人数を正しく入力してください");
+          return;
+        }
+        if (!Number.isFinite(coins) || coins < 0) {
+          alert("回収枚数を正しく入力してください");
+          return;
+        }
+        if (!Number.isFinite(rate) || rate <= 0) {
+          alert("交換率を正しく入力してください");
+          return;
+        }
+
+        const totalInvest = 40000 * people;
+        const totalReturn = coins * rate;
+        const raw = (totalInvest - totalReturn) / people;
+
+        const pay = Math.floor(raw / 500) * 500;
+        const remainder = raw - pay;
+
+        const msg =
+`【のりうち結果】
+人数：${people}人
+総投資：${formatYen(totalInvest)}
+総回収：${formatYen(totalReturn)}
+
+1人あたり：${formatYen(raw)}
+500円単位：${formatYen(pay)}
+余り：${formatYen(remainder)}`;
+
+document.getElementById("result").textContent = msg;
+
+await liff.sendMessages([
+  {
+    type: "text",
+    text: msg
+  }
+]);
+
+      });
+    }
+
+    main().catch(console.error);
+  </script>
+</body>
+</html>
