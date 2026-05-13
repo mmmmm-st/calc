@@ -3,146 +3,55 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ノリ打ち精算 Pro - フルレポートVer</title>
-
+<title>ノリ打ち精算 Pro - DB共有Ver</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-
 <style>
-:root{
-  --bg:#f8fafc;
-  --card:#ffffff;
-  --line:#f1f5f9;
-  --input-border:#e2e8f0;
-  --text:#1e293b;
-  --muted:#64748b;
-  --green:#10b981;
-  --red:#ef4444;
-  --accent:#4f46e5;
-  --line-green:#06c755;
-}
-
+:root{ --bg:#f8fafc; --card:#ffffff; --line:#f1f5f9; --input-border:#e2e8f0; --text:#1e293b; --muted:#64748b; --green:#10b981; --red:#ef4444; --accent:#4f46e5; --line-green:#06c755; }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-
-body{
-  margin:0;
-  padding:20px 10px;
-  background:var(--bg);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  color:var(--text);
-}
-
+body{ margin:0; padding:20px 10px; background:var(--bg); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:var(--text); }
 .wrap{max-width:800px; margin:auto;}
-
-.card{
-  background:var(--card);
-  border-radius:20px;
-  padding:20px;
-  margin-bottom:16px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
-}
-
+.card{ background:var(--card); border-radius:20px; padding:20px; margin-bottom:16px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); }
 h1{ font-size:22px; margin:0 0 15px; font-weight:800; }
 h2{ font-size:18px; margin:0 0 16px; font-weight:700; }
-
 .grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:12px; }
 .third{ grid-column:span 4; }
-
-label{
-  display:block;
-  margin-bottom:6px;
-  font-weight:700;
-  font-size:13px;
-}
-
-input{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1.5px solid var(--input-border);
-  font-size:16px;
-  color:var(--text);
-}
-
-.player{
-  background:#fff;
-  border:1px solid #f1f5f9;
-  border-radius:16px;
-  padding:20px;
-  margin-bottom:12px;
-}
-
-.player-top {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
-}
-
+label{ display:block; margin-bottom:6px; font-weight:700; font-size:13px; }
+input{ width:100%; padding:12px; border-radius:10px; border:1.5px solid var(--input-border); font-size:16px; color:var(--text); }
+.player{ background:#fff; border:1px solid #f1f5f9; border-radius:16px; padding:20px; margin-bottom:12px; }
+.player-top { display: flex; justify-content: space-between; margin-bottom: 12px; }
 .result-label { font-size: 11px; font-weight: 700; margin-bottom: 4px; text-align:right; color:var(--muted);}
 .result-value { font-size: 18px; font-weight: 800; color: #cbd5e1; text-align:right;}
-
 .unused-display { font-size: 11px; color: var(--muted); margin-top: 4px; }
-
 button{ border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; }
 .main-btn{ background:var(--accent); color:white; width:100%; margin:10px 0 10px; }
-.line-btn{ background:var(--line-green); color:white; width:100%; margin-bottom: 20px; }
+.line-btn{ background:var(--line-green); color:white; width:100%; margin-bottom: 10px; }
 .sub-btn{ background:#f1f5f9; color:var(--text); width:100%; }
 .delete-btn{ background:#fee2e2; color:var(--red); width:100%; }
-
-.personal-total-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-    gap: 12px; 
-    margin-bottom: 24px; 
-}
-
-.personal-card {
-    background: #f8fafc;
-    border-radius: 16px;
-    padding: 16px;
-    border: 1px solid rgba(0,0,0,0.03);
-}
-
-.personal-card .name-label {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 4px;
-    font-weight: 500;
-}
-
-.personal-card .amount-value {
-    font-size: 18px;
-    font-weight: 800;
-}
-
+.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.personal-card { background: #f8fafc; border-radius: 16px; padding: 16px; border: 1px solid rgba(0,0,0,0.03); }
+.personal-card .name-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
+.personal-card .amount-value { font-size: 18px; font-weight: 800; }
 .summary{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
 .box{ padding:12px; border-radius:12px; background:#f8fafc; border:1px solid var(--line); }
 .box-title{ font-size:11px; color:var(--muted); margin-bottom:2px;}
 .box-value{ font-size:16px; font-weight:800; }
-
 .table-wrapper{ overflow-x:auto; margin-top:15px; }
 table{ width:100%; border-collapse:collapse; font-size:13px; min-width: 400px;}
 th, td{ padding:12px 8px; border-bottom:1px solid var(--line); text-align:left; }
-th { color: var(--muted); font-weight: 700; }
-
 .pay-box{ margin-top:20px; border-radius:12px; background:#f0fdf4; padding:10px; }
 .pay-row{ display:flex; justify-content:space-between; padding:8px; background:#fff; margin-bottom:5px; border-radius:8px; }
-
-@media(min-width:600px){ .summary{ grid-template-columns:repeat(3,1fr); } }
 </style>
 </head>
-
 <body>
-
 <div class="wrap">
   <div class="card">
     <h1>ノリ打ち精算</h1>
     <div class="grid">
-      <div class="third"><label>基準投資</label><input id="baseInvest" type="number" placeholder="40000" value="40000" oninput="updateAllUnused()"></div>
-      <div class="third"><label>交換率</label><input id="rate" type="number" placeholder="20" value="20"></div>
-      <div class="third"><label>換金単位</label><input id="roundUnit" type="number" placeholder="500" value="500"></div>
+      <div class="third"><label>基準投資</label><input id="baseInvest" type="number" value="40000" oninput="updateAllUnused()"></div>
+      <div class="third"><label>交換率</label><input id="rate" type="number" value="20"></div>
+      <div class="third"><label>換金単位</label><input id="roundUnit" type="number" value="500"></div>
     </div>
   </div>
-
   <div class="card">
     <h2>参加者</h2>
     <div id="players"></div>
@@ -151,164 +60,114 @@ th { color: var(--muted); font-weight: 700; }
       <div style="grid-column: span 6;"><button class="sub-btn" id="saveMemberBtn">名前保存</button></div>
     </div>
   </div>
-
-  <button class="main-btn" id="calcBtn">計算を実行する</button>
-  <button class="line-btn" id="lineSendBtn" style="display:none;">LINEに結果を送る</button>
-
+  <button class="main-btn" id="calcBtn">計算を実行して共有保存</button>
+  <div id="loading" style="display:none; text-align:center; padding:10px; color:var(--accent); font-weight:bold;">データ送信中...</div>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+    <button class="line-btn" id="lineSendBtn" style="display:none;">自分に送る</button>
+    <button class="sub-btn" id="shareBtn" style="display:none; background:var(--line-green); color:white;">グループ共有</button>
+  </div>
   <div class="card" id="resultCard" style="display:none;">
     <h2>精算結果</h2>
     <div class="summary">
-      <div class="box"><div class="box-title">グループ総損益</div><div class="box-value" id="profitTotal" style="color:var(--accent)">-</div></div>
-      <div class="box"><div class="box-title">1人あたり純利益</div><div id="perProfit" class="box-value">-</div></div>
-      <div class="box"><div class="box-title">回収</div><div class="box-value" id="cashTotal">-</div></div>
-      <div class="box"><div class="box-title">未投資</div><div class="box-value" id="remainTotal">-</div></div>
+      <div class="box"><div class="box-title">グループ総損益</div><div class="box-value" id="profitTotal">-</div></div>
+      <div class="box"><div class="box-title">1人あたり純利</div><div id="perProfit" class="box-value">-</div></div>
     </div>
-    
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>名前</th>
-            <th>収支</th>
-            <th>手持ち</th>
-            <th>精算額</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-
-    <div class="pay-box" id="payBox">
-      <div style="font-weight:800; color:#065f46; margin-bottom:10px;">お金の受け渡し</div>
-      <div id="payList"></div>
-    </div>
+    <div class="table-wrapper"><table><thead><tr><th>名前</th><th>収支</th><th>手持ち</th><th>精算額</th></tr></thead><tbody id="tbody"></tbody></table></div>
+    <div class="pay-box" id="payBox"><div id="payList"></div></div>
   </div>
-
   <div class="card">
-    <h2>個人累計収支</h2>
+    <h2>共有累計収支</h2>
     <div id="personalTotals" class="personal-total-grid"></div>
-    
-    <h2 style="margin-top:20px; border-top:1px solid var(--line); padding-top:20px;">履歴</h2>
+    <h2>履歴（共有）</h2>
     <div id="history"></div>
   </div>
 </div>
 
 <script>
-// --- 重要: ここを LIFFタブの LIFF ID (例: 2010062599-XXXXXXXX) に書き換えてください ---
+// --- すでにURLとIDを埋め込み済みです ---
 const LIFF_ID = "2010062599-fM2vPvTM"; 
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzlXFC4ErmS8hNofXBHYPIofd_5vBlLBsqo5yLGBFVvmb5vdCO-OnTIF4VBzVMSA6TJRA/exec"; 
 
-function money(v){ return new Intl.NumberFormat("ja-JP").format(Math.round(v)) + "円"; }
-
-let history = JSON.parse(localStorage.getItem("nori_history") || "[]");
+let history = [];
 let savedMembers = JSON.parse(localStorage.getItem("nori_members") || '["Aさん","Bさん","Cさん"]');
 let lastShareMessage = "";
 
-// LIFF初期化
-liff.init({ liffId: LIFF_ID })
-  .then(() => {
-    // ログインしていなければログインさせる
-    if (!liff.isLoggedIn()) {
-      liff.login();
-    }
-  })
-  .catch((err) => {
-    console.error("LIFF初期化失敗", err);
-  });
+function money(v){ return new Intl.NumberFormat("ja-JP").format(Math.round(v)) + "円"; }
 
-function save(){ localStorage.setItem("nori_history", JSON.stringify(history)); }
-
-function getAggregatedData() {
-    let personMap = {};
-    let grandTotalProfit = 0;
-    history.forEach(h => {
-        grandTotalProfit += h.profit;
-        h.players.forEach(p => {
-            personMap[p.name] = (personMap[p.name] || 0) + p.val;
-        });
-    });
-    return { personMap, grandTotalProfit };
+// DB読み込み
+async function loadHistory() {
+  try {
+    const res = await fetch(GAS_URL);
+    history = await res.json();
+    renderHistory();
+  } catch (e) { console.error("Load Error", e); }
 }
+
+// DB保存
+async function saveToDB(newData) {
+  document.getElementById("loading").style.display = "block";
+  try {
+    await fetch(GAS_URL, {
+      method: "POST",
+      body: JSON.stringify(newData)
+    });
+    await loadHistory();
+  } catch (e) { alert("保存失敗。ネット接続を確認してください"); }
+  document.getElementById("loading").style.display = "none";
+}
+
+liff.init({ liffId: LIFF_ID }).then(() => {
+  if (!liff.isLoggedIn()) { liff.login(); } else { loadHistory(); }
+});
 
 function renderHistory(){
   const el=document.getElementById("history");
   const personalEl=document.getElementById("personalTotals");
   el.innerHTML=""; personalEl.innerHTML="";
   
-  const { personMap } = getAggregatedData();
-
-  history.forEach((h,i)=>{
+  let personMap = {};
+  history.slice().reverse().forEach((h) => {
     let details="";
     h.players.forEach(p=>{
+      personMap[p.name] = (personMap[p.name] || 0) + p.val;
       const color=p.val>=0?"var(--green)":"var(--red)";
-      details+=`<div style="display:flex; justify-content:space-between; font-size:12px;">
-        <span>${p.name}</span><span style="color:${color}; font-weight:bold;">${money(p.val)}</span>
-      </div>`;
+      details+=`<div style="display:flex; justify-content:space-between; font-size:12px;"><span>${p.name}</span><span style="color:${color}">${money(p.val)}</span></div>`;
     });
-
     const box=document.createElement("div");
     box.className="box"; box.style.marginBottom="10px"; box.style.background="#fff";
-    box.innerHTML=`
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-        <span style="font-size:10px; color:var(--muted)">${h.time}</span>
-        <button style="background:none; color:var(--red); font-size:10px;" onclick="deleteHistory(${i})">削除</button>
-      </div>
-      <div style="font-weight:800; margin-bottom:5px; border-bottom:1px solid var(--line); padding-bottom:5px;">合計 ${money(h.profit)}</div>
-      ${details}
-    `;
-    el.prepend(box);
+    box.innerHTML=`<div style="font-size:10px; color:var(--muted)">${h.time}</div><div style="font-weight:800;">合計 ${money(h.profit)}</div>${details}`;
+    el.appendChild(box);
   });
 
   Object.keys(personMap).sort().forEach(name => {
-      const val = personMap[name];
-      const pCard = document.createElement("div");
-      pCard.className = "personal-card";
-      pCard.innerHTML = `
-        <div class="name-label">${name} 累計</div>
-        <div class="amount-value" style="color:${val>=0?'var(--green)':'var(--red)'}">${money(val)}</div>
-      `;
-      personalEl.appendChild(pCard);
+    const pCard = document.createElement("div");
+    pCard.className = "personal-card";
+    pCard.innerHTML = `<div class="name-label">${name}</div><div class="amount-value" style="color:${personMap[name]>=0?'var(--green)':'var(--red)'}">${money(personMap[name])}</div>`;
+    personalEl.appendChild(pCard);
   });
 }
 
-function deleteHistory(i){ history.splice(i,1); save(); renderHistory(); }
-
 function updateAllUnused() {
-    const base = +(document.getElementById("baseInvest").value || 0);
-    document.querySelectorAll(".player").forEach(node => {
-        const invest = +(node.querySelector(".invest").value || 0);
-        const unused = base - invest;
-        node.querySelector(".unused-val").textContent = money(unused);
-    });
+  const base = +(document.getElementById("baseInvest").value || 0);
+  document.querySelectorAll(".player").forEach(node => {
+    const invest = +(node.querySelector(".invest").value || 0);
+    node.querySelector(".unused-val").textContent = money(base - invest);
+  });
 }
 
 function addPlayer(name="", investValue=40000){
   const div=document.createElement("div");
   div.className="player";
-  div.innerHTML=`
-    <div class="player-top">
-      <div style="width:60%;"><label>名前</label><input class="name" value="${name}" placeholder="名前"></div>
-      <div><div class="result-label">収支</div><div class="result-value">-</div></div>
-    </div>
-    <div class="grid">
-      <div class="third">
-        <label>投資</label>
-        <input class="invest" type="number" placeholder="0" value="${investValue}" oninput="updateAllUnused()">
-        <div class="unused-display">余り: <span class="unused-val">${money(0)}</span></div>
-      </div>
-      <div class="third"><label>枚数</label><input class="coins" type="number" placeholder="0"></div>
-      <div class="third"><label style="color:transparent;">削除</label><button class="delete-btn" style="padding:10px;" onclick="this.closest('.player').remove()">削除</button></div>
-    </div>
-  `;
+  div.innerHTML=`<div class="player-top"><div style="width:60%;"><label>名前</label><input class="name" value="${name}"></div><div><div class="result-label">収支</div><div class="result-value">-</div></div></div><div class="grid"><div class="third"><label>投資</label><input class="invest" type="number" value="${investValue}" oninput="updateAllUnused()"><div class="unused-display">余:<span class="unused-val">0円</span></div></div><div class="third"><label>枚数</label><input class="coins" type="number" value="0"></div><div class="third"><label style="color:transparent;">削</label><button class="delete-btn" onclick="this.closest('.player').remove()">×</button></div></div>`;
   document.getElementById("players").appendChild(div);
   updateAllUnused();
 }
 
-document.getElementById("calcBtn").onclick=function(){
+document.getElementById("calcBtn").onclick=async function(){
   const baseAmt = +(document.getElementById("baseInvest").value || 0);
   const rate = +(document.getElementById("rate").value || 0);
   const unit = +(document.getElementById("roundUnit").value || 1);
   const pNodes = document.querySelectorAll(".player");
-  
   let players = [];
   pNodes.forEach(node => {
     const name = node.querySelector(".name").value || "匿名";
@@ -318,120 +177,65 @@ document.getElementById("calcBtn").onclick=function(){
     players.push({ name, invest, coins, cash, node });
   });
 
-  if(players.length === 0) return;
-
   const totalInvest = players.reduce((s, p) => s + p.invest, 0);
   const totalCash = players.reduce((s, p) => s + p.cash, 0);
-  const totalUnused = (baseAmt * players.length) - totalInvest; 
-  const totalProfit = totalCash - totalInvest; 
-  const totalPool = totalCash + totalUnused; 
-  const fairShare = totalPool / players.length; 
-  const perProfit = totalProfit / players.length; 
+  const totalUnused = (baseAmt * players.length) - totalInvest;
+  const totalProfit = totalCash - totalInvest;
+  const fairShare = (totalCash + totalUnused) / players.length;
 
   document.getElementById("resultCard").style.display = "block";
   document.getElementById("lineSendBtn").style.display = "block";
-  document.getElementById("cashTotal").textContent = money(totalCash);
-  document.getElementById("remainTotal").textContent = money(totalUnused);
+  document.getElementById("shareBtn").style.display = "block";
   document.getElementById("profitTotal").textContent = money(totalProfit);
-  document.getElementById("perProfit").textContent = (perProfit >= 0 ? "+" : "") + money(perProfit);
-  document.getElementById("perProfit").style.color = perProfit >= 0 ? "var(--green)" : "var(--red)";
-
+  
   const tbody = document.getElementById("tbody");
   tbody.innerHTML = "";
-  const payList = document.getElementById("payList");
-  payList.innerHTML = "";
-  
   let receive = [], pay = [], snapshot = [];
   players.forEach(p => {
     const myProfit = p.cash - p.invest;
-    const myUnused = baseAmt - p.invest; 
-    const myHand = p.cash + myUnused; 
-    const diff = fairShare - myHand; 
-
+    const myHand = p.cash + (baseAmt - p.invest);
+    const diff = fairShare - myHand;
     const resVal = p.node.querySelector(".result-value");
     resVal.textContent = (myProfit >= 0 ? "+" : "") + money(myProfit);
     resVal.style.color = myProfit >= 0 ? "var(--green)" : "var(--red)";
-
     if(diff > 1) receive.push({ name: p.name, amount: diff });
     if(diff < -1) pay.push({ name: p.name, amount: -diff });
-
     const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td><b>${p.name}</b></td>
-      <td style="color:${myProfit>=0?'var(--green)':'var(--red)'}">${money(myProfit)}</td>
-      <td>${money(myHand)}</td>
-      <td style="font-weight:800; color:${diff>=0?'var(--green)':'var(--red)'}">${diff >= 0 ? '貰う：' : '払う：'}${money(Math.abs(diff))}</td>
-    `;
+    tr.innerHTML = `<td>${p.name}</td><td>${money(myProfit)}</td><td>${money(myHand)}</td><td>${diff >= 0 ? '貰う' : '払う'}${money(Math.abs(diff))}</td>`;
     tbody.appendChild(tr);
     snapshot.push({ name: p.name, val: myProfit });
   });
 
-  history.push({ 
+  const newData = { 
     time: new Date().toLocaleString('ja-JP',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}), 
     profit: totalProfit, 
     players: snapshot 
-  });
-  save(); 
-  
-  const { personMap, grandTotalProfit } = getAggregatedData();
-  renderHistory();
+  };
+  await saveToDB(newData);
 
-  let msg = `【ノリ打ち精算結果レポート】\n\n`;
-
-  msg += `■ 個人の累計収支 (全履歴)\n`;
-  Object.keys(personMap).sort().forEach(name => {
-    const val = personMap[name];
-    msg += `・${name}：${(val >= 0 ? "+" : "") + money(val)}\n`;
-  });
-
-  msg += `\n■ 今回の精算内容\n`;
-  snapshot.forEach(p => {
-    msg += `・${p.name}の収支：${(p.val >= 0 ? "+" : "") + money(p.val)}\n`;
-  });
-  msg += `------------------\n`;
-  msg += `今回の合計収支：${(totalProfit >= 0 ? "+" : "") + money(totalProfit)}\n`;
-  msg += `1人あたり純増：${(perProfit >= 0 ? "+" : "") + money(perProfit)}\n\n`;
-
-  msg += "■ お金の受け渡し指示\n";
-  let hasPay = false;
-  let rList = receive.map(x => ({...x}));
-  let pList = pay.map(x => ({...x}));
-  rList.forEach(r => {
-    pList.forEach(p => {
+  let msg = `【ノリ打ち精算レポート】\n`;
+  snapshot.forEach(p => msg += `・${p.name}：${(p.val >= 0 ? "+" : "") + money(p.val)}\n`);
+  msg += `計：${money(totalProfit)}\n\n指示：\n`;
+  receive.forEach(r => {
+    pay.forEach(p => {
       if(r.amount <= 0 || p.amount <= 0) return;
       const move = Math.min(r.amount, p.amount);
-      const row = document.createElement("div");
-      row.className = "pay-row";
-      row.innerHTML = `<span><b>${p.name}</b> → ${r.name}</span><span style="color:var(--green); font-weight:800;">${money(move)}</span>`;
-      payList.appendChild(row);
       msg += `・${p.name} → ${r.name}：${money(move)}\n`;
       r.amount -= move; p.amount -= move;
-      hasPay = true;
     });
   });
-  if(!hasPay) msg += "移動なし\n";
-
-  msg += `\n■ グループ全体の通算累計\n`;
-  msg += `合計収支：${(grandTotalProfit >= 0 ? "+" : "") + money(grandTotalProfit)}\n`;
-
   lastShareMessage = msg;
 };
 
-document.getElementById("lineSendBtn").onclick = async function(){
-    if (!liff.isInClient()) { 
-        alert("LINEアプリ内から開いてください。\n\n【内容】\n" + lastShareMessage); 
-        return; 
-    }
+document.getElementById("shareBtn").onclick = async () => {
+  if (liff.isApiAvailable('shareTargetPicker')) {
+    await liff.shareTargetPicker([{ type: "text", text: lastShareMessage }]);
+  }
+};
 
-    try {
-        await liff.sendMessages([{
-            type: 'text',
-            text: lastShareMessage
-        }]);
-        liff.closeWindow();
-    } catch (err) {
-        alert("エラー: " + err.message);
-    }
+document.getElementById("lineSendBtn").onclick = async () => {
+  await liff.sendMessages([{ type: 'text', text: lastShareMessage }]);
+  liff.closeWindow();
 };
 
 document.getElementById("addBtn").onclick = () => addPlayer();
@@ -442,7 +246,6 @@ document.getElementById("saveMemberBtn").onclick = () => {
 };
 
 if(savedMembers.length > 0) savedMembers.forEach(n => addPlayer(n));
-else ["Aさん", "Bさん", "Cさん"].forEach(n => addPlayer(n));
 renderHistory();
 </script>
 </body>
