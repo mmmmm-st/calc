@@ -202,7 +202,14 @@ let history = JSON.parse(localStorage.getItem("nori_history") || "[]");
 let savedMembers = JSON.parse(localStorage.getItem("nori_members") || '["Aさん","Bさん","Cさん"]');
 let lastShareMessage = "";
 
-liff.init({ liffId: LIFF_ID }).catch(console.error);
+// LIFF初期化とエラーハンドリング
+liff.init({ liffId: LIFF_ID })
+  .then(() => {
+    console.log("LIFF初期化成功");
+  })
+  .catch((err) => {
+    console.error("LIFF初期化失敗", err);
+  });
 
 function save(){ localStorage.setItem("nori_history", JSON.stringify(history)); }
 
@@ -365,7 +372,6 @@ document.getElementById("calcBtn").onclick=function(){
   const { personMap, grandTotalProfit } = getAggregatedData();
   renderHistory();
 
-  // LINEメッセージ構築（ご要望の順序）
   let msg = `【ノリ打ち精算結果レポート】\n\n`;
 
   msg += `■ 個人の累計収支 (全履歴)\n`;
@@ -407,9 +413,29 @@ document.getElementById("calcBtn").onclick=function(){
   lastShareMessage = msg;
 };
 
-document.getElementById("lineSendBtn").onclick = function(){
-    if (!liff.isInClient()) { alert("LINEアプリ内で実行してください。\n\n" + lastShareMessage); return; }
-    liff.sendMessages([{ type: 'text', text: lastShareMessage }]).then(() => liff.closeWindow()).catch(console.error);
+// --- LINE送信ボタン処理の修正版 ---
+document.getElementById("lineSendBtn").onclick = async function(){
+    // 1. クライアントチェック
+    if (!liff.isInClient()) { 
+        alert("LINEアプリ内（トーク画面のリンク）から開いてください。\n\n【送信内容】\n" + lastShareMessage); 
+        return; 
+    }
+
+    try {
+        // 2. メッセージ送信実行
+        await liff.sendMessages([{
+            type: 'text',
+            text: lastShareMessage
+        }]);
+        
+        // 3. 成功したら閉じる
+        liff.closeWindow();
+        
+    } catch (err) {
+        // 4. 失敗時のエラー特定用アラート
+        alert("送信に失敗しました。\n理由: " + err.message + "\n\n※LINE Developersの設定で Scope > chat_message.write がONになっているか確認してください。");
+        console.error(err);
+    }
 };
 
 document.getElementById("addBtn").onclick = () => addPlayer();
