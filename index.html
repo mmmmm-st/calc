@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ノリ打ち精算 Pro - DB共有＆フルレポートVer</title>
+<title>ノリ打ち精算 Pro - 共有DBフルレポートVer</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 :root{ --bg:#f8fafc; --card:#ffffff; --line:#f1f5f9; --input-border:#e2e8f0; --text:#1e293b; --muted:#64748b; --green:#10b981; --red:#ef4444; --accent:#4f46e5; --line-green:#06c755; }
@@ -64,12 +64,9 @@ th, td{ padding:12px 8px; border-bottom:1px solid var(--line); text-align:left; 
   </div>
 
   <button class="main-btn" id="calcBtn">計算を実行して共有保存</button>
-  <div id="loading" style="display:none; text-align:center; padding:10px; color:var(--accent); font-weight:bold;">データ送信中...</div>
+  <div id="loading" style="display:none; text-align:center; padding:10px; color:var(--accent); font-weight:bold;">データ通信中...</div>
   
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-    <button class="line-btn" id="lineSendBtn" style="display:none;">自分に送る</button>
-    <button class="sub-btn" id="shareBtn" style="display:none; background:var(--line-green); color:white;">グループ共有</button>
-  </div>
+  <button class="line-btn" id="lineSendBtn" style="display:none;">LINEに結果を送る</button>
 
   <div class="card" id="resultCard" style="display:none;">
     <h2>精算結果</h2>
@@ -94,31 +91,34 @@ th, td{ padding:12px 8px; border-bottom:1px solid var(--line); text-align:left; 
   </div>
 
   <div class="card">
-    <h2>共有累計収支</h2>
+    <h2>グループ通算累計</h2>
     <div id="personalTotals" class="personal-total-grid"></div>
-    <h2>履歴（共有）</h2>
-    <div id="history"></div>
+    <h2 style="border-top:1px solid var(--line); padding-top:20px;">共有履歴</h2>
+    <div id="history">読み込み中...</div>
   </div>
 </div>
 
 <script>
-// --- 設定 ---
 const LIFF_ID = "2010062599-fM2vPvTM"; 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbzlXFC4ErmS8hNofXBHYPIofd_5vBlLBsqo5yLGBFVvmb5vdCO-OnTIF4VBzVMSA6TJRA/exec"; 
 
 function money(v){ return new Intl.NumberFormat("ja-JP").format(Math.round(v)) + "円"; }
 
-let history = [];
+let historyData = [];
 let savedMembers = JSON.parse(localStorage.getItem("nori_members") || '["Aさん","Bさん","Cさん"]');
 let lastShareMessage = "";
 
 // DB読み込み
 async function loadHistory() {
+  const historyEl = document.getElementById("history");
   try {
     const res = await fetch(GAS_URL);
-    history = await res.json();
+    historyData = await res.json();
     renderHistory();
-  } catch (e) { console.error("Load Error", e); }
+  } catch (e) { 
+    console.error("Load Error", e);
+    historyEl.innerHTML = "履歴の読み込みに失敗しました。";
+  }
 }
 
 // DB保存
@@ -140,9 +140,16 @@ function renderHistory(){
   const personalEl=document.getElementById("personalTotals");
   el.innerHTML=""; personalEl.innerHTML="";
   
+  if(historyData.length === 0) {
+    el.innerHTML = "履歴はありません。";
+    return 0;
+  }
+
   let personMap = {};
   let grandTotal = 0;
-  history.slice().reverse().forEach((h) => {
+  
+  // 履歴の描画（新しい順）
+  [...historyData].reverse().forEach((h) => {
     grandTotal += h.profit;
     let details="";
     h.players.forEach(p=>{
@@ -152,17 +159,18 @@ function renderHistory(){
     });
     const box=document.createElement("div");
     box.className="box"; box.style.marginBottom="10px"; box.style.background="#fff";
-    box.innerHTML=`<div style="font-size:10px; color:var(--muted)">${h.time}</div><div style="font-weight:800;">合計 ${money(h.profit)}</div>${details}`;
+    box.innerHTML=`<div style="font-size:10px; color:var(--muted)">${h.time}</div><div style="font-weight:800; border-bottom:1px solid var(--line); margin-bottom:5px; padding-bottom:5px;">合計 ${money(h.profit)}</div>${details}`;
     el.appendChild(box);
   });
 
+  // 累計の描画
   Object.keys(personMap).sort().forEach(name => {
     const pCard = document.createElement("div");
     pCard.className = "personal-card";
-    pCard.innerHTML = `<div class="name-label">${name}</div><div class="amount-value" style="color:${personMap[name]>=0?'var(--green)':'var(--red)'}">${money(personMap[name])}</div>`;
+    pCard.innerHTML = `<div class="name-label">${name} 累計</div><div class="amount-value" style="color:${personMap[name]>=0?'var(--green)':'var(--red)'}">${money(personMap[name])}</div>`;
     personalEl.appendChild(pCard);
   });
-  return grandTotal;
+  return { personMap, grandTotal };
 }
 
 function updateAllUnused() {
@@ -195,6 +203,8 @@ document.getElementById("calcBtn").onclick=async function(){
     players.push({ name, invest, coins, cash, node });
   });
 
+  if(players.length === 0) return;
+
   const totalInvest = players.reduce((s, p) => s + p.invest, 0);
   const totalCash = players.reduce((s, p) => s + p.cash, 0);
   const totalUnused = (baseAmt * players.length) - totalInvest;
@@ -204,7 +214,6 @@ document.getElementById("calcBtn").onclick=async function(){
 
   document.getElementById("resultCard").style.display = "block";
   document.getElementById("lineSendBtn").style.display = "block";
-  document.getElementById("shareBtn").style.display = "block";
   document.getElementById("profitTotal").textContent = money(totalProfit);
   document.getElementById("perProfit").textContent = (perProfit>=0?"+":"")+money(perProfit);
   document.getElementById("cashTotal").textContent = money(totalCash);
@@ -233,59 +242,75 @@ document.getElementById("calcBtn").onclick=async function(){
     snapshot.push({ name: p.name, val: myProfit });
   });
 
+  // DB保存用データ
   const newData = { 
     time: new Date().toLocaleString('ja-JP',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}), 
     profit: totalProfit, 
     players: snapshot 
   };
   await saveToDB(newData);
-  const grandTotal = renderHistory();
+  
+  // 保存後の最新データで累計と履歴を更新
+  const { personMap, grandTotal } = renderHistory();
 
-  let msg = `【ノリ打ち精算レポート】\n\n`;
-  msg += `■ 今回の精算\n`;
+  // LINEメッセージ作成（フルレポート版の内容を復元）
+  let msg = `【ノリ打ち精算結果レポート】\n\n`;
+  msg += `■ 今回の個人収支\n`;
   snapshot.forEach(p => msg += `・${p.name}：${(p.val >= 0 ? "+" : "") + money(p.val)}\n`);
-  msg += `計：${money(totalProfit)} (1人 ${money(perProfit)})\n\n`;
-  msg += `■ お金の受け渡し\n`;
+  msg += `合計収支：${(totalProfit >= 0 ? "+" : "") + money(totalProfit)}\n`;
+  msg += `1人あたり：${(perProfit >= 0 ? "+" : "") + money(perProfit)}\n\n`;
+
+  msg += `■ お金の受け渡し指示\n`;
   let hasPay = false;
-  receive.forEach(r => {
-    pay.forEach(p => {
+  let rTemp = JSON.parse(JSON.stringify(receive));
+  let pTemp = JSON.parse(JSON.stringify(pay));
+
+  rTemp.forEach(r => {
+    pTemp.forEach(p => {
       if(r.amount <= 0 || p.amount <= 0) return;
       const move = Math.min(r.amount, p.amount);
+      
       const row = document.createElement("div");
       row.className = "pay-row";
       row.innerHTML = `<span><b>${p.name}</b> → ${r.name}</span><span style="color:var(--green); font-weight:800;">${money(move)}</span>`;
       payList.appendChild(row);
+      
       msg += `・${p.name} → ${r.name}：${money(move)}\n`;
       r.amount -= move; p.amount -= move;
       hasPay = true;
     });
   });
   if(!hasPay) msg += "移動なし\n";
-  msg += `\n■ グループ累計収支\n`;
-  msg += `合計：${(grandTotal >= 0 ? "+" : "") + money(grandTotal)}\n`;
+
+  msg += `\n■ グループ全員の累計収支\n`;
+  Object.keys(personMap).sort().forEach(name => {
+    msg += `・${name}：${(personMap[name] >= 0 ? "+" : "") + money(personMap[name])}\n`;
+  });
+  msg += `------------------\n`;
+  msg += `総通算：${(grandTotal >= 0 ? "+" : "") + money(grandTotal)}`;
+
   lastShareMessage = msg;
 };
 
-document.getElementById("shareBtn").onclick = async () => {
-  if (liff.isApiAvailable('shareTargetPicker')) {
-    await liff.shareTargetPicker([{ type: "text", text: lastShareMessage }]);
-  }
-};
-
 document.getElementById("lineSendBtn").onclick = async () => {
-  await liff.sendMessages([{ type: 'text', text: lastShareMessage }]);
-  liff.closeWindow();
+  if (!liff.isInClient()) { 
+    alert("LINEアプリ内で実行してください。\n\n" + lastShareMessage);
+    return;
+  }
+  try {
+    await liff.sendMessages([{ type: 'text', text: lastShareMessage }]);
+    liff.closeWindow();
+  } catch (err) { alert("送信エラー: " + err); }
 };
 
 document.getElementById("addBtn").onclick = () => addPlayer();
 document.getElementById("saveMemberBtn").onclick = () => {
   const names = [...document.querySelectorAll(".name")].map(i => i.value);
   localStorage.setItem("nori_members", JSON.stringify(names));
-  alert("メンバーを保存しました");
+  alert("メンバー名を保存しました");
 };
 
 if(savedMembers.length > 0) savedMembers.forEach(n => addPlayer(n));
-loadHistory();
 </script>
 </body>
 </html>
