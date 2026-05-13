@@ -170,7 +170,7 @@ th { color: var(--muted); font-weight: 700; }
           <tr>
             <th>名前</th>
             <th>収支</th>
-            <th>手持ち</th>
+            <th>手持ち(余り+換金)</th>
             <th>精算額</th>
           </tr>
         </thead>
@@ -194,7 +194,8 @@ th { color: var(--muted); font-weight: 700; }
 </div>
 
 <script>
-const LIFF_ID = "2010062599";
+// --- 重要: ここを LIFFタブの LIFF ID (例: 2010062599-XXXXXXXX) に書き換えてください ---
+const LIFF_ID = "2010062599"; 
 
 function money(v){ return new Intl.NumberFormat("ja-JP").format(Math.round(v)) + "円"; }
 
@@ -202,10 +203,13 @@ let history = JSON.parse(localStorage.getItem("nori_history") || "[]");
 let savedMembers = JSON.parse(localStorage.getItem("nori_members") || '["Aさん","Bさん","Cさん"]');
 let lastShareMessage = "";
 
-// LIFF初期化とエラーハンドリング
+// LIFF初期化
 liff.init({ liffId: LIFF_ID })
   .then(() => {
-    console.log("LIFF初期化成功");
+    // ログインしていなければログインさせる
+    if (!liff.isLoggedIn()) {
+      liff.login();
+    }
   })
   .catch((err) => {
     console.error("LIFF初期化失敗", err);
@@ -413,28 +417,20 @@ document.getElementById("calcBtn").onclick=function(){
   lastShareMessage = msg;
 };
 
-// --- LINE送信ボタン処理の修正版 ---
 document.getElementById("lineSendBtn").onclick = async function(){
-    // 1. クライアントチェック
     if (!liff.isInClient()) { 
-        alert("LINEアプリ内（トーク画面のリンク）から開いてください。\n\n【送信内容】\n" + lastShareMessage); 
+        alert("LINEアプリ内から開いてください。\n\n【内容】\n" + lastShareMessage); 
         return; 
     }
 
     try {
-        // 2. メッセージ送信実行
         await liff.sendMessages([{
             type: 'text',
             text: lastShareMessage
         }]);
-        
-        // 3. 成功したら閉じる
         liff.closeWindow();
-        
     } catch (err) {
-        // 4. 失敗時のエラー特定用アラート
-        alert("送信に失敗しました。\n理由: " + err.message + "\n\n※LINE Developersの設定で Scope > chat_message.write がONになっているか確認してください。");
-        console.error(err);
+        alert("エラー: " + err.message);
     }
 };
 
