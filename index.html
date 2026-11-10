@@ -15,215 +15,65 @@
   --green: #059669;
   --red: #dc2626;
   --accent: #6366f1;
-  --accent-light: #e0e7ff;
   --line-green: #06c755;
   --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.08), 0 8px 10px -6px rgba(99, 102, 241, 0.08);
   --radius: 20px;
 }
-
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+* { box-sizing: border-box; }
 body {
-  margin: 0;
-  padding: 24px 12px;
-  background: var(--bg);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0; padding: 24px 12px; background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: var(--text);
-  -webkit-font-smoothing: antialiased;
 }
-
 .wrap { max-width: 680px; margin: auto; }
-
 .card {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: var(--card); border-radius: var(--radius);
+  padding: 24px; margin-bottom: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  border: 1px solid var(--line);
 }
-
-h1 { font-size: 20px; margin: 0; font-weight: 800; letter-spacing: -0.025em; color: var(--text); }
-h2 { font-size: 17px; margin: 0 0 16px; font-weight: 700; letter-spacing: -0.025em; display: flex; align-items: center; gap: 8px; }
-
+h1 { font-size: 20px; margin: 0; font-weight: 800; }
+h2 { font-size: 17px; margin: 0 0 16px; font-weight: 700; }
 .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
 .half { grid-column: span 6; }
-
-label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  font-size: 11px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
+label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 11px; color: var(--muted); text-transform: uppercase; }
 input, select {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1.5px solid var(--line);
-  font-size: 14px;
-  color: var(--text);
-  background: #f8fafc;
-  transition: all 0.2s ease;
-  outline: none;
-  font-weight: 500;
+  width: 100%; padding: 12px; border-radius: 12px;
+  border: 1.5px solid var(--line); font-size: 14px; background: #f8fafc; outline: none;
 }
-
-input:focus, select:focus {
-  background: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-}
-
-.player {
-  background: #f8fafc;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 12px;
-}
-
-.player-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 12px;
-}
-
-.result-label { font-size: 11px; font-weight: 600; margin-bottom: 2px; text-align: right; color: var(--muted); }
+input:focus, select:focus { border-color: var(--accent); background: #fff; }
+.player { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+.player-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
+.result-label { font-size: 11px; font-weight: 600; color: var(--muted); text-align: right; }
 .result-value { font-size: 17px; font-weight: 800; text-align: right; }
-
-button {
-  border: none;
-  border-radius: 12px;
-  padding: 14px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.1s ease, background 0.2s;
-}
-button:active { transform: scale(0.98); }
-
-.main-btn { background: var(--gradient); color: white; width: 100%; margin: 8px 0; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
-.line-btn { background: var(--line-green); color: white; width: 100%; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(6, 199, 85, 0.35); }
+button { border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; }
+.main-btn { background: var(--gradient); color: white; width: 100%; margin: 8px 0; }
+.line-btn { background: var(--line-green); color: white; width: 100%; margin-bottom: 12px; }
 .sub-btn { background: #f1f5f9; color: var(--text); width: 100%; border: 1px solid var(--line); }
-.sub-btn:hover { background: #e2e8f0; }
-
-.delete-btn { background: #fee2e2; color: var(--red); width: auto; padding: 6px 12px; font-size: 12px; border-radius: 8px; }
-
-.grand-total-box {
-  background: var(--gradient);
-  border-radius: 16px;
-  padding: 20px 24px;
-  color: white;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
-}
-.grand-total-label { font-size: 11px; opacity: 0.85; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.grand-total-value { font-size: 30px; font-weight: 900; letter-spacing: -0.03em; }
-
-.global-filter-card {
-  background: #f1f5f9;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 20px;
-}
-.filter-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 8px;
-}
-@media (max-width: 540px) {
-  .filter-grid {
-    grid-template-columns: 1fr;
-  }
-}
-.filter-grid select {
-  background: #fff;
-  font-size: 13px;
-  padding: 10px 12px;
-  font-weight: 600;
-}
-
-.chart-card {
-  background: #f8fafc;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 0px;
-}
-.chart-title { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
-
-.chart-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 11px; font-weight: 600; margin-bottom: 12px; }
-.legend-item { display: flex; align-items: center; gap: 6px; }
-.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-
-.chart-fit-wrap {
-  width: 100%;
-  background: #fff;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  padding: 6px 0;
-  overflow: hidden;
-}
-svg { 
-  display: block; 
-  width: 100%; 
-  height: 200px; 
-  overflow: visible; 
-}
-
-.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
-.personal-card { background: #f8fafc; border-radius: 14px; padding: 16px; border: 1px solid var(--line); }
-.personal-card .name-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
-.personal-card .amount-value { font-size: 16px; font-weight: 800; }
-
+.delete-btn { background: #fee2e2; color: var(--red); padding: 6px 12px; font-size: 12px; border-radius: 8px; }
 .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
 .box { padding: 14px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--line); }
 .box-title { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
 .box-value { font-size: 16px; font-weight: 800; }
-
 .table-wrapper { overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 1px solid var(--line); }
-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 420px; background: #fff; }
-th { background: #f8fafc; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
 th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; }
-tr:last-child td { border-bottom: none; }
-
+th { background: #f8fafc; color: var(--muted); font-size: 11px; }
 .pay-box { margin-top: 16px; border-radius: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px; }
 .pay-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #fff; margin-bottom: 6px; border-radius: 8px; border: 1px solid #dcfce7; font-size: 14px; }
-
-.hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 12px; position: relative; transition: all 0.2s; }
-.hist-item:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
-.hist-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; align-items: center; }
-.hist-del-btn { color: var(--red); font-size: 11px; font-weight: 700; background: #fee2e2; padding: 6px 12px; border-radius: 8px; cursor: pointer; border: none; }
-
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
-.modal-content { background: #fff; padding: 24px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+.hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 12px; position: relative; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px;">
+  <div class="card">
     <h1>🎰 ノリ打ち精算</h1>
-    <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 8px 14px; font-size: 13px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
-  </div>
-
-  <!-- テスト用日時設定カード -->
-  <div class="card" style="background: #eef2ff; border-color: #c7d2fe;">
-    <h2 style="font-size: 14px; color: #4338ca; margin-bottom: 8px;">🧪 テスト用日時設定（自由に変更可能）</h2>
-    <input type="text" id="testDateInput" placeholder="例: 2026年11月10日">
-    <div style="font-size: 11px; color: #6366f1; margin-top: 4px;">※空欄のままなら今日の日付が自動で保存されます</div>
   </div>
 
   <div class="card">
     <h2>参加者</h2>
     <div id="players"></div>
-    <button class="sub-btn" id="addBtn" style="border-style: dashed; border-color: #cbd5e1; color: var(--accent); font-weight: 600;">＋ 参加者を追加</button>
+    <button class="sub-btn" id="addBtn" style="border-style: dashed; color: var(--accent);">＋ 参加者を追加</button>
   </div>
 
   <button class="main-btn" id="calcBtn">計算を実行してプレビュー</button>
@@ -233,7 +83,7 @@ tr:last-child td { border-bottom: none; }
   <div class="card" id="resultCard" style="display:none;">
     <h2>精算結果</h2>
     <div class="summary">
-      <div class="box"><div class="box-title">グループ総損益</div><div class="box-value" id="profitTotal" style="color:var(--accent)">-</div></div>
+      <div class="box"><div class="box-title">グループ総損益</div><div class="box-value" id="profitTotal">-</div></div>
       <div class="box"><div class="box-title">1人あたり純利益</div><div id="perProfit" class="box-value">-</div></div>
       <div class="box"><div class="box-title">総投資額</div><div id="investTotal" class="box-value">-</div></div>
       <div class="box"><div class="box-title">総回収額</div><div id="cashTotal" class="box-value">-</div></div>
@@ -244,60 +94,20 @@ tr:last-child td { border-bottom: none; }
         <tbody id="tbody"></tbody>
       </table>
     </div>
-    <div class="pay-box" id="payBox">
+    <div class="pay-box">
       <div style="font-weight: 700; color: #166534; font-size: 13px; margin-bottom: 8px;">💸 お金の受け渡し指示</div>
       <div id="payList"></div>
     </div>
   </div>
 
-  <div class="global-filter-card">
-    <div style="font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">🔍 表示フィルター（グラフ・履歴共通）</div>
-    <div class="filter-grid">
-      <select id="combinationSelect" onchange="onFilterChange()"></select>
-      <select id="yearSelect" onchange="onYearChange()"></select>
-      <select id="monthSelect" onchange="onFilterChange()"></select>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>統計グラフ</h2>
-    <div class="grand-total-box">
-      <div class="grand-total-label" id="grandTotalLabel">グループ選択期間の累計収支</div>
-      <div class="grand-total-value" id="grandTotalDisplay">0円</div>
-    </div>
-
-    <div class="chart-card" id="graphsArea" style="display:none;">
-      <div class="chart-title">📈 収支推移グラフ</div>
-      <div class="chart-legend" id="chartLegend"></div>
-      <div class="chart-fit-wrap">
-        <svg id="excelLineChart"></svg>
-      </div>
-    </div>
-  </div>
-
   <div class="card">
     <h2>履歴一覧</h2>
-    <div id="personalTotals" class="personal-total-grid"></div>
     <div id="history" style="color: var(--muted); font-size: 13px;">読み込み中...</div>
-  </div>
-</div>
-
-<div class="modal" id="memberModal">
-  <div class="modal-content">
-    <h2>メンバー管理</h2>
-    <p style="font-size: 12px; color: var(--muted); margin-bottom: 16px;">よく参加するメンバーの名前を登録できます。</p>
-    <div id="memberListEdit" style="margin-bottom: 16px; max-height: 200px; overflow-y: auto;"></div>
-    <div class="grid" style="margin-bottom: 12px;">
-      <div class="half"><input type="text" id="newMemberName" placeholder="新しい名前"></div>
-      <div class="half"><button class="sub-btn" id="addMemberStoreBtn" style="background: var(--accent); color: #fff; border:none; height: 100%;">追加</button></div>
-    </div>
-    <button class="sub-btn" id="closeModalBtn" style="background: #f1f5f9;">閉じる</button>
   </div>
 </div>
 
 <script>
 const LIFF_ID = "2010062599-fM2vPvTM"; 
-// ★先ほど新しくコピーしたGASのウェブアプリURLをここに設定してください
 const GAS_URL = "https://script.google.com/macros/s/AKfycbzC7M8Jv0XHX3rekb5z6j-v9YJq0frhsqzcy65_Ush3ebYpCNKHDuNoYb_pkLZz4JTrQ/exec"; 
 
 function money(v){
@@ -307,393 +117,53 @@ function money(v){
 
 let historyData = [];
 let lastShareMessage = "";
-let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
-
-// 日付文字列を綺麗に整形・変換する補助関数（ISO形式の対策）
-function cleanTimeStr(rawTime) {
-  if (!rawTime) return "2026年11月10日";
-  let str = String(rawTime);
-  // もし旧形式のISO文字列（2026-11-09T15:00:00.000Zなど）だったらパースして日本語に直す
-  if (str.includes("T") || str.includes("-")) {
-    let d = new Date(str);
-    if (!isNaN(d.getTime())) {
-      return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-    }
-  }
-  return str;
-}
+let storedMembers = ["Aさん", "Bさん", "Cさん"];
 
 async function loadHistory() {
-  const historyEl = document.getElementById("history");
-  
   try {
     const res = await fetch(GAS_URL);
-    let rawData = await res.json();
-    
-    // 読み込んだデータの日付を強制的にクレンジング
-    historyData = rawData.map(item => ({
-      ...item,
-      time: cleanTimeStr(item.time)
-    }));
-
-    renderAll();
-  } catch (e) { 
-    historyEl.innerHTML = "履歴の読み込みに失敗しました。";
-    historyData = [];
-    renderAll();
+    historyData = await res.json();
+    renderHistory();
+  } catch (e) {
+    document.getElementById("history").innerHTML = "履歴の読み込みに失敗しました。";
   }
 }
 
 async function deleteHistory(rowIdx) {
   if(!confirm("この履歴を削除しますか？")) return;
-  
   document.getElementById("loading").style.display = "block";
   try {
     await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: rowIdx }) });
-  } catch(e) {
-    console.error(e);
-  }
+  } catch(e) {}
   setTimeout(async () => {
     await loadHistory();
     document.getElementById("loading").style.display = "none";
   }, 1000);
 }
 
-function renderAll() {
-  const graphsArea = document.getElementById("graphsArea");
-  if(!Array.isArray(historyData) || historyData.length === 0){
-    graphsArea.style.display = "none";
-    document.getElementById("history").innerHTML = "履歴はありません。";
-    document.getElementById("personalTotals").innerHTML = "";
-    document.getElementById("grandTotalDisplay").textContent = "0円";
-    return;
-  }
-  graphsArea.style.display = "block";
-  updateFilterSelectOptions();
-  renderFilteredContent();
-}
-
-function renderFilteredContent() {
-  renderGrandTotals();
-  renderExcelChart();
-  renderHistoryList();
-}
-
-function renderGrandTotals() {
-  const grandEl = document.getElementById("grandTotalDisplay");
-  const grandLabelEl = document.getElementById("grandTotalLabel");
-  const comboSelect = document.getElementById("combinationSelect");
-  const yearSelect = document.getElementById("yearSelect");
-  const monthSelect = document.getElementById("monthSelect");
-
-  const selectedCombo = comboSelect ? comboSelect.value : "";
-  const selectedYear = yearSelect ? yearSelect.value : "all";
-  const selectedMonth = monthSelect ? monthSelect.value : "all";
-
-  let labelStr = "グループ累計収支";
-  if(selectedYear !== "all") {
-    labelStr = selectedMonth !== "all" ? `${selectedYear}年${selectedMonth}月のグループ収支` : `${selectedYear}年のグループ累計収支`;
-  }
-  grandLabelEl.textContent = labelStr;
-
-  let gTotal = 0;
-  if(Array.isArray(historyData)) {
-    historyData.forEach(h => {
-      const names = h.players.map(p => p.name).sort().join(", ");
-      if(selectedCombo && names !== selectedCombo) return;
-      if(matchFilter(h, selectedYear, selectedMonth)) {
-        gTotal += Number(h.profit || 0);
-      }
-    });
-  }
-  grandEl.textContent = money(gTotal);
-}
-
-function getAvailableYearsAndMonths() {
-  let yearsSet = new Set();
-  let yearMonthMap = {};
-
-  historyData.forEach(h => {
-    if(!h.time) return;
-    let timeStr = String(h.time);
-    
-    let yMatch = timeStr.match(/(\d{4})年/);
-    let year = yMatch ? yMatch[1] : "2026";
-    yearsSet.add(year);
-
-    if(!yearMonthMap[year]) yearMonthMap[year] = new Set();
-    let mMatch = timeStr.match(/(\d{1,2})月/);
-    if(mMatch) {
-      yearMonthMap[year].add(mMatch[1]);
-    }
-  });
-
-  let years = Array.from(yearsSet).sort().reverse();
-  let formattedMap = {};
-  Object.keys(yearMonthMap).forEach(y => {
-    formattedMap[y] = Array.from(yearMonthMap[y]).sort((a,b)=>Number(b)-Number(a));
-  });
-
-  return { years, yearMonthMap: formattedMap };
-}
-
-function updateFilterSelectOptions() {
-  const comboSelect = document.getElementById("combinationSelect");
-  const yearSelect = document.getElementById("yearSelect");
-  
-  const currentCombo = comboSelect.value;
-  const currentYear = yearSelect.value || "all";
-
-  let combos = {}; 
-  historyData.forEach(h => {
-    const names = h.players.map(p => p.name).sort().join(", ");
-    if(names) {
-      combos[names] = `👥 ${names} (${h.players.length}人)`;
-    }
-  });
-
-  const comboKeys = Object.keys(combos);
-  comboSelect.innerHTML = "";
-  comboKeys.forEach((key, index) => {
-    const opt = document.createElement("option");
-    opt.value = key;
-    opt.textContent = combos[key];
-    if(key === currentCombo || (!currentCombo && index === 0)) opt.selected = true;
-    comboSelect.appendChild(opt);
-  });
-
-  let { years } = getAvailableYearsAndMonths();
-  
-  yearSelect.innerHTML = `<option value="all">📅 全期間</option>`;
-  years.forEach(y => {
-    const opt = document.createElement("option");
-    opt.value = y;
-    opt.textContent = `📁 ${y}年`;
-    yearSelect.appendChild(opt);
-  });
-  if([...yearSelect.options].some(o => o.value === currentYear)) {
-    yearSelect.value = currentYear;
-  } else {
-    yearSelect.value = "all";
-  }
-
-  updateMonthOptions();
-}
-
-function onYearChange() {
-  updateMonthOptions();
-  renderFilteredContent();
-}
-
-function onFilterChange() {
-  renderFilteredContent();
-}
-
-function updateMonthOptions() {
-  const yearSel = document.getElementById("yearSelect");
-  const monthSel = document.getElementById("monthSelect");
-  const selectedYear = yearSel.value;
-  const currentMonth = monthSel.value;
-
-  let { yearMonthMap } = getAvailableYearsAndMonths();
-
-  if(selectedYear === "all") {
-    monthSel.innerHTML = `<option value="all">📄 すべての月</option>`;
-    monthSel.value = "all";
-  } else {
-    monthSel.innerHTML = `<option value="all">📄 ${selectedYear}年すべての月</option>`;
-    let months = yearMonthMap[selectedYear] || [];
-    months.forEach(m => {
-      const opt = document.createElement("option");
-      opt.value = m;
-      opt.textContent = `└ ${m}月`;
-      monthSel.appendChild(opt);
-    });
-
-    if([...monthSel.options].some(o => o.value === currentMonth)) {
-      monthSel.value = currentMonth;
-    } else {
-      monthSel.value = "all";
-    }
-  }
-}
-
-function matchFilter(h, yearVal, monthVal) {
-  if(!h.time) return false;
-  let timeStr = String(h.time);
-  
-  let yM = timeStr.match(/(\d{4})年/);
-  let year = yM ? yM[1] : "2026";
-  let mM = timeStr.match(/(\d{1,2})月/);
-  let month = mM ? mM[1] : "";
-
-  if(yearVal !== "all" && yearVal !== year) return false;
-  if(monthVal !== "all" && monthVal !== month) return false;
-  return true;
-}
-
-function renderExcelChart() {
-  const svg = document.getElementById("excelLineChart");
-  const legendContainer = document.getElementById("chartLegend");
-  const comboSelect = document.getElementById("combinationSelect");
-  const yearSelect = document.getElementById("yearSelect");
-  const monthSelect = document.getElementById("monthSelect");
-  
-  svg.innerHTML = "";
-  legendContainer.innerHTML = "";
-
-  if(!historyData || historyData.length === 0 || comboSelect.options.length === 0) return;
-
-  const selectedCombo = comboSelect.value;
-  const selectedYear = yearSelect.value;
-  const selectedMonth = monthSelect.value;
-
-  let targetHistory = historyData.filter(h => {
-    const names = h.players.map(p => p.name).sort().join(", ");
-    if(names !== selectedCombo) return false;
-    return matchFilter(h, selectedYear, selectedMonth);
-  });
-
-  if(targetHistory.length === 0) return;
-
-  let groupSum = 0;
-  const groupData = targetHistory.map(h => groupSum += Number(h.profit || 0));
-
-  let allNames = [];
-  targetHistory.forEach(h => {
-    h.players.forEach(p => {
-      if(!allNames.includes(p.name)) allNames.push(p.name);
-    });
-  });
-
-  let memberSeries = {};
-  allNames.forEach(name => {
-    let pSum = 0;
-    memberSeries[name] = targetHistory.map(h => {
-      const p = h.players.find(x => x.name === name);
-      if(p) pSum += Number(p.val || 0);
-      return pSum;
-    });
-  });
-
-  let allValues = [...groupData];
-  allNames.forEach(name => allValues.push(...memberSeries[name]));
-
-  const width = 600;
-  const height = 200;
-  const paddingX = 45; 
-  const paddingY = 20;
-
-  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-
-  const minVal = Math.min(0, ...allValues);
-  const maxVal = Math.max(0, ...allValues);
-  const range = (maxVal - minVal) === 0 ? 1 : (maxVal - minVal);
-
-  const getX = (i) => paddingX + (i / (Math.max(targetHistory.length - 1, 1))) * (width - paddingX - 15);
-  const getY = (val) => height - paddingY - ((val - minVal) / range) * (height - paddingY * 2);
-
-  const gridSteps = 4;
-  for(let s = 0; s <= gridSteps; s++) {
-    const val = minVal + (range / gridSteps) * s;
-    const y = getY(val);
-    svg.innerHTML += `<line x1="${paddingX}" y1="${y}" x2="${width - 10}" y2="${y}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2,2"/>`;
-    let labelText = Math.round(val / 10000) + "万";
-    if(val === 0) labelText = "0";
-    svg.innerHTML += `<text x="${paddingX - 6}" y="${y + 3.5}" fill="#64748b" font-size="9" text-anchor="end">${labelText}</text>`;
-  }
-
-  const totalCount = targetHistory.length;
-  let step = 1;
-  if (totalCount > 10) step = 3;
-  else if (totalCount > 5) step = 2;
-
-  targetHistory.forEach((h, i) => {
-    const x = getX(i);
-    svg.innerHTML += `<line x1="${x}" y1="${paddingY}" x2="${x}" y2="${height - paddingY}" stroke="#f1f5f9" stroke-width="1"/>`;
-    if (i === 0 || i === totalCount - 1 || i % step === 0) {
-      const dateStr = h.time ? h.time.split(' ')[0] : `#${i+1}`;
-      svg.innerHTML += `<text x="${x}" y="${height - 5}" fill="#64748b" font-size="9" text-anchor="middle">${dateStr}</text>`;
-    }
-  });
-
-  const colors = ["#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6"];
-
-  const drawLineAndDots = (data, color, label) => {
-    if(data.length === 0) return;
-    let points = [];
-    data.forEach((val, i) => points.push(`${getX(i)},${getY(val)}`));
-
-    if(data.length > 1) {
-      svg.innerHTML += `<polyline fill="none" stroke="${color}" stroke-width="2.5" points="${points.join(" ")}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    }
-    data.forEach((val, i) => {
-      svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="3.5" fill="#fff" stroke="${color}" stroke-width="2"/>`;
-    });
-
-    legendContainer.innerHTML += `
-      <div class="legend-item">
-        <div class="legend-dot" style="background: ${color};"></div>
-        <span>${label}</span>
-      </div>
-    `;
-  };
-
-  drawLineAndDots(groupData, "var(--accent)", "ノリ打ち全体");
-  allNames.forEach((name, idx) => {
-    const color = colors[(idx + 1) % colors.length];
-    drawLineAndDots(memberSeries[name], color, name);
-  });
-}
-
-function renderHistoryList() {
+function renderHistory() {
   const el = document.getElementById("history");
-  const personalEl = document.getElementById("personalTotals");
-  const yearSelect = document.getElementById("yearSelect");
-  const monthSelect = document.getElementById("monthSelect");
-  
-  el.innerHTML = ""; personalEl.innerHTML = "";
-  if(!Array.isArray(historyData) || historyData.length === 0) return;
-
-  const selectedYear = yearSelect ? yearSelect.value : "all";
-  const selectedMonth = monthSelect ? monthSelect.value : "all";
-
-  let filteredHistory = historyData.filter(h => matchFilter(h, selectedYear, selectedMonth));
-
-  let pMap = {};
-  filteredHistory.forEach((h) => {
-    h.players.forEach(p => {
-      pMap[p.name] = (pMap[p.name] || 0) + Number(p.val);
-    });
-  });
-
-  Object.keys(pMap).sort().forEach(name => {
-    const pCard = document.createElement("div");
-    pCard.className = "personal-card";
-    pCard.innerHTML = `<div class="name-label">${name}</div><div class="amount-value" style="color:${pMap[name]>=0?'var(--green)':'var(--red)'}">${money(pMap[name])}</div>`;
-    personalEl.appendChild(pCard);
-  });
-
-  if(filteredHistory.length === 0) {
-    el.innerHTML = "該当する期間の履歴はありません。";
+  el.innerHTML = "";
+  if(!Array.isArray(historyData) || historyData.length === 0) {
+    el.innerHTML = "履歴はありません。";
     return;
   }
 
-  [...filteredHistory].reverse().forEach((h) => {
+  [...historyData].reverse().forEach((h) => {
     let details = "";
-    h.players.forEach(p => {
-      details += `<div style="display:flex; justify-content:space-between; font-size:12px; margin-top:4px;"><span>${p.name}</span><span style="font-weight:600; color:${p.val>=0?'var(--green)':'var(--red)'}">${money(p.val)}</span></div>`;
-    });
+    if(h.players) {
+      h.players.forEach(p => {
+        details += `<div style="display:flex; justify-content:space-between; font-size:12px; margin-top:4px;"><span>${p.name}</span><span style="font-weight:600; color:${p.val>=0?'var(--green)':'var(--red)'}">${money(p.val)}</span></div>`;
+      });
+    }
 
     const box = document.createElement("div");
     box.className = "hist-item";
-    
     box.innerHTML = `
-      <div class="hist-actions">
-        <button class="hist-del-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
+      <div style="position:absolute; top:14px; right:14px;">
+        <button class="delete-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
       </div>
-      <div style="font-size:11px; color:var(--muted); font-weight:600; margin-bottom:4px;">記録日時</div>
-      <div style="font-weight:700; font-size:13px; color:var(--text); margin-bottom:6px;">${h.time}</div>
+      <div style="font-size:11px; color:var(--muted); font-weight:600; margin-bottom:4px;">${h.time}</div>
       <div style="font-weight:800; margin-bottom:8px; font-size:14px;">合計 ${money(h.profit)}</div>
       ${details}
     `;
@@ -701,14 +171,12 @@ function renderHistoryList() {
   });
 }
 
-function addPlayer(selectedName = "", investVal = 10000, cashVal = 0){
+function addPlayer(name = "", invest = 10000, cash = 0){
   const div = document.createElement("div");
   div.className = "player";
-  
   let options = '<option value="">選択してください</option>';
   storedMembers.forEach(m => {
-    const selected = (m === selectedName) ? 'selected' : '';
-    options += `<option value="${m}" ${selected}>${m}</option>`;
+    options += `<option value="${m}" ${m === name ? 'selected' : ''}>${m}</option>`;
   });
 
   div.innerHTML = `
@@ -723,32 +191,20 @@ function addPlayer(selectedName = "", investVal = 10000, cashVal = 0){
       </div>
     </div>
     <div class="grid">
-      <div class="half">
-        <label>投資額</label>
-        <input class="invest" type="number" value="${investVal}">
-      </div>
-      <div class="half">
-        <label>回収額</label>
-        <input class="cash" type="number" value="${cashVal}">
-      </div>
+      <div class="half"><label>投資額</label><input class="invest" type="number" value="${invest}"></div>
+      <div class="half"><label>回収額</label><input class="cash" type="number" value="${cash}"></div>
     </div>
     <div style="margin-top:12px; display:flex; justify-content:flex-end;">
       <button class="delete-btn" onclick="this.closest('.player').remove()">削除</button>
     </div>`;
-  
   document.getElementById("players").appendChild(div);
 }
 
 document.getElementById("calcBtn").onclick = async function() {
   const pNodes = document.querySelectorAll(".player");
-  if(pNodes.length === 0) {
-    alert("参加者を1人以上追加してください");
-    return;
-  }
+  if(pNodes.length === 0) { alert("参加者を追加してください"); return; }
 
-  let players = [];
-  let hasError = false;
-
+  let players = [], hasError = false;
   pNodes.forEach(node => {
     const name = node.querySelector(".name-select").value;
     const invest = +(node.querySelector(".invest").value || 0);
@@ -757,10 +213,7 @@ document.getElementById("calcBtn").onclick = async function() {
     players.push({ name, invest, cash, node });
   });
 
-  if(hasError) {
-    alert("名前が未選択の参加者がいます。");
-    return;
-  }
+  if(hasError) { alert("名前が未選択の参加者がいます"); return; }
 
   const totalInvest = players.reduce((s, p) => s + p.invest, 0);
   const totalCash = players.reduce((s, p) => s + p.cash, 0);
@@ -771,9 +224,9 @@ document.getElementById("calcBtn").onclick = async function() {
   document.getElementById("lineSendBtn").style.display = "block";
   document.getElementById("profitTotal").textContent = money(totalProfit);
   document.getElementById("perProfit").textContent = money(fairProfitPerPerson);
-  document.getElementById("investTotal").textContent = new Intl.NumberFormat("ja-JP").format(totalInvest) + "円";
-  document.getElementById("cashTotal").textContent = new Intl.NumberFormat("ja-JP").format(totalCash) + "円";
-  
+  document.getElementById("investTotal").textContent = totalInvest.toLocaleString() + "円";
+  document.getElementById("cashTotal").textContent = totalCash.toLocaleString() + "円";
+
   const tbody = document.getElementById("tbody"); tbody.innerHTML = "";
   const payList = document.getElementById("payList"); payList.innerHTML = "";
   let receive = [], pay = [], snapshot = [];
@@ -781,24 +234,16 @@ document.getElementById("calcBtn").onclick = async function() {
   players.forEach(p => {
     const individualProfit = p.cash - p.invest;
     const targetAmount = p.invest + fairProfitPerPerson;
-    const diff = p.cash - targetAmount; 
+    const diff = p.cash - targetAmount;
 
-    const resVal = p.node.querySelector(".result-value");
-    resVal.textContent = money(individualProfit);
-    resVal.style.color = individualProfit >= 0 ? "var(--green)" : "var(--red)";
+    p.node.querySelector(".result-value").textContent = money(individualProfit);
+    p.node.querySelector(".result-value").style.color = individualProfit >= 0 ? "var(--green)" : "var(--red)";
 
-    if(diff > 1) {
-      pay.push({ name: p.name, amount: diff });
-    } else if(diff < -1) {
-      receive.push({ name: p.name, amount: -diff });
-    }
+    if(diff > 1) pay.push({ name: p.name, amount: diff });
+    else if(diff < -1) receive.push({ name: p.name, amount: -diff });
 
     const isPay = diff > 0;
-    const absDiff = Math.abs(diff);
-    
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td><b>${p.name}</b></td><td>${new Intl.NumberFormat("ja-JP").format(p.invest)}円</td><td>${new Intl.NumberFormat("ja-JP").format(p.cash)}円</td><td style="color:${individualProfit>=0?'var(--green)':'var(--red)'}; font-weight:600;">${money(individualProfit)}</td><td style="font-weight:800; color:${isPay?'var(--red)':'var(--green)'}">${isPay ? '払う：' : '貰う：'}${new Intl.NumberFormat("ja-JP").format(Math.round(absDiff))}円</td>`;
-    tbody.appendChild(tr);
+    tbody.innerHTML += `<tr><td><b>${p.name}</b></td><td>${p.invest.toLocaleString()}円</td><td>${p.cash.toLocaleString()}円</td><td style="color:${individualProfit>=0?'var(--green':'var(--red')};">${money(individualProfit)}</td><td style="font-weight:800; color:${isPay?'var(--red)':'var(--green)'}">${isPay ? '払う：' : '貰う：'}${Math.round(Math.abs(diff)).toLocaleString()}円</td></tr>`;
     snapshot.push({ name: p.name, val: individualProfit });
   });
 
@@ -811,47 +256,29 @@ document.getElementById("calcBtn").onclick = async function() {
     receive.forEach(r => {
       if(p.amount <= 0 || r.amount <= 0) return;
       const move = Math.min(p.amount, r.amount);
-      payList.innerHTML += `<div class="pay-row"><span><b>${p.name}</b> → ${r.name}</span><span style="color:var(--green);font-weight:800;">${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円</span></div>`;
-      msg += `・${p.name} → ${r.name}：${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円\n`;
+      payList.innerHTML += `<div class="pay-row"><span><b>${p.name}</b> → ${r.name}</span><span style="color:var(--green);font-weight:800;">${Math.round(move).toLocaleString()}円</span></div>`;
+      msg += `・${p.name} → ${r.name}：${Math.round(move).toLocaleString()}円\n`;
       p.amount -= move; r.amount -= move; hasPay = true;
     });
   });
 
   if(!hasPay) {
-    payList.innerHTML = `<div style="padding:4px; color:var(--muted); font-size:13px;">受け渡しの必要はありません</div>`;
+    payList.innerHTML = `<div style="color:var(--muted); font-size:13px;">受け渡しの必要はありません</div>`;
     msg += "移動なし\n";
   }
   lastShareMessage = msg;
 
-  const testDateVal = document.getElementById("testDateInput").value.trim();
-  let defaultTimeStr = "";
-  if(testDateVal) {
-    defaultTimeStr = testDateVal;
-  } else {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
-    defaultTimeStr = `${year}年${month}月${day}日`;
-  }
-
-  const newHist = {
-    time: defaultTimeStr, 
-    profit: totalProfit, 
-    players: snapshot 
-  };
+  const now = new Date();
+  const timeStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
 
   document.getElementById("loading").style.display = "block";
-  
   try {
-    await fetch(GAS_URL, { 
-      method: "POST", 
-      mode: "no-cors", 
-      body: JSON.stringify(newHist) 
+    await fetch(GAS_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify({ time: timeStr, profit: totalProfit, players: snapshot })
     });
-  } catch (e) {
-    console.error(e);
-  }
+  } catch(e) {}
 
   setTimeout(async () => {
     await loadHistory();
@@ -859,64 +286,18 @@ document.getElementById("calcBtn").onclick = async function() {
   }, 1000);
 };
 
-document.getElementById("lineSendBtn").onclick = async () => {
+document.getElementById("lineSendBtn").onclick = () => {
   liff.sendMessages([{ type: 'text', text: lastShareMessage }]).then(() => liff.closeWindow());
 };
 
 document.getElementById("addBtn").onclick = () => addPlayer();
 
-const modal = document.getElementById("memberModal");
-document.getElementById("openMemberModal").onclick = () => {
-  renderMemberListEdit();
-  modal.style.display = "flex";
-};
-document.getElementById("closeModalBtn").onclick = () => {
-  modal.style.display = "none";
-  location.reload();
-};
-
-function renderMemberListEdit() {
-  const container = document.getElementById("memberListEdit");
-  container.innerHTML = "";
-  storedMembers.forEach((m, idx) => {
-    const row = document.createElement("div");
-    row.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; background:#f8fafc; padding:8px 12px; border-radius:8px; border:1px solid var(--line);";
-    row.innerHTML = `<span style="font-weight:600;">${m}</span><button class="delete-btn" onclick="removeStoredMember(${idx})">削除</button>`;
-    container.appendChild(row);
-  });
-}
-
-window.removeStoredMember = function(idx) {
-  storedMembers.splice(idx, 1);
-  localStorage.setItem("nori_stored_members", JSON.stringify(storedMembers));
-  renderMemberListEdit();
-};
-
-document.getElementById("addMemberStoreBtn").onclick = () => {
-  const nameInput = document.getElementById("newMemberName");
-  const name = nameInput.value.trim();
-  if(!name) return;
-  if(storedMembers.includes(name)) {
-    alert("すでに登録されています");
-    return;
-  }
-  storedMembers.push(name);
-  localStorage.setItem("nori_stored_members", JSON.stringify(storedMembers));
-  nameInput.value = "";
-  renderMemberListEdit();
-};
-
 liff.init({ liffId: LIFF_ID }).then(() => {
-  if (!liff.isLoggedIn()) { 
-    liff.login(); 
-  } else { 
+  if (!liff.isLoggedIn()) { liff.login(); } 
+  else { 
     loadHistory();
-    if(storedMembers.length > 0) {
-      addPlayer(storedMembers[0], 10000, 0);
-      if(storedMembers[1]) addPlayer(storedMembers[1], 40000, 0);
-    } else {
-      addPlayer("", 10000, 0);
-    }
+    addPlayer("Aさん", 10000, 0);
+    addPlayer("Bさん", 10000, 0);
   }
 });
 </script>
