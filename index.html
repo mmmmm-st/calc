@@ -213,7 +213,7 @@ tr:last-child td { border-bottom: none; }
     <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 8px 14px; font-size: 13px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
   </div>
 
-  <!-- 🧪 テスト用：記録日時を自由に書き換えられるカード -->
+  <!-- テスト用日時設定カード -->
   <div class="card" style="background: #eef2ff; border-color: #c7d2fe;">
     <h2 style="font-size: 14px; color: #4338ca; margin-bottom: 8px;">🧪 テスト用日時設定（自由に変更可能）</h2>
     <input type="text" id="testDateInput" placeholder="例: 2026年11月10日">
@@ -250,7 +250,6 @@ tr:last-child td { border-bottom: none; }
     </div>
   </div>
 
-  <!-- 統合された共通フィルターバー -->
   <div class="global-filter-card">
     <div style="font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">🔍 表示フィルター（グラフ・履歴共通）</div>
     <div class="filter-grid">
@@ -260,7 +259,6 @@ tr:last-child td { border-bottom: none; }
     </div>
   </div>
 
-  <!-- 統計グラフエリア -->
   <div class="card">
     <h2>統計グラフ</h2>
     <div class="grand-total-box">
@@ -277,7 +275,6 @@ tr:last-child td { border-bottom: none; }
     </div>
   </div>
 
-  <!-- 履歴一覧エリア（個人収支カード含む） -->
   <div class="card">
     <h2>履歴一覧</h2>
     <div id="personalTotals" class="personal-total-grid"></div>
@@ -300,7 +297,8 @@ tr:last-child td { border-bottom: none; }
 
 <script>
 const LIFF_ID = "2010062599-fM2vPvTM"; 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwBY90tukG42D5BKw-lEAePj2NM3n-90slLHZN7oTXrTGQ5bWkeuUHdEZQXcduyEz_f5A/exec"; 
+// ★先ほど新しくコピーしたGASのウェブアプリURLをここに設定してください
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzC7M8Jv0XHX3rekb5z6j-v9YJq0frhsqzcy65_Ush3ebYpCNKHDuNoYb_pkLZz4JTrQ/exec"; 
 
 function money(v){
   if (v === 0) return "0円";
@@ -311,12 +309,33 @@ let historyData = [];
 let lastShareMessage = "";
 let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
 
+// 日付文字列を綺麗に整形・変換する補助関数（ISO形式の対策）
+function cleanTimeStr(rawTime) {
+  if (!rawTime) return "2026年11月10日";
+  let str = String(rawTime);
+  // もし旧形式のISO文字列（2026-11-09T15:00:00.000Zなど）だったらパースして日本語に直す
+  if (str.includes("T") || str.includes("-")) {
+    let d = new Date(str);
+    if (!isNaN(d.getTime())) {
+      return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+    }
+  }
+  return str;
+}
+
 async function loadHistory() {
   const historyEl = document.getElementById("history");
   
   try {
     const res = await fetch(GAS_URL);
-    historyData = await res.json();
+    let rawData = await res.json();
+    
+    // 読み込んだデータの日付を強制的にクレンジング
+    historyData = rawData.map(item => ({
+      ...item,
+      time: cleanTimeStr(item.time)
+    }));
+
     renderAll();
   } catch (e) { 
     historyEl.innerHTML = "履歴の読み込みに失敗しました。";
@@ -804,7 +823,6 @@ document.getElementById("calcBtn").onclick = async function() {
   }
   lastShareMessage = msg;
 
-  // テスト用日時入力欄の値があればそれを優先、なければ今日の日付を使用
   const testDateVal = document.getElementById("testDateInput").value.trim();
   let defaultTimeStr = "";
   if(testDateVal) {
@@ -888,7 +906,6 @@ document.getElementById("addMemberStoreBtn").onclick = () => {
   renderMemberListEdit();
 };
 
-// 本番環境（LINE LIFF）の初期化処理
 liff.init({ liffId: LIFF_ID }).then(() => {
   if (!liff.isLoggedIn()) { 
     liff.login(); 
