@@ -213,6 +213,13 @@ tr:last-child td { border-bottom: none; }
     <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 8px 14px; font-size: 13px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
   </div>
 
+  <!-- テスト用日時設定カード -->
+  <div class="card" style="background: #eef2ff; border-color: #c7d2fe;">
+    <h2 style="font-size: 14px; color: #4338ca; margin-bottom: 8px;">🧪 テスト用日時設定（自由に変更可能）</h2>
+    <input type="text" id="testDateInput" placeholder="例: 2026年11月10日">
+    <div style="font-size: 11px; color: #6366f1; margin-top: 4px;">※空欄のままなら今日の日付が自動で保存されます</div>
+  </div>
+
   <div class="card">
     <h2>参加者</h2>
     <div id="players"></div>
@@ -290,6 +297,7 @@ tr:last-child td { border-bottom: none; }
 
 <script>
 const LIFF_ID = "2010062599-fM2vPvTM"; 
+// ★先ほど新しくコピーしたGASのウェブアプリURLをここに設定してください
 const GAS_URL = "https://script.google.com/macros/s/AKfycby7oUyS6AHE-B5b_v1xtSuIFEIOsS0s_1kN6JeskN7tm1wp3cxkBHBrNvTs-6TQMrxG8g/exec"; 
   
 function money(v){
@@ -301,9 +309,11 @@ let historyData = [];
 let lastShareMessage = "";
 let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
 
+// 日付文字列を綺麗に整形・変換する補助関数（ISO形式の対策）
 function cleanTimeStr(rawTime) {
-  if (!rawTime) return "";
+  if (!rawTime) return "2026年11月10日";
   let str = String(rawTime);
+  // もし旧形式のISO文字列（2026-11-09T15:00:00.000Zなど）だったらパースして日本語に直す
   if (str.includes("T") || str.includes("-")) {
     let d = new Date(str);
     if (!isNaN(d.getTime())) {
@@ -315,13 +325,17 @@ function cleanTimeStr(rawTime) {
 
 async function loadHistory() {
   const historyEl = document.getElementById("history");
+  
   try {
     const res = await fetch(GAS_URL);
     let rawData = await res.json();
+    
+    // 読み込んだデータの日付を強制的にクレンジング
     historyData = rawData.map(item => ({
       ...item,
       time: cleanTimeStr(item.time)
     }));
+
     renderAll();
   } catch (e) { 
     historyEl.innerHTML = "履歴の読み込みに失敗しました。";
@@ -339,9 +353,10 @@ async function deleteHistory(rowIdx) {
   } catch(e) {
     console.error(e);
   }
-  // 高速化：待ち時間を撤廃して非同期で即座に再読み込み
-  await loadHistory();
-  document.getElementById("loading").style.display = "none";
+  setTimeout(async () => {
+    await loadHistory();
+    document.getElementById("loading").style.display = "none";
+  }, 1000);
 }
 
 function renderAll() {
@@ -401,6 +416,7 @@ function getAvailableYearsAndMonths() {
   historyData.forEach(h => {
     if(!h.time) return;
     let timeStr = String(h.time);
+    
     let yMatch = timeStr.match(/(\d{4})年/);
     let year = yMatch ? yMatch[1] : "2026";
     yearsSet.add(year);
@@ -424,6 +440,7 @@ function getAvailableYearsAndMonths() {
 function updateFilterSelectOptions() {
   const comboSelect = document.getElementById("combinationSelect");
   const yearSelect = document.getElementById("yearSelect");
+  
   const currentCombo = comboSelect.value;
   const currentYear = yearSelect.value || "all";
 
@@ -446,6 +463,7 @@ function updateFilterSelectOptions() {
   });
 
   let { years } = getAvailableYearsAndMonths();
+  
   yearSelect.innerHTML = `<option value="all">📅 全期間</option>`;
   years.forEach(y => {
     const opt = document.createElement("option");
@@ -476,6 +494,7 @@ function updateMonthOptions() {
   const monthSel = document.getElementById("monthSelect");
   const selectedYear = yearSel.value;
   const currentMonth = monthSel.value;
+
   let { yearMonthMap } = getAvailableYearsAndMonths();
 
   if(selectedYear === "all") {
@@ -502,6 +521,7 @@ function updateMonthOptions() {
 function matchFilter(h, yearVal, monthVal) {
   if(!h.time) return false;
   let timeStr = String(h.time);
+  
   let yM = timeStr.match(/(\d{4})年/);
   let year = yM ? yM[1] : "2026";
   let mM = timeStr.match(/(\d{1,2})月/);
@@ -650,7 +670,7 @@ function renderHistoryList() {
   Object.keys(pMap).sort().forEach(name => {
     const pCard = document.createElement("div");
     pCard.className = "personal-card";
-    pCard.innerHTML = `<div class="name-label">${name}</div><div class="amount-value" style="color:${pMap[p.name]>=0?'var(--green)':'var(--red)'}">${money(pMap[name])}</div>`;
+    pCard.innerHTML = `<div class="name-label">${name}</div><div class="amount-value" style="color:${pMap[name]>=0?'var(--green)':'var(--red)'}">${money(pMap[name])}</div>`;
     personalEl.appendChild(pCard);
   });
 
@@ -667,6 +687,7 @@ function renderHistoryList() {
 
     const box = document.createElement("div");
     box.className = "hist-item";
+    
     box.innerHTML = `
       <div class="hist-actions">
         <button class="hist-del-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
@@ -683,6 +704,7 @@ function renderHistoryList() {
 function addPlayer(selectedName = "", investVal = 10000, cashVal = 0){
   const div = document.createElement("div");
   div.className = "player";
+  
   let options = '<option value="">選択してください</option>';
   storedMembers.forEach(m => {
     const selected = (m === selectedName) ? 'selected' : '';
@@ -713,6 +735,7 @@ function addPlayer(selectedName = "", investVal = 10000, cashVal = 0){
     <div style="margin-top:12px; display:flex; justify-content:flex-end;">
       <button class="delete-btn" onclick="this.closest('.player').remove()">削除</button>
     </div>`;
+  
   document.getElementById("players").appendChild(div);
 }
 
@@ -800,9 +823,17 @@ document.getElementById("calcBtn").onclick = async function() {
   }
   lastShareMessage = msg;
 
-  // 常に現在の日付を自動取得
-  const now = new Date();
-  const defaultTimeStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+  const testDateVal = document.getElementById("testDateInput").value.trim();
+  let defaultTimeStr = "";
+  if(testDateVal) {
+    defaultTimeStr = testDateVal;
+  } else {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    defaultTimeStr = `${year}年${month}月${day}日`;
+  }
 
   const newHist = {
     time: defaultTimeStr, 
@@ -822,9 +853,10 @@ document.getElementById("calcBtn").onclick = async function() {
     console.error(e);
   }
 
-  // 高速化：待ち時間（setTimeout）を完全に廃止し即座に同期・再描画
-  await loadHistory();
-  document.getElementById("loading").style.display = "none";
+  setTimeout(async () => {
+    await loadHistory();
+    document.getElementById("loading").style.display = "none";
+  }, 1000);
 };
 
 document.getElementById("lineSendBtn").onclick = async () => {
