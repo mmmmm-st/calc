@@ -322,8 +322,15 @@ async function deleteHistory(idx) {
   if(!confirm("この履歴を削除しますか？")) return;
   
   document.getElementById("loading").style.display = "block";
-  await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: idx }) });
-  setTimeout(loadHistory, 1500);
+  try {
+    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: idx }) });
+  } catch(e) {
+    console.error(e);
+  }
+  setTimeout(async () => {
+    await loadHistory();
+    document.getElementById("loading").style.display = "none";
+  }, 1000);
 }
 
 function renderAll() {
@@ -787,7 +794,6 @@ document.getElementById("calcBtn").onclick = async function() {
   lastShareMessage = msg;
 
   const now = new Date();
-  // 確実に「YYYY年M月D日」の形式にする
   const year = now.getFullYear();
   const month = now.getMonth() + 1;
   const day = now.getDate();
@@ -799,14 +805,23 @@ document.getElementById("calcBtn").onclick = async function() {
     profit: totalProfit, 
     players: snapshot 
   };
-  
+
   document.getElementById("loading").style.display = "block";
-  await fetch(GAS_URL, { 
-    method: "POST", 
-    mode: "no-cors", 
-    body: JSON.stringify(newHist) 
-  });
-  setTimeout(loadHistory, 1500);
+  
+  try {
+    await fetch(GAS_URL, { 
+      method: "POST", 
+      mode: "no-cors", 
+      body: JSON.stringify(newHist) 
+    });
+  } catch (e) {
+    console.error(e);
+  }
+
+  setTimeout(async () => {
+    await loadHistory();
+    document.getElementById("loading").style.display = "none";
+  }, 1000);
 };
 
 document.getElementById("lineSendBtn").onclick = async () => {
