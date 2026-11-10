@@ -213,6 +213,13 @@ tr:last-child td { border-bottom: none; }
     <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 8px 14px; font-size: 13px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
   </div>
 
+  <!-- 🧪 テスト用：記録日時を自由に書き換えられるカード -->
+  <div class="card" style="background: #eef2ff; border-color: #c7d2fe;">
+    <h2 style="font-size: 14px; color: #4338ca; margin-bottom: 8px;">🧪 テスト用日時設定（自由に変更可能）</h2>
+    <input type="text" id="testDateInput" placeholder="例: 2026年11月10日">
+    <div style="font-size: 11px; color: #6366f1; margin-top: 4px;">※空欄のままなら今日の日付が自動で保存されます</div>
+  </div>
+
   <div class="card">
     <h2>参加者</h2>
     <div id="players"></div>
@@ -797,11 +804,18 @@ document.getElementById("calcBtn").onclick = async function() {
   }
   lastShareMessage = msg;
 
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1;
-  const day = now.getDate();
-  const defaultTimeStr = `${year}年${month}月${day}日`;
+  // テスト用日時入力欄の値があればそれを優先、なければ今日の日付を使用
+  const testDateVal = document.getElementById("testDateInput").value.trim();
+  let defaultTimeStr = "";
+  if(testDateVal) {
+    defaultTimeStr = testDateVal;
+  } else {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    defaultTimeStr = `${year}年${month}月${day}日`;
+  }
 
   const newHist = {
     time: defaultTimeStr, 
