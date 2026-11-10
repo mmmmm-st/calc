@@ -787,7 +787,11 @@ document.getElementById("calcBtn").onclick = async function() {
   lastShareMessage = msg;
 
   const now = new Date();
-  const defaultTimeStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+  // 確実に「YYYY年M月D日」の形式にする
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  const defaultTimeStr = `${year}年${month}月${day}日`;
 
   const newHist = {
     id: Date.now(),
@@ -795,7 +799,7 @@ document.getElementById("calcBtn").onclick = async function() {
     profit: totalProfit, 
     players: snapshot 
   };
-
+  
   document.getElementById("loading").style.display = "block";
   await fetch(GAS_URL, { 
     method: "POST", 
