@@ -69,15 +69,24 @@ label {
 input, select {
   width: 100%;
   max-width: 100%;
+  box-sizing: border-box;
   padding: 12px 14px;
   border-radius: 12px;
   border: 1.5px solid var(--line);
-  font-size: 16px; /* スマホでズームされないよう16pxに設定 */
+  font-size: 16px;
   color: var(--text);
   background: #f8fafc;
   transition: all 0.2s ease;
   outline: none;
   font-weight: 500;
+}
+
+/* 日付フォームがスマホで溢れないように調整 */
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #f8fafc;
+  text-align: center;
 }
 
 input:focus, select:focus {
