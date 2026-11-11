@@ -113,7 +113,7 @@ button:active { transform: scale(0.98); }
 .sub-btn { background: #f1f5f9; color: var(--text); width: 100%; border: 1px solid var(--line); }
 .sub-btn:hover { background: #e2e8f0; }
 
-.delete-btn { background: #fee2e2; color: var(--red); width: auto; padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+.delete-btn { background: #fee2e2; color: var(--red); width: auto; padding: 4px 10px; font-size: 11px; border-radius: 6px; }
 
 .grand-total-box {
   background: var(--gradient);
@@ -122,9 +122,21 @@ button:active { transform: scale(0.98); }
   color: white;
   margin-bottom: 20px;
   box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .grand-total-label { font-size: 11px; opacity: 0.85; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.grand-total-value { font-size: 30px; font-weight: 900; letter-spacing: -0.03em; }
+.grand-total-value { font-size: 26px; font-weight: 900; letter-spacing: -0.03em; }
+.grand-winrate-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 14px;
+  border-radius: 12px;
+  text-align: right;
+  backdrop-filter: blur(4px);
+}
+.grand-winrate-label { font-size: 10px; opacity: 0.85; font-weight: 600; text-transform: uppercase; }
+.grand-winrate-value { font-size: 18px; font-weight: 800; }
 
 .global-filter-card {
   background: #f1f5f9;
@@ -178,10 +190,12 @@ svg {
   overflow: visible; 
 }
 
-.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
-.personal-card { background: #f8fafc; border-radius: 14px; padding: 16px; border: 1px solid var(--line); }
-.personal-card .name-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
-.personal-card .amount-value { font-size: 16px; font-weight: 800; }
+.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+.personal-card { background: #f8fafc; border-radius: 14px; padding: 14px; border: 1px solid var(--line); }
+.personal-card .name-label { font-size: 12px; color: var(--text); font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+.personal-card .amount-value { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.personal-card .sub-info { font-size: 11px; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 6px; }
+.personal-card .mest-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 6px; margin-top: 4px; font-size: 11px; font-weight: 700; }
 
 .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
 .box { padding: 14px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--line); }
@@ -200,7 +214,6 @@ tr:last-child td { border-bottom: none; }
 .hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 12px; position: relative; transition: all 0.2s; }
 .hist-item:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
 .hist-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; align-items: center; }
-.hist-del-btn { color: var(--red); font-size: 11px; font-weight: 700; background: #fee2e2; padding: 6px 12px; border-radius: 8px; cursor: pointer; border: none; }
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
 .modal-content { background: #fff; padding: 24px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
@@ -214,12 +227,16 @@ tr:last-child td { border-bottom: none; }
   </div>
 
   <div class="card">
-    <h2>参加者</h2>
+    <h2>参加者 & 日付</h2>
+    <div style="margin-bottom: 16px;">
+      <label>実践日</label>
+      <input type="date" id="recordDateInput">
+    </div>
     <div id="players"></div>
     <button class="sub-btn" id="addBtn" style="border-style: dashed; border-color: #cbd5e1; color: var(--accent); font-weight: 600;">＋ 参加者を追加</button>
   </div>
 
-  <button class="main-btn" id="calcBtn">計算を実行してプレビュー</button>
+  <button class="main-btn" id="calcBtn">計算を実行して保存</button>
   <div id="loading" style="display:none; text-align:center; padding:10px; color:var(--accent); font-weight:bold;">処理中...</div>
   <button class="line-btn" id="lineSendBtn" style="display:none;">LINEに結果を送る</button>
 
@@ -255,8 +272,14 @@ tr:last-child td { border-bottom: none; }
   <div class="card">
     <h2>統計グラフ</h2>
     <div class="grand-total-box">
-      <div class="grand-total-label" id="grandTotalLabel">グループ選択期間の累計収支</div>
-      <div class="grand-total-value" id="grandTotalDisplay">0円</div>
+      <div>
+        <div class="grand-total-label" id="grandTotalLabel">グループ選択期間の累計収支</div>
+        <div class="grand-total-value" id="grandTotalDisplay">0円</div>
+      </div>
+      <div class="grand-winrate-badge">
+        <div class="grand-winrate-label">グループ勝率</div>
+        <div class="grand-winrate-value" id="grandWinRateDisplay">0%</div>
+      </div>
     </div>
 
     <div class="chart-card" id="graphsArea" style="display:none;">
@@ -269,8 +292,10 @@ tr:last-child td { border-bottom: none; }
   </div>
 
   <div class="card">
-    <h2>履歴一覧</h2>
+    <h2>個人別実績・飯スト</h2>
     <div id="personalTotals" class="personal-total-grid"></div>
+    <div style="font-size: 11px; color: var(--muted); margin-bottom: 16px;">※今回の参加者中で最も収支が高かった（または負け額が一番少なかった）方に飯ストが自動で＋1されます。</div>
+    <h2>履歴一覧</h2>
     <div id="history" style="color: var(--muted); font-size: 13px;">読み込み中...</div>
   </div>
 </div>
@@ -330,6 +355,13 @@ async function loadHistory() {
   }
 }
 
+window.updateMemberMest = function(name, delta) {
+  let currentMest = Number(localStorage.getItem(`nori_mest_${name}`) || 0);
+  let newMest = Math.max(0, currentMest + delta);
+  localStorage.setItem(`nori_mest_${name}`, newMest);
+  renderHistoryList();
+};
+
 async function deleteHistory(rowIdx) {
   if(!confirm("この履歴を削除しますか？")) return;
   
@@ -350,6 +382,7 @@ function renderAll() {
     document.getElementById("history").innerHTML = "履歴はありません。";
     document.getElementById("personalTotals").innerHTML = "";
     document.getElementById("grandTotalDisplay").textContent = "0円";
+    document.getElementById("grandWinRateDisplay").textContent = "0%";
     return;
   }
   graphsArea.style.display = "block";
@@ -365,6 +398,7 @@ function renderFilteredContent() {
 
 function renderGrandTotals() {
   const grandEl = document.getElementById("grandTotalDisplay");
+  const grandWinRateEl = document.getElementById("grandWinRateDisplay");
   const grandLabelEl = document.getElementById("grandTotalLabel");
   const comboSelect = document.getElementById("combinationSelect");
   const yearSelect = document.getElementById("yearSelect");
@@ -381,16 +415,27 @@ function renderGrandTotals() {
   grandLabelEl.textContent = labelStr;
 
   let gTotal = 0;
+  let totalSessions = 0;
+  let winSessions = 0;
+
   if(Array.isArray(historyData)) {
     historyData.forEach(h => {
       const names = h.players.map(p => p.name).sort().join(", ");
       if(selectedCombo && names !== selectedCombo) return;
       if(matchFilter(h, selectedYear, selectedMonth)) {
-        gTotal += Number(h.profit || 0);
+        const profit = Number(h.profit || 0);
+        gTotal += profit;
+        totalSessions += 1;
+        if(profit > 0) {
+          winSessions += 1;
+        }
       }
     });
   }
+
+  const groupWinRate = totalSessions > 0 ? Math.round((winSessions / totalSessions) * 100) : 0;
   grandEl.textContent = money(gTotal);
+  grandWinRateEl.textContent = `${groupWinRate}% (${winSessions}/${totalSessions}勝)`;
 }
 
 function getAvailableYearsAndMonths() {
@@ -639,17 +684,39 @@ function renderHistoryList() {
 
   let filteredHistory = historyData.filter(h => matchFilter(h, selectedYear, selectedMonth));
 
-  let pMap = {};
+  let pStats = {};
   filteredHistory.forEach((h) => {
     h.players.forEach(p => {
-      pMap[p.name] = (pMap[p.name] || 0) + Number(p.val);
+      if(!pStats[p.name]) {
+        pStats[p.name] = { total: 0, count: 0, wins: 0 };
+      }
+      pStats[p.name].total += Number(p.val);
+      pStats[p.name].count += 1;
+      if(Number(p.val) > 0) {
+        pStats[p.name].wins += 1;
+      }
     });
   });
 
-  Object.keys(pMap).sort().forEach(name => {
+  Object.keys(pStats).sort().forEach(name => {
+    const s = pStats[name];
+    const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
+    let mestCount = Number(localStorage.getItem(`nori_mest_${name}`) || 0);
+
     const pCard = document.createElement("div");
     pCard.className = "personal-card";
-    pCard.innerHTML = `<div class="name-label">${name}</div><div class="amount-value" style="color:${pMap[name]>=0?'var(--green)':'var(--red)'}">${money(pMap[name])}</div>`;
+    pCard.innerHTML = `
+      <div class="name-label"><span>${name}</span></div>
+      <div class="amount-value" style="color:${s.total>=0?'var(--green)':'var(--red)'}">${money(s.total)}</div>
+      <div class="sub-info">
+        <span>勝率: ${winRate}%</span>
+        <span>(${s.wins}勝/${s.count}回)</span>
+      </div>
+      <div class="mest-row">
+        <span>飯スト: <b style="color:var(--accent);">${mestCount}</b></span>
+        <button style="padding:3px 8px; font-size:10px; background:#fee2e2; color:var(--red); border-radius:6px; font-weight:700;" onclick="updateMemberMest('${name}', -1)">消費</button>
+      </div>
+    `;
     personalEl.appendChild(pCard);
   });
 
@@ -668,7 +735,7 @@ function renderHistoryList() {
     box.className = "hist-item";
     box.innerHTML = `
       <div class="hist-actions">
-        <button class="hist-del-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
+        <button class="delete-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
       </div>
       <div style="font-size:11px; color:var(--muted); font-weight:600; margin-bottom:4px;">記録日時</div>
       <div style="font-weight:700; font-size:13px; color:var(--text); margin-bottom:6px;">${h.time}</div>
@@ -754,7 +821,7 @@ document.getElementById("calcBtn").onclick = async function() {
   const payList = document.getElementById("payList"); payList.innerHTML = "";
   let receive = [], pay = [], snapshot = [];
 
-  players.forEach(p => {
+  let calculatedPlayers = players.map(p => {
     const individualProfit = p.cash - p.invest;
     const targetAmount = p.invest + fairProfitPerPerson;
     const diff = p.cash - targetAmount; 
@@ -776,7 +843,17 @@ document.getElementById("calcBtn").onclick = async function() {
     tr.innerHTML = `<td><b>${p.name}</b></td><td>${new Intl.NumberFormat("ja-JP").format(p.invest)}円</td><td>${new Intl.NumberFormat("ja-JP").format(p.cash)}円</td><td style="color:${individualProfit>=0?'var(--green)':'var(--red)'}; font-weight:600;">${money(individualProfit)}</td><td style="font-weight:800; color:${isPay?'var(--red)':'var(--green)'}">${isPay ? '払う：' : '貰う：'}${new Intl.NumberFormat("ja-JP").format(Math.round(absDiff))}円</td>`;
     tbody.appendChild(tr);
     snapshot.push({ name: p.name, val: individualProfit });
+
+    return { name: p.name, profit: individualProfit };
   });
+
+  // 💡 一番成績が良かった人（最大プラス or 最小マイナス）に飯スト＋1自動加算
+  calculatedPlayers.sort((a, b) => b.profit - a.profit);
+  const bestPlayer = calculatedPlayers[0];
+  if (bestPlayer) {
+    let currentMest = Number(localStorage.getItem(`nori_mest_${bestPlayer.name}`) || 0);
+    localStorage.setItem(`nori_mest_${bestPlayer.name}`, currentMest + 1);
+  }
 
   let msg = `【ノリ打ち精算レポート】\n\n■ 今回の収支\n`;
   snapshot.forEach(p => msg += `・${p.name}：${money(p.val)}\n`);
@@ -799,11 +876,18 @@ document.getElementById("calcBtn").onclick = async function() {
   }
   lastShareMessage = msg;
 
-  const now = new Date();
-  const defaultTimeStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+  const dateInputVal = document.getElementById("recordDateInput").value;
+  let formattedDateStr = "";
+  if (dateInputVal) {
+    let parts = dateInputVal.split("-");
+    formattedDateStr = `${parts[0]}年${Number(parts[1])}月${Number(parts[2])}日`;
+  } else {
+    let now = new Date();
+    formattedDateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+  }
 
   const newHist = {
-    time: defaultTimeStr, 
+    time: formattedDateStr, 
     profit: totalProfit, 
     players: snapshot 
   };
@@ -824,8 +908,13 @@ document.getElementById("calcBtn").onclick = async function() {
   document.getElementById("loading").style.display = "none";
 };
 
+// 💡 本番用：LINEトークに結果を送信してウィンドウを閉じる
 document.getElementById("lineSendBtn").onclick = async () => {
-  liff.sendMessages([{ type: 'text', text: lastShareMessage }]).then(() => liff.closeWindow());
+  if (liff.isInClient()) {
+    liff.sendMessages([{ type: 'text', text: lastShareMessage }]).then(() => liff.closeWindow());
+  } else {
+    alert("LINEアプリ内から開いていないため送信できません。以下の内容をコピーしてください:\n\n" + lastShareMessage);
+  }
 };
 
 document.getElementById("addBtn").onclick = () => addPlayer();
@@ -871,7 +960,14 @@ document.getElementById("addMemberStoreBtn").onclick = () => {
   renderMemberListEdit();
 };
 
+// 💡 本番用：LIFF初期化処理
 liff.init({ liffId: LIFF_ID }).then(() => {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  document.getElementById("recordDateInput").value = `${yyyy}-${mm}-${dd}`;
+
   if (!liff.isLoggedIn()) { 
     liff.login(); 
   } else { 
