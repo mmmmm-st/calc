@@ -26,28 +26,34 @@
 
 body {
   margin: 0;
-  padding: 24px 12px;
+  padding: 16px 8px;
   background: var(--bg);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
 }
 
-.wrap { max-width: 680px; margin: auto; }
+.wrap { max-width: 680px; margin: auto; width: 100%; overflow-x: hidden; }
 
 .card {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 20px;
+  padding: 16px;
+  margin-bottom: 16px;
   box-shadow: var(--shadow);
   border: 1px solid rgba(226, 232, 240, 0.8);
+  width: 100%;
 }
 
-h1 { font-size: 20px; margin: 0; font-weight: 800; letter-spacing: -0.025em; color: var(--text); }
-h2 { font-size: 17px; margin: 0 0 16px; font-weight: 700; letter-spacing: -0.025em; display: flex; align-items: center; gap: 8px; }
+@media (min-width: 480px) {
+  .card { padding: 24px; }
+  body { padding: 24px 12px; }
+}
 
-.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.025em; color: var(--text); }
+h2 { font-size: 16px; margin: 0 0 16px; font-weight: 700; letter-spacing: -0.025em; display: flex; align-items: center; gap: 8px; }
+
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; width: 100%; }
 .half { grid-column: span 6; }
 
 label {
@@ -62,10 +68,11 @@ label {
 
 input, select {
   width: 100%;
+  max-width: 100%;
   padding: 12px 14px;
   border-radius: 12px;
   border: 1.5px solid var(--line);
-  font-size: 14px;
+  font-size: 16px; /* スマホでズームされないよう16pxに設定 */
   color: var(--text);
   background: #f8fafc;
   transition: all 0.2s ease;
@@ -83,19 +90,21 @@ input:focus, select:focus {
   background: #f8fafc;
   border: 1px solid var(--line);
   border-radius: 14px;
-  padding: 16px;
+  padding: 12px;
   margin-bottom: 12px;
+  width: 100%;
 }
 
 .player-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  gap: 8px;
 }
 
 .result-label { font-size: 11px; font-weight: 600; margin-bottom: 2px; text-align: right; color: var(--muted); }
-.result-value { font-size: 17px; font-weight: 800; text-align: right; }
+.result-value { font-size: 16px; font-weight: 800; text-align: right; }
 
 button {
   border: none;
@@ -105,38 +114,50 @@ button {
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.1s ease, background 0.2s;
+  width: 100%;
 }
 button:active { transform: scale(0.98); }
 
-.main-btn { background: var(--gradient); color: white; width: 100%; margin: 8px 0; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
-.line-btn { background: var(--line-green); color: white; width: 100%; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(6, 199, 85, 0.35); }
-.sub-btn { background: #f1f5f9; color: var(--text); width: 100%; border: 1px solid var(--line); }
+.main-btn { background: var(--gradient); color: white; margin: 8px 0; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
+.line-btn { background: var(--line-green); color: white; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(6, 199, 85, 0.35); }
+.sub-btn { background: #f1f5f9; color: var(--text); border: 1px solid var(--line); }
 .sub-btn:hover { background: #e2e8f0; }
 
-.delete-btn { background: #fee2e2; color: var(--red); width: auto; padding: 4px 10px; font-size: 11px; border-radius: 6px; }
+.delete-btn { background: #fee2e2; color: var(--red); width: auto; padding: 6px 12px; font-size: 11px; border-radius: 6px; }
 
 .grand-total-box {
   background: var(--gradient);
   border-radius: 16px;
-  padding: 20px 24px;
+  padding: 16px;
   color: white;
   margin-bottom: 20px;
   box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (min-width: 480px) {
+  .grand-total-box {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+  }
 }
 .grand-total-label { font-size: 11px; opacity: 0.85; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.grand-total-value { font-size: 26px; font-weight: 900; letter-spacing: -0.03em; }
+.grand-total-value { font-size: 24px; font-weight: 900; letter-spacing: -0.03em; }
 .grand-winrate-badge {
   background: rgba(255, 255, 255, 0.2);
   padding: 8px 14px;
   border-radius: 12px;
-  text-align: right;
+  text-align: left;
   backdrop-filter: blur(4px);
 }
+@media (min-width: 480px) {
+  .grand-winrate-badge { text-align: right; }
+}
 .grand-winrate-label { font-size: 10px; opacity: 0.85; font-weight: 600; text-transform: uppercase; }
-.grand-winrate-value { font-size: 18px; font-weight: 800; }
+.grand-winrate-value { font-size: 16px; font-weight: 800; }
 
 .global-filter-card {
   background: #f1f5f9;
@@ -147,12 +168,12 @@ button:active { transform: scale(0.98); }
 }
 .filter-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
 }
-@media (max-width: 540px) {
+@media (min-width: 480px) {
   .filter-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1.2fr 1fr 1fr;
   }
 }
 .filter-grid select {
@@ -166,12 +187,12 @@ button:active { transform: scale(0.98); }
   background: #f8fafc;
   border: 1px solid var(--line);
   border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 0px;
+  padding: 12px;
+  overflow: hidden;
 }
 .chart-title { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
 
-.chart-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 11px; font-weight: 600; margin-bottom: 12px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; font-weight: 600; margin-bottom: 12px; }
 .legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
@@ -181,49 +202,49 @@ button:active { transform: scale(0.98); }
   border-radius: 10px;
   border: 1px solid var(--line);
   padding: 6px 0;
-  overflow: hidden;
+  overflow-x: auto;
 }
 svg { 
   display: block; 
   width: 100%; 
-  height: 200px; 
+  min-width: 450px;
+  height: 180px; 
   overflow: visible; 
 }
 
-.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
-.personal-card { background: #f8fafc; border-radius: 14px; padding: 14px; border: 1px solid var(--line); }
-.personal-card .name-label { font-size: 12px; color: var(--text); font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-.personal-card .amount-value { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-bottom: 16px; }
+.personal-card { background: #f8fafc; border-radius: 14px; padding: 12px; border: 1px solid var(--line); }
+.personal-card .name-label { font-size: 12px; color: var(--text); font-weight: 700; margin-bottom: 4px; }
+.personal-card .amount-value { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
 .personal-card .sub-info { font-size: 11px; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 6px; }
 .personal-card .mest-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 6px; margin-top: 4px; font-size: 11px; font-weight: 700; }
 
-.summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-.box { padding: 14px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--line); }
+.summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+.box { padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--line); }
 .box-title { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
-.box-value { font-size: 16px; font-weight: 800; }
+.box-value { font-size: 15px; font-weight: 800; }
 
 .table-wrapper { overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 1px solid var(--line); }
-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 420px; background: #fff; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 380px; background: #fff; }
 th { background: #f8fafc; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
-th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; }
 tr:last-child td { border-bottom: none; }
 
-.pay-box { margin-top: 16px; border-radius: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px; }
-.pay-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #fff; margin-bottom: 6px; border-radius: 8px; border: 1px solid #dcfce7; font-size: 14px; }
+.pay-box { margin-top: 16px; border-radius: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; }
+.pay-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #fff; margin-bottom: 6px; border-radius: 8px; border: 1px solid #dcfce7; font-size: 13px; }
 
-.hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 12px; position: relative; transition: all 0.2s; }
-.hist-item:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+.hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; position: relative; }
 .hist-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; align-items: center; }
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
-.modal-content { background: #fff; padding: 24px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+.modal-content { background: #fff; padding: 20px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px;">
+  <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px;">
     <h1>🎰 ノリ打ち精算</h1>
-    <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 8px 14px; font-size: 13px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
+    <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 8px 12px; font-size: 12px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
   </div>
 
   <div class="card">
@@ -261,7 +282,7 @@ tr:last-child td { border-bottom: none; }
   </div>
 
   <div class="global-filter-card">
-    <div style="font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">🔍 表示フィルター（グラフ・履歴共通）</div>
+    <div style="font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">🔍 表示フィルター</div>
     <div class="filter-grid">
       <select id="combinationSelect" onchange="onFilterChange()"></select>
       <select id="yearSelect" onchange="onYearChange()"></select>
@@ -294,7 +315,7 @@ tr:last-child td { border-bottom: none; }
   <div class="card">
     <h2>個人別実績・飯スト</h2>
     <div id="personalTotals" class="personal-total-grid"></div>
-    <div style="font-size: 11px; color: var(--muted); margin-bottom: 16px;">※今回の参加者中で最も収支が高かった（または負け額が一番少なかった）方に飯ストが自動で＋1されます。</div>
+    <div style="font-size: 11px; color: var(--muted); margin-bottom: 16px;">※最も収支が高かった（または負け額が少なかった）方に飯ストが自動で＋1されます。</div>
     <h2>履歴一覧</h2>
     <div id="history" style="color: var(--muted); font-size: 13px;">読み込み中...</div>
   </div>
@@ -604,7 +625,7 @@ function renderExcelChart() {
   allNames.forEach(name => allValues.push(...memberSeries[name]));
 
   const width = 600;
-  const height = 200;
+  const height = 180;
   const paddingX = 45; 
   const paddingY = 20;
 
@@ -746,7 +767,7 @@ function renderHistoryList() {
   });
 }
 
-function addPlayer(selectedName = "", investVal = 10000, cashVal = 0){
+function addPlayer(selectedName = "", investVal = "", cashVal = ""){
   const div = document.createElement("div");
   div.className = "player";
   let options = '<option value="">選択してください</option>';
@@ -769,11 +790,11 @@ function addPlayer(selectedName = "", investVal = 10000, cashVal = 0){
     <div class="grid">
       <div class="half">
         <label>投資額</label>
-        <input class="invest" type="number" value="${investVal}">
+        <input class="invest" type="number" inputmode="numeric" pattern="[0-9]*" value="${investVal}" placeholder="0">
       </div>
       <div class="half">
         <label>回収額</label>
-        <input class="cash" type="number" value="${cashVal}">
+        <input class="cash" type="number" inputmode="numeric" pattern="[0-9]*" value="${cashVal}" placeholder="0">
       </div>
     </div>
     <div style="margin-top:12px; display:flex; justify-content:flex-end;">
@@ -794,8 +815,11 @@ document.getElementById("calcBtn").onclick = async function() {
 
   pNodes.forEach(node => {
     const name = node.querySelector(".name-select").value;
-    const invest = +(node.querySelector(".invest").value || 0);
-    const cash = +(node.querySelector(".cash").value || 0);
+    const investStr = node.querySelector(".invest").value;
+    const cashStr = node.querySelector(".cash").value;
+    const invest = investStr === "" ? 0 : +investStr;
+    const cash = cashStr === "" ? 0 : +cashStr;
+
     if(!name) hasError = true;
     players.push({ name, invest, cash, node });
   });
@@ -847,7 +871,6 @@ document.getElementById("calcBtn").onclick = async function() {
     return { name: p.name, profit: individualProfit };
   });
 
-  // 💡 一番成績が良かった人（最大プラス or 最小マイナス）に飯スト＋1自動加算
   calculatedPlayers.sort((a, b) => b.profit - a.profit);
   const bestPlayer = calculatedPlayers[0];
   if (bestPlayer) {
@@ -908,7 +931,6 @@ document.getElementById("calcBtn").onclick = async function() {
   document.getElementById("loading").style.display = "none";
 };
 
-// 💡 本番用：LINEトークに結果を送信してウィンドウを閉じる
 document.getElementById("lineSendBtn").onclick = async () => {
   if (liff.isInClient()) {
     liff.sendMessages([{ type: 'text', text: lastShareMessage }]).then(() => liff.closeWindow());
@@ -960,7 +982,6 @@ document.getElementById("addMemberStoreBtn").onclick = () => {
   renderMemberListEdit();
 };
 
-// 💡 本番用：LIFF初期化処理
 liff.init({ liffId: LIFF_ID }).then(() => {
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -973,10 +994,10 @@ liff.init({ liffId: LIFF_ID }).then(() => {
   } else { 
     loadHistory();
     if(storedMembers.length > 0) {
-      addPlayer(storedMembers[0], 10000, 0);
-      if(storedMembers[1]) addPlayer(storedMembers[1], 40000, 0);
+      addPlayer(storedMembers[0], "", "");
+      if(storedMembers[1]) addPlayer(storedMembers[1], "", "");
     } else {
-      addPlayer("", 10000, 0);
+      addPlayer("", "", "");
     }
   }
 });
