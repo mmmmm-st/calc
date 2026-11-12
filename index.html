@@ -265,7 +265,6 @@ tr:last-child td { border-bottom: none; }
 .pay-box { margin-top: 16px; border-radius: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; }
 .pay-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #fff; margin-bottom: 6px; border-radius: 8px; border: 1px solid #dcfce7; font-size: 13px; }
 
-/* コンパクトになった履歴カード */
 .hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; position: relative; }
 .hist-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; align-items: center; }
 .hist-summary-row {
@@ -423,7 +422,7 @@ let historyData = [];
 let serverMestMap = {};
 let lastShareMessage = "";
 let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
-let isInitialFilterSet = false; // 初回フィルター自動選択用フラグ
+let isInitialFilterSet = false;
 
 function cleanTimeStr(rawTime) {
   if (!rawTime) return "";
@@ -799,7 +798,6 @@ function updateFilterSelectOptions() {
     yearSelect.appendChild(opt);
   });
 
-  // 初回起動時のみ、今年の年と今月の月にデフォルト設定する
   if (!isInitialFilterSet) {
     const now = new Date();
     const currentYearStr = String(now.getFullYear());
@@ -808,7 +806,7 @@ function updateFilterSelectOptions() {
     if ([...yearSelect.options].some(o => o.value === currentYearStr)) {
       yearSelect.value = currentYearStr;
     } else if (years.length > 0) {
-      yearSelect.value = years[0]; // データがなければ最新の年
+      yearSelect.value = years[0];
     } else {
       yearSelect.value = "all";
     }
@@ -819,7 +817,7 @@ function updateFilterSelectOptions() {
     if ([...monthSel.options].some(o => o.value === currentMonthStr)) {
       monthSel.value = currentMonthStr;
     } else {
-      monthSel.value = "all"; // 今月のデータがなければすべての月にフォールバック
+      monthSel.value = "all";
     }
 
     isInitialFilterSet = true;
@@ -858,7 +856,7 @@ function updateMonthOptions() {
     months.forEach(m => {
       const opt = document.createElement("option");
       opt.value = m;
-      opt.textContent = `└ ${m}月`;
+      opt.textContent = `${m}月`;
       monthSel.appendChild(opt);
     });
 
