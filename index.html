@@ -553,7 +553,6 @@ function renderPersonalTotalsAndHistory() {
       }
       pStats[p.name].total += Number(p.val);
       pStats[p.name].count += 1;
-      // 収支0円も勝ち扱い（>= 0）にする
       if(Number(p.val) >= 0) {
         pStats[p.name].wins += 1;
       }
@@ -636,7 +635,6 @@ function renderGrandTotals() {
         const profit = Number(h.profit || 0);
         gTotal += profit;
         totalSessions += 1;
-        // グループ収支0円も勝ち扱い（>= 0）にする
         if(profit >= 0) {
           winSessions += 1;
         }
@@ -791,8 +789,12 @@ function renderExcelChart() {
 
   if(targetHistory.length === 0) return;
 
+  // 0スタート（初回の前に「収支0円のスタート地点」を仮想追加、または累計に組み込む）
+  // ここで各セッションの累計を計算する際、起点を0にするため先頭に0を追加するか、あるいはグラフの描画データを調整します。
   let groupSum = 0;
-  const groupData = targetHistory.map(h => groupSum += Number(h.profit || 0));
+  let rawGroupData = targetHistory.map(h => groupSum += Number(h.profit || 0));
+  // グラフの起点（0）を先頭に挿入
+  const groupData = [0, ...rawGroupData];
 
   let allNames = [];
   targetHistory.forEach(h => {
@@ -804,11 +806,13 @@ function renderExcelChart() {
   let memberSeries = {};
   allNames.forEach(name => {
     let pSum = 0;
-    memberSeries[name] = targetHistory.map(h => {
+    let rawSeries = targetHistory.map(h => {
       const p = h.players.find(x => x.name === name);
       if(p) pSum += Number(p.val || 0);
       return pSum;
     });
+    // 個人データも起点の0を追加
+    memberSeries[name] = [0, ...rawSeries];
   });
 
   let allValues = [...groupData];
@@ -825,7 +829,9 @@ function renderExcelChart() {
   const maxVal = Math.max(0, ...allValues);
   const range = (maxVal - minVal) === 0 ? 1 : (maxVal - minVal);
 
-  const getX = (i) => paddingX + (i / (Math.max(targetHistory.length - 1, 1))) * (width - paddingX - 15);
+  // データ点数（スタートの「0」を含めるため targetHistory.length + 1）
+  const totalPoints = groupData.length;
+  const getX = (i) => paddingX + (i / (Math.max(totalPoints - 1, 1))) * (width - paddingX - 15);
   const getY = (val) => height - paddingY - ((val - minVal) / range) * (height - paddingY * 2);
 
   const gridSteps = 4;
@@ -838,16 +844,20 @@ function renderExcelChart() {
     svg.innerHTML += `<text x="${paddingX - 6}" y="${y + 3.5}" fill="#64748b" font-size="9" text-anchor="end">${labelText}</text>`;
   }
 
-  const totalCount = targetHistory.length;
+  // X軸のラベル（スタート地点の「0」ラベルと、各セッションの日付をマッピング）
   let step = 1;
-  if (totalCount > 10) step = 3;
-  else if (totalCount > 5) step = 2;
+  if (totalPoints > 11) step = 3;
+  else if (totalPoints > 6) step = 2;
 
-  targetHistory.forEach((h, i) => {
+  groupData.forEach((val, i) => {
     const x = getX(i);
     svg.innerHTML += `<line x1="${x}" y1="${paddingY}" x2="${x}" y2="${height - paddingY}" stroke="#f1f5f9" stroke-width="1"/>`;
-    if (i === 0 || i === totalCount - 1 || i % step === 0) {
-      const dateStr = h.time ? h.time.split(' ')[0] : `#${i+1}`;
+    if (i === 0 || i === totalPoints - 1 || i % step === 0) {
+      let dateStr = "開始";
+      if (i > 0) {
+        let h = targetHistory[i - 1];
+        dateStr = h && h.time ? h.time.split(' ')[0] : `#${i}`;
+      }
       svg.innerHTML += `<text x="${x}" y="${height - 5}" fill="#64748b" font-size="9" text-anchor="middle">${dateStr}</text>`;
     }
   });
@@ -984,6 +994,7 @@ document.getElementById("calcBtn").onclick = async function() {
   });
 
   let msg = `【ノリ打ち精算レポート】\n\n■ 今回の収支\n`;
+  snapshot.forecast = ""; // placeholder
   snapshot.forEach(p => msg += `・${p.name}：${money(p.val)}\n`);
   msg += `合計：${money(totalProfit)}\n\n■ 受け渡し指示\n`;
   let hasPay = false;
