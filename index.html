@@ -81,7 +81,6 @@ input, select {
   font-weight: 500;
 }
 
-/* 日付フォームがスマホで溢れないように調整 */
 input[type="date"] {
   appearance: none;
   -webkit-appearance: none;
@@ -221,12 +220,33 @@ svg {
   overflow: visible; 
 }
 
-.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-bottom: 16px; }
-.personal-card { background: #f8fafc; border-radius: 14px; padding: 12px; border: 1px solid var(--line); }
-.personal-card .name-label { font-size: 12px; color: var(--text); font-weight: 700; margin-bottom: 4px; }
+.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.personal-card { background: #f8fafc; border-radius: 14px; padding: 12px; border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
+.personal-card .name-label { font-size: 13px; color: var(--text); font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .personal-card .amount-value { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
-.personal-card .sub-info { font-size: 11px; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 6px; }
-.personal-card .mest-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 6px; margin-top: 4px; font-size: 11px; font-weight: 700; }
+.personal-card .sub-info { font-size: 11px; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 8px; }
+
+.mest-row { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  border-top: 1px solid var(--line); 
+  padding-top: 8px; 
+  margin-top: 4px; 
+  font-size: 12px; 
+  font-weight: 700; 
+  gap: 4px;
+}
+.mest-text { white-space: nowrap; }
+.mest-btn { 
+  padding: 4px 8px; 
+  font-size: 11px; 
+  background: #fee2e2; 
+  color: var(--red); 
+  border-radius: 6px; 
+  font-weight: 700; 
+  width: auto !important; 
+}
 
 .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
 .box { padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--line); }
@@ -244,6 +264,25 @@ tr:last-child td { border-bottom: none; }
 
 .hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; position: relative; }
 .hist-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; align-items: center; }
+
+/* 履歴トグル用スタイル */
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+.accordion-icon {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  transition: transform 0.2s;
+}
+#historyContainer {
+  display: none; /* 初期状態は閉じている */
+  margin-top: 16px;
+}
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
 .modal-content { background: #fff; padding: 20px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
@@ -324,9 +363,18 @@ tr:last-child td { border-bottom: none; }
   <div class="card">
     <h2>個人別実績・飯スト</h2>
     <div id="personalTotals" class="personal-total-grid"></div>
-    <div style="font-size: 11px; color: var(--muted); margin-bottom: 16px;">※最も収支が高かった（または負け額が少なかった）方に飯ストが自動で＋1されます。</div>
-    <h2>履歴一覧</h2>
-    <div id="history" style="color: var(--muted); font-size: 13px;">読み込み中...</div>
+    <div style="font-size: 11px; color: var(--muted); margin-bottom: 0px;">※最も収支が高かった（または負け額が少なかった）方に飯ストが自動で＋1されます。</div>
+  </div>
+
+  <!-- 履歴一覧（折りたたみ式） -->
+  <div class="card">
+    <div class="accordion-header" onclick="toggleHistoryAccordion()">
+      <h2 style="margin:0;">履歴一覧</h2>
+      <span class="accordion-icon" id="accordionIcon">▼ 表示する</span>
+    </div>
+    <div id="historyContainer">
+      <div id="history" style="color: var(--muted); font-size: 13px;">読み込み中...</div>
+    </div>
   </div>
 </div>
 
@@ -353,6 +401,7 @@ function money(v){
 }
 
 let historyData = [];
+let serverMestLogs = [];
 let lastShareMessage = "";
 let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
 
@@ -368,28 +417,67 @@ function cleanTimeStr(rawTime) {
   return str;
 }
 
+function parseDateStrToObj(dateStr) {
+  if (!dateStr) return new Date(0);
+  let match = dateStr.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+  if (match) {
+    return new Date(match[1], match[2] - 1, match[3]);
+  }
+  let d = new Date(dateStr);
+  return isNaN(d.getTime()) ? new Date(0) : d;
+}
+
+// 履歴の開閉切り替え関数
+function toggleHistoryAccordion() {
+  const container = document.getElementById("historyContainer");
+  const icon = document.getElementById("accordionIcon");
+  if (container.style.display === "block") {
+    container.style.display = "none";
+    icon.textContent = "▼ 表示する";
+  } else {
+    container.style.display = "block";
+    icon.textContent = "▲ 閉じる";
+  }
+}
+
 async function loadHistory() {
   const historyEl = document.getElementById("history");
   try {
     const res = await fetch(GAS_URL);
-    let rawData = await res.json();
-    historyData = rawData.map(item => ({
-      ...item,
-      time: cleanTimeStr(item.time)
-    }));
+    let jsonRes = await res.json();
+    
+    if (Array.isArray(jsonRes)) {
+      historyData = jsonRes.map(item => ({ ...item, time: cleanTimeStr(item.time) }));
+      serverMestLogs = [];
+    } else {
+      historyData = (jsonRes.history || []).map(item => ({ ...item, time: cleanTimeStr(item.time) }));
+      serverMestLogs = jsonRes.mestLogs || [];
+    }
+    
+    historyData.sort((a, b) => parseDateStrToObj(a.time) - parseDateStrToObj(b.time));
+    
     renderAll();
   } catch (e) { 
     historyEl.innerHTML = "履歴の読み込みに失敗しました。";
     historyData = [];
+    serverMestLogs = [];
     renderAll();
   }
 }
 
-window.updateMemberMest = function(name, delta) {
-  let currentMest = Number(localStorage.getItem(`nori_mest_${name}`) || 0);
-  let newMest = Math.max(0, currentMest + delta);
-  localStorage.setItem(`nori_mest_${name}`, newMest);
-  renderHistoryList();
+window.updateMemberMest = async function(name, delta) {
+  document.getElementById("loading").style.display = "block";
+  try {
+    await fetch(GAS_URL, { 
+      method: "POST", 
+      mode: "no-cors", 
+      body: JSON.stringify({ method: "UPDATE_MEST", name: name, delta: delta }) 
+    });
+    await loadHistory();
+  } catch(e) {
+    console.error(e);
+  }
+  document.getElementById("loading").style.display = "none";
 };
 
 async function deleteHistory(rowIdx) {
@@ -718,7 +806,7 @@ function renderHistoryList() {
   filteredHistory.forEach((h) => {
     h.players.forEach(p => {
       if(!pStats[p.name]) {
-        pStats[p.name] = { total: 0, count: 0, wins: 0 };
+        pStats[p.name] = { total: 0, count: 0, wins: 0, autoMest: 0 };
       }
       pStats[p.name].total += Number(p.val);
       pStats[p.name].count += 1;
@@ -728,23 +816,43 @@ function renderHistoryList() {
     });
   });
 
+  historyData.forEach(h => {
+    if (h.players && h.players.length > 0) {
+      let sorted = [...h.players].sort((a, b) => b.val - a.val);
+      let best = sorted[0];
+      if (best && pStats[best.name]) {
+        pStats[best.name].autoMest = (pStats[best.name].autoMest || 0) + 1;
+      }
+    }
+  });
+
+  let mestOffsets = {};
+  serverMestLogs.forEach(log => {
+    mestOffsets[log.name] = (mestOffsets[log.name] || 0) + Number(log.delta);
+  });
+
   Object.keys(pStats).sort().forEach(name => {
     const s = pStats[name];
     const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
-    let mestCount = Number(localStorage.getItem(`nori_mest_${name}`) || 0);
+    
+    let autoMest = s.autoMest || 0;
+    let offset = mestOffsets[name] || 0;
+    let mestCount = Math.max(0, autoMest + offset);
 
     const pCard = document.createElement("div");
     pCard.className = "personal-card";
     pCard.innerHTML = `
-      <div class="name-label"><span>${name}</span></div>
-      <div class="amount-value" style="color:${s.total>=0?'var(--green)':'var(--red)'}">${money(s.total)}</div>
-      <div class="sub-info">
-        <span>勝率: ${winRate}%</span>
-        <span>(${s.wins}勝/${s.count}回)</span>
+      <div>
+        <div class="name-label">${name}</div>
+        <div class="amount-value" style="color:${s.total>=0?'var(--green)':'var(--red)'}">${money(s.total)}</div>
+        <div class="sub-info">
+          <span>勝率: ${winRate}%</span>
+          <span>(${s.wins}勝/${s.count}回)</span>
+        </div>
       </div>
       <div class="mest-row">
-        <span>飯スト: <b style="color:var(--accent);">${mestCount}</b></span>
-        <button style="padding:3px 8px; font-size:10px; background:#fee2e2; color:var(--red); border-radius:6px; font-weight:700;" onclick="updateMemberMest('${name}', -1)">消費</button>
+        <span class="mest-text">飯スト: <b style="color:var(--accent);">${mestCount}</b></span>
+        <button class="mest-btn" onclick="updateMemberMest('${name}', -1)">消費</button>
       </div>
     `;
     personalEl.appendChild(pCard);
@@ -854,7 +962,7 @@ document.getElementById("calcBtn").onclick = async function() {
   const payList = document.getElementById("payList"); payList.innerHTML = "";
   let receive = [], pay = [], snapshot = [];
 
-  let calculatedPlayers = players.map(p => {
+  players.forEach(p => {
     const individualProfit = p.cash - p.invest;
     const targetAmount = p.invest + fairProfitPerPerson;
     const diff = p.cash - targetAmount; 
@@ -876,16 +984,7 @@ document.getElementById("calcBtn").onclick = async function() {
     tr.innerHTML = `<td><b>${p.name}</b></td><td>${new Intl.NumberFormat("ja-JP").format(p.invest)}円</td><td>${new Intl.NumberFormat("ja-JP").format(p.cash)}円</td><td style="color:${individualProfit>=0?'var(--green)':'var(--red)'}; font-weight:600;">${money(individualProfit)}</td><td style="font-weight:800; color:${isPay?'var(--red)':'var(--green)'}">${isPay ? '払う：' : '貰う：'}${new Intl.NumberFormat("ja-JP").format(Math.round(absDiff))}円</td>`;
     tbody.appendChild(tr);
     snapshot.push({ name: p.name, val: individualProfit });
-
-    return { name: p.name, profit: individualProfit };
   });
-
-  calculatedPlayers.sort((a, b) => b.profit - a.profit);
-  const bestPlayer = calculatedPlayers[0];
-  if (bestPlayer) {
-    let currentMest = Number(localStorage.getItem(`nori_mest_${bestPlayer.name}`) || 0);
-    localStorage.setItem(`nori_mest_${bestPlayer.name}`, currentMest + 1);
-  }
 
   let msg = `【ノリ打ち精算レポート】\n\n■ 今回の収支\n`;
   snapshot.forEach(p => msg += `・${p.name}：${money(p.val)}\n`);
