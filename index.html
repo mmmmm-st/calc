@@ -200,24 +200,23 @@ button:active { transform: scale(0.98); }
 }
 .chart-title { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
 
-.chart-legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; font-weight: 600; margin-bottom: 12px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
 .legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
+/* グラフをゆったり大きく見せるコンテナ */
 .chart-fit-wrap {
   width: 100%;
   background: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid var(--line);
-  padding: 6px 0;
+  padding: 8px 0;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 svg { 
   display: block; 
-  width: 100%; 
-  min-width: 450px;
-  height: 180px; 
-  overflow: visible; 
+  height: 270px; /* 高さをしっかり大きくしました */
 }
 
 .personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
@@ -815,55 +814,85 @@ function renderExcelChart() {
   let allValues = [...groupData];
   allNames.forEach(name => allValues.push(...memberSeries[name]));
 
-  const width = 600;
-  const height = 180;
-  const paddingX = 45; 
-  const paddingY = 20;
+  // データ数に応じて横幅を大きく広げる（1点あたり約50px確保して見やすく）
+  const totalPoints = groupData.length;
+  const width = Math.max(580, totalPoints * 52);
+  const height = 270;
+  const paddingLeft = 58;
+  const paddingRight = 55; // 最後の日付が右端で見切れないよう十分な余白を確保
+  const paddingTop = 25;
+  const paddingBottom = 32;
 
+  svg.style.width = `${width}px`;
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
-  const minVal = Math.min(0, ...allValues);
-  const maxVal = Math.max(0, ...allValues);
-  const range = (maxVal - minVal) === 0 ? 1 : (maxVal - minVal);
+  // 0を基準にキリの良い目盛り幅（1万, 2万, 5万, 10万...）を自動計算して文字の重なりを防止
+  let rawMin = Math.min(0, ...allValues);
+  let rawMax = Math.max(0, ...allValues);
+  let rawSpan = Math.max(rawMax - rawMin, 20000);
 
-  const totalPoints = groupData.length;
-  const getX = (i) => paddingX + (i / (Math.max(totalPoints - 1, 1))) * (width - paddingX - 15);
-  const getY = (val) => height - paddingY - ((val - minVal) / range) * (height - paddingY * 2);
+  // 目盛りの1ステップ幅をキリの良い金額にする
+  let rawStep = rawSpan / 4;
+  let stepUnit = 10000;
+  if (rawStep > 100000) stepUnit = 100000;
+  else if (rawStep > 50000) stepUnit = 50000;
+  else if (rawStep > 20000) stepUnit = 25000;
+  else if (rawStep > 10000) stepUnit = 20000;
+  else if (rawStep > 5000) stepUnit = 10000;
+  else stepUnit = 5000;
 
-  // 左側の縦軸目盛り（均等ステップ＋必ず「0」の基準線を入れる）
-  const gridSteps = 4;
-  let tickValues = [];
-  for(let s = 0; s <= gridSteps; s++) {
-    tickValues.push(minVal + (range / gridSteps) * s);
-  }
-  // もし均等分割の中に 0 が含まれていなければ、0 を追加してソート
-  if (!tickValues.some(v => Math.abs(v) < 1)) {
-    tickValues.push(0);
-    tickValues.sort((a, b) => a - b);
-  }
+  // 0から上下に stepUnit 刻みで目盛りを作るため、文字同士が絶対に重ならない
+  let minVal = Math.floor(rawMin / stepUnit) * stepUnit;
+  let maxVal = Math.ceil(rawMax / stepUnit) * stepUnit;
+  if (maxVal === minVal) maxVal += stepUnit;
+  let range = maxVal - minVal;
 
-  tickValues.forEach((val) => {
+  const getX = (i) => paddingLeft + (i / (Math.max(totalPoints - 1, 1))) * (width - paddingLeft - paddingRight);
+  const getY = (val) => height - paddingBottom - ((val - minVal) / range) * (height - paddingTop - paddingBottom);
+
+  // 左側の縦軸目盛り（必ず0が含まれ、等間隔で見やすく配置）
+  for(let val = minVal; val <= maxVal + 1; val += stepUnit) {
     const y = getY(val);
-    const isZero = Math.abs(val) < 1;
-    // 0のラインは少し濃い線（実線）にして基準を明確化
-    svg.innerHTML += `<line x1="${paddingX}" y1="${y}" x2="${width - 10}" y2="${y}" stroke="${isZero ? '#94a3b8' : '#e2e8f0'}" stroke-width="${isZero ? '1.5' : '1'}" ${isZero ? '' : 'stroke-dasharray="2,2"'}/>`;
-    let labelText = Math.round(val / 10000) + "万";
-    if(isZero) labelText = "0";
-    svg.innerHTML += `<text x="${paddingX - 6}" y="${y + 3.5}" fill="${isZero ? '#0f172a' : '#64748b'}" font-weight="${isZero ? '700' : '400'}" font-size="9" text-anchor="end">${labelText}</text>`;
-  });
+    const isZero = (val === 0);
+    svg.innerHTML += `<line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="${isZero ? '#64748b' : '#e2e8f0'}" stroke-width="${isZero ? '1.8' : '1'}" ${isZero ? '' : 'stroke-dasharray="3,3"'}/>`;
+    
+    let labelText = "";
+    if (isZero) {
+      labelText = "0";
+    } else if (Math.abs(val) >= 10000) {
+      labelText = (val / 10000) + "万";
+    } else {
+      labelText = (val / 1000) + "千";
+    }
 
-  // X軸の縦線と日付ラベル（「開始」の文字は出さず、1回目以降の日付のみ表示）
-  let step = 1;
-  if (totalPoints > 11) step = 3;
-  else if (totalPoints > 6) step = 2;
+    svg.innerHTML += `<text x="${paddingLeft - 10}" y="${y + 4}" fill="${isZero ? '#0f172a' : '#64748b'}" font-weight="${isZero ? '800' : '500'}" font-size="11" text-anchor="end">${labelText}</text>`;
+  }
+
+  // X軸の縦線と日付ラベル（最後の点まで確実に日付を表示）
+  let xStep = 1;
+  if (totalPoints > 16) xStep = 3;
+  else if (totalPoints > 9) xStep = 2;
 
   groupData.forEach((val, i) => {
     const x = getX(i);
-    svg.innerHTML += `<line x1="${x}" y1="${paddingY}" x2="${x}" y2="${height - paddingY}" stroke="#f1f5f9" stroke-width="1"/>`;
-    if (i > 0 && (i === totalPoints - 1 || i % step === 0)) {
+    svg.innerHTML += `<line x1="${x}" y1="${paddingTop}" x2="${x}" y2="${height - paddingBottom}" stroke="#f1f5f9" stroke-width="1"/>`;
+    
+    // 最初は空文字（開始ラベル不要）、以降は間引きつつ最後の点は必ず表示
+    if (i > 0 && (i === totalPoints - 1 || i % xStep === 0)) {
       let h = targetHistory[i - 1];
-      let dateStr = h && h.time ? h.time.split(' ')[0] : `#${i}`;
-      svg.innerHTML += `<text x="${x}" y="${height - 5}" fill="#64748b" font-size="9" text-anchor="middle">${dateStr}</text>`;
+      let dateStr = "";
+      if (h && h.time) {
+        // 「2026年11月12日」を「11/12」のようにコンパクトにして見切れを完全に防ぐ（または年付きも収まるよう調整）
+        let m = h.time.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+        if (m) {
+          dateStr = `${m[2]}/${m[3]}`;
+        } else {
+          dateStr = h.time.split(' ')[0];
+        }
+      } else {
+        dateStr = `#${i}`;
+      }
+      svg.innerHTML += `<text x="${x}" y="${height - 10}" fill="#64748b" font-size="11" font-weight="600" text-anchor="middle">${dateStr}</text>`;
     }
   });
 
@@ -875,10 +904,10 @@ function renderExcelChart() {
     data.forEach((val, i) => points.push(`${getX(i)},${getY(val)}`));
 
     if(data.length > 1) {
-      svg.innerHTML += `<polyline fill="none" stroke="${color}" stroke-width="2.5" points="${points.join(" ")}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      svg.innerHTML += `<polyline fill="none" stroke="${color}" stroke-width="3" points="${points.join(" ")}" stroke-linecap="round" stroke-linejoin="round"/>`;
     }
     data.forEach((val, i) => {
-      svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="3.5" fill="#fff" stroke="${color}" stroke-width="2"/>`;
+      svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="4.5" fill="#fff" stroke="${color}" stroke-width="2.5"/>`;
     });
 
     legendContainer.innerHTML += `
