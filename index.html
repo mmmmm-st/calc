@@ -247,6 +247,11 @@ svg {
   font-weight: 700; 
   width: auto !important; 
 }
+.mest-btn:disabled {
+  background: #f1f5f9;
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
 
 .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
 .box { padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--line); }
@@ -453,7 +458,7 @@ async function loadHistory() {
   }
 }
 
-// 飯スト消費：サーバーに「消費アクション」の履歴を記録して全体で同期
+// 飯スト消費：消費ボタンを押したときに関数を正しく呼び出してサーバーに記録
 window.updateMemberMest = async function(name, delta) {
   document.getElementById("loading").style.display = "block";
   try {
@@ -485,14 +490,12 @@ async function deleteHistory(rowIdx) {
 function renderAll() {
   const graphsArea = document.getElementById("graphsArea");
   
-  // 収支の履歴（通常のセッション）のみを抽出してグラフや統計に使う
   const sessionHistory = historyData.filter(h => !h.isMestAction);
 
   if(!Array.isArray(sessionHistory) || sessionHistory.length === 0){
     graphsArea.style.display = "none";
     document.getElementById("history").innerHTML = "履歴はありません。";
-    document.getElementById("personalTotals0")?.remove(); // placeholder
-    renderPersonalTotalsOnly(); // 履歴がなくても飯ストは計算できるようにする
+    renderPersonalTotalsOnly();
     document.getElementById("grandTotalDisplay").textContent = "0円";
     document.getElementById("grandWinRateDisplay").textContent = "0%";
     return;
@@ -506,10 +509,8 @@ function renderPersonalTotalsOnly() {
   const personalEl = document.getElementById("personalTotals");
   personalEl.innerHTML = "";
   
-  // メンバーごとの統計と飯スト計算
   let pStats = {};
   
-  // 1. 通常のセッションから勝率・収支を計算
   historyData.filter(h => !h.isMestAction).forEach(h => {
     h.players.forEach(p => {
       if(!pStats[p.name]) {
@@ -523,7 +524,6 @@ function renderPersonalTotalsOnly() {
     });
   });
 
-  // 2. セッションごとに一番勝った人に飯スト+1
   historyData.filter(h => !h.isMestAction).forEach(h => {
     if(h.players && h.players.length > 0) {
       let sorted = [...h.players].sort((a,b) => b.val - a.val);
@@ -534,14 +534,12 @@ function renderPersonalTotalsOnly() {
     }
   });
 
-  // 3. 消費アクション（isMestAction）分をマイナス
   historyData.filter(h => h.isMestAction).forEach(h => {
     if(h.mestName && pStats[h.mestName]) {
       pStats[h.mestName].mest = Math.max(0, pStats[h.mestName].mest - 1);
     }
   });
 
-  // まだセッションがないメンバーでも登録済みなら表示できるように
   storedMembers.forEach(m => {
     if(!pStats[m]) {
       pStats[m] = { total: 0, count: 0, wins: 0, mest: 0 };
@@ -551,6 +549,7 @@ function renderPersonalTotalsOnly() {
   Object.keys(pStats).sort().forEach(name => {
     const s = pStats[name];
     const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
+    const canConsume = s.mest > 0;
     
     const pCard = document.createElement("div");
     pCard.className = "personal-card";
@@ -565,7 +564,7 @@ function renderPersonalTotalsOnly() {
       </div>
       <div class="mest-row">
         <span class="mest-text">飯スト: <b style="color:var(--accent);">${s.mest}</b></span>
-        <button class="mest-btn" onclick="updateMemberMest('${name}', 1)">消費</button>
+        <button class="mest-btn" ${!canConsume ? 'disabled' : ''} onclick="updateMemberMest('${name}', -1)">消費</button>
       </div>
     `;
     personalEl.appendChild(pCard);
@@ -1053,7 +1052,7 @@ document.getElementById("lineSendBtn").onclick = async () => {
 
 document.getElementById("addBtn").onclick = () => addPlayer();
 
-const modal = document.getElementById("memberModal");
+The modal = document.getElementById("memberModal");
 document.getElementById("openMemberModal").onclick = () => {
   renderMemberListEdit();
   modal.style.display = "flex";
