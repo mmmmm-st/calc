@@ -265,7 +265,6 @@ tr:last-child td { border-bottom: none; }
 .pay-box { margin-top: 16px; border-radius: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; }
 .pay-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #fff; margin-bottom: 6px; border-radius: 8px; border: 1px solid #dcfce7; font-size: 13px; }
 
-/* さらに洗練されたコンパクト履歴カード */
 .hist-item { 
   background: #ffffff; 
   border: 1px solid var(--line); 
@@ -280,7 +279,7 @@ tr:last-child td { border-bottom: none; }
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  padding-right: 45px; /* 削除ボタンと被らないように */
+  padding-right: 45px;
 }
 .hist-date {
   font-size: 12px;
@@ -320,7 +319,7 @@ tr:last-child td { border-bottom: none; }
 }
 .hist-players-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 6px;
   margin-bottom: 8px;
 }
@@ -695,8 +694,8 @@ function renderPersonalTotalsAndHistory() {
             <span style="color:${p.val>=0?'var(--green)':'var(--red)'};">${money(p.val)}</span>
           </div>
           <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px;">
-            <span>投:${new Intl.NumberFormat("ja-JP").format(pInvest)}</span>
-            <span>回:${new Intl.NumberFormat("ja-JP").format(pCash)}</span>
+            <span>投資:${new Intl.NumberFormat("ja-JP").format(pInvest)}</span>
+            <span>回収:${new Intl.NumberFormat("ja-JP").format(pCash)}</span>
           </div>
         </div>
       `;
@@ -734,7 +733,7 @@ function renderPersonalTotalsAndHistory() {
       </div>
       <div class="hist-summary-row">
         <span style="font-weight:800; font-size:13px;">合計: <span style="color:${totalProfit>=0?'var(--green)':'var(--red)'}">${money(totalProfit)}</span></span>
-        <span class="hist-per-badge">1人: ${money(perProfit)}</span>
+        <span class="hist-per-badge">1人あたり: ${money(perProfit)}</span>
       </div>
       <div class="hist-section-title">各メンバーの内訳</div>
       <div class="hist-players-grid">
