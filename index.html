@@ -789,11 +789,9 @@ function renderExcelChart() {
 
   if(targetHistory.length === 0) return;
 
-  // 0スタート（初回の前に「収支0円のスタート地点」を仮想追加、または累計に組み込む）
-  // ここで各セッションの累計を計算する際、起点を0にするため先頭に0を追加するか、あるいはグラフの描画データを調整します。
+  // 先頭を 0 スタートにし、次から各回の累計収支をプロット
   let groupSum = 0;
   let rawGroupData = targetHistory.map(h => groupSum += Number(h.profit || 0));
-  // グラフの起点（0）を先頭に挿入
   const groupData = [0, ...rawGroupData];
 
   let allNames = [];
@@ -811,7 +809,6 @@ function renderExcelChart() {
       if(p) pSum += Number(p.val || 0);
       return pSum;
     });
-    // 個人データも起点の0を追加
     memberSeries[name] = [0, ...rawSeries];
   });
 
@@ -829,22 +826,33 @@ function renderExcelChart() {
   const maxVal = Math.max(0, ...allValues);
   const range = (maxVal - minVal) === 0 ? 1 : (maxVal - minVal);
 
-  // データ点数（スタートの「0」を含めるため targetHistory.length + 1）
   const totalPoints = groupData.length;
   const getX = (i) => paddingX + (i / (Math.max(totalPoints - 1, 1))) * (width - paddingX - 15);
   const getY = (val) => height - paddingY - ((val - minVal) / range) * (height - paddingY * 2);
 
+  // 左側の縦軸目盛り（均等ステップ＋必ず「0」の基準線を入れる）
   const gridSteps = 4;
+  let tickValues = [];
   for(let s = 0; s <= gridSteps; s++) {
-    const val = minVal + (range / gridSteps) * s;
-    const y = getY(val);
-    svg.innerHTML += `<line x1="${paddingX}" y1="${y}" x2="${width - 10}" y2="${y}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2,2"/>`;
-    let labelText = Math.round(val / 10000) + "万";
-    if(val === 0) labelText = "0";
-    svg.innerHTML += `<text x="${paddingX - 6}" y="${y + 3.5}" fill="#64748b" font-size="9" text-anchor="end">${labelText}</text>`;
+    tickValues.push(minVal + (range / gridSteps) * s);
+  }
+  // もし均等分割の中に 0 が含まれていなければ、0 を追加してソート
+  if (!tickValues.some(v => Math.abs(v) < 1)) {
+    tickValues.push(0);
+    tickValues.sort((a, b) => a - b);
   }
 
-  // X軸のラベル（スタート地点の「0」ラベルと、各セッションの日付をマッピング）
+  tickValues.forEach((val) => {
+    const y = getY(val);
+    const isZero = Math.abs(val) < 1;
+    // 0のラインは少し濃い線（実線）にして基準を明確化
+    svg.innerHTML += `<line x1="${paddingX}" y1="${y}" x2="${width - 10}" y2="${y}" stroke="${isZero ? '#94a3b8' : '#e2e8f0'}" stroke-width="${isZero ? '1.5' : '1'}" ${isZero ? '' : 'stroke-dasharray="2,2"'}/>`;
+    let labelText = Math.round(val / 10000) + "万";
+    if(isZero) labelText = "0";
+    svg.innerHTML += `<text x="${paddingX - 6}" y="${y + 3.5}" fill="${isZero ? '#0f172a' : '#64748b'}" font-weight="${isZero ? '700' : '400'}" font-size="9" text-anchor="end">${labelText}</text>`;
+  });
+
+  // X軸の縦線と日付ラベル（「開始」の文字は出さず、1回目以降の日付のみ表示）
   let step = 1;
   if (totalPoints > 11) step = 3;
   else if (totalPoints > 6) step = 2;
@@ -852,12 +860,9 @@ function renderExcelChart() {
   groupData.forEach((val, i) => {
     const x = getX(i);
     svg.innerHTML += `<line x1="${x}" y1="${paddingY}" x2="${x}" y2="${height - paddingY}" stroke="#f1f5f9" stroke-width="1"/>`;
-    if (i === 0 || i === totalPoints - 1 || i % step === 0) {
-      let dateStr = "開始";
-      if (i > 0) {
-        let h = targetHistory[i - 1];
-        dateStr = h && h.time ? h.time.split(' ')[0] : `#${i}`;
-      }
+    if (i > 0 && (i === totalPoints - 1 || i % step === 0)) {
+      let h = targetHistory[i - 1];
+      let dateStr = h && h.time ? h.time.split(' ')[0] : `#${i}`;
       svg.innerHTML += `<text x="${x}" y="${height - 5}" fill="#64748b" font-size="9" text-anchor="middle">${dateStr}</text>`;
     }
   });
@@ -994,7 +999,6 @@ document.getElementById("calcBtn").onclick = async function() {
   });
 
   let msg = `【ノリ打ち精算レポート】\n\n■ 今回の収支\n`;
-  snapshot.forecast = ""; // placeholder
   snapshot.forEach(p => msg += `・${p.name}：${money(p.val)}\n`);
   msg += `合計：${money(totalProfit)}\n\n■ 受け渡し指示\n`;
   let hasPay = false;
