@@ -270,7 +270,6 @@ tr:last-child td { border-bottom: none; }
 .hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; position: relative; }
 .hist-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; align-items: center; }
 
-/* 履歴トグル用スタイル */
 .accordion-header {
   display: flex;
   justify-content: space-between;
@@ -357,7 +356,7 @@ tr:last-child td { border-bottom: none; }
     </div>
 
     <div class="chart-card" id="graphsArea" style="display:none;">
-      <div class="chart-title">📈 収支推移グラフ</div>
+      <div class="chart-title">📈 収支推移グラフ (起点: 0円)</div>
       <div class="chart-legend" id="chartLegend"></div>
       <div class="chart-fit-wrap">
         <svg id="excelLineChart"></svg>
@@ -368,7 +367,7 @@ tr:last-child td { border-bottom: none; }
   <div class="card">
     <h2>個人別実績・飯スト</h2>
     <div id="personalTotals" class="personal-total-grid"></div>
-    <div style="font-size: 11px; color: var(--muted); margin-bottom: 0px;">※最も収支が高かった（または負け額が少なかった）方に飯ストが自動で＋1されます。</div>
+    <div style="font-size: 11px; color: var(--muted); margin-bottom: 0px;">※選択中の組み合わせ・期間に参加しているメンバーのみ表示されます。</div>
   </div>
 
   <div class="card">
@@ -463,7 +462,16 @@ async function loadHistory() {
   }
 }
 
+// ③ 飯スト消費（確認ポップアップ付き）
 window.updateMemberMest = async function(name, delta) {
+  let currentCount = serverMestMap[name] || 0;
+  if(delta < 0 && currentCount <= 0) {
+    alert("消費できる飯ストがありません。");
+    return;
+  }
+  
+  if(!confirm(`「${name}」の飯ストを1つ消費しますか？`)) return;
+
   document.getElementById("loading").style.display = "block";
   try {
     await fetch(GAS_URL, { 
@@ -496,7 +504,7 @@ function renderAll() {
   if(!Array.isArray(historyData) || historyData.length === 0){
     graphsArea.style.display = "none";
     document.getElementById("history").innerHTML = "履歴はありません。";
-    renderPersonalTotalsOnly();
+    document.getElementById("personalTotals").innerHTML = "";
     document.getElementById("grandTotalDisplay").textContent = "0円";
     document.getElementById("grandWinRateDisplay").textContent = "0%";
     return;
@@ -506,12 +514,43 @@ function renderAll() {
   renderFilteredContent();
 }
 
-function renderPersonalTotalsOnly() {
+function renderFilteredContent() {
+  renderGrandTotals();
+  renderExcelChart();
+  renderPersonalTotalsAndHistory();
+}
+
+// ① & ② フィルターで絞り込まれた履歴とメンバーのみを表示
+function renderPersonalTotalsAndHistory() {
   const personalEl = document.getElementById("personalTotals");
+  const histEl = document.getElementById("history");
+  const comboSelect = document.getElementById("combinationSelect");
+  const yearSelect = document.getElementById("yearSelect");
+  const monthSelect = document.getElementById("monthSelect");
+
   personalEl.innerHTML = "";
-  
+  histEl.innerHTML = "";
+
+  const selectedCombo = comboSelect ? comboSelect.value : "";
+  const selectedYear = yearSelect ? yearSelect.value : "all";
+  const selectedMonth = monthSelect ? monthSelect.value : "all";
+
+  // フィルターに一致する履歴だけを抽出
+  let filteredHistory = historyData.filter(h => {
+    const names = h.players.map(p => p.name).sort().join(", ");
+    if(selectedCombo && names !== selectedCombo) return false;
+    return matchFilter(h, selectedYear, selectedMonth);
+  });
+
+  if(filteredHistory.length === 0) {
+    personalEl.innerHTML = "<div style='font-size:12px; color:var(--muted); grid-column: 1/-1;'>該当するメンバー・期間の実績はありません。</div>";
+    histEl.innerHTML = "該当する期間の履歴はありません。";
+    return;
+  }
+
+  // ① 絞り込まれた履歴に登場するメンバーを集計
   let pStats = {};
-  historyData.forEach((h) => {
+  filteredHistory.forEach((h) => {
     h.players.forEach(p => {
       if(!pStats[p.name]) {
         pStats[p.name] = { total: 0, count: 0, wins: 0 };
@@ -524,17 +563,9 @@ function renderPersonalTotalsOnly() {
     });
   });
 
-  storedMembers.forEach(m => {
-    if(!pStats[m]) {
-      pStats[m] = { total: 0, count: 0, wins: 0 };
-    }
-  });
-
   Object.keys(pStats).sort().forEach(name => {
     const s = pStats[name];
     const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
-    
-    // 別シートの数値を直接表示
     let mestCount = serverMestMap[name] || 0;
     const canConsume = mestCount > 0;
 
@@ -556,13 +587,27 @@ function renderPersonalTotalsOnly() {
     `;
     personalEl.appendChild(pCard);
   });
-}
 
-function renderFilteredContent() {
-  renderGrandTotals();
-  renderExcelChart();
-  renderPersonalTotalsOnly();
-  renderHistoryList();
+  // ② 絞り込まれた履歴一覧を描画
+  [...filteredHistory].reverse().forEach((h) => {
+    let details = "";
+    h.players.forEach(p => {
+      details += `<div style="display:flex; justify-content:space-between; font-size:12px; margin-top:4px;"><span>${p.name}</span><span style="font-weight:600; color:${p.val>=0?'var(--green)':'var(--red)'}">${money(p.val)}</span></div>`;
+    });
+
+    const box = document.createElement("div");
+    box.className = "hist-item";
+    box.innerHTML = `
+      <div class="hist-actions">
+        <button class="delete-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
+      </div>
+      <div style="font-size:11px; color:var(--muted); font-weight:600; margin-bottom:4px;">記録日時</div>
+      <div style="font-weight:700; font-size:13px; color:var(--text); margin-bottom:6px;">${h.time}</div>
+      <div style="font-weight:800; margin-bottom:8px; font-size:14px;">合計 ${money(h.profit)}</div>
+      ${details}
+    `;
+    histEl.appendChild(box);
+  });
 }
 
 function renderGrandTotals() {
@@ -725,6 +770,7 @@ function matchFilter(h, yearVal, monthVal) {
   return true;
 }
 
+// ④ グラフの起点を 0 に固定して描画
 function renderExcelChart() {
   const svg = document.getElementById("excelLineChart");
   const legendContainer = document.getElementById("chartLegend");
@@ -779,6 +825,7 @@ function renderExcelChart() {
 
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
+  // 起点を強制的に 0 に設定（最小値が0未満なら最小値、プラスなら0スタート）
   const minVal = Math.min(0, ...allValues);
   const maxVal = Math.max(0, ...allValues);
   const range = (maxVal - minVal) === 0 ? 1 : (maxVal - minVal);
@@ -836,45 +883,6 @@ function renderExcelChart() {
   allNames.forEach((name, idx) => {
     const color = colors[(idx + 1) % colors.length];
     drawLineAndDots(memberSeries[name], color, name);
-  });
-}
-
-function renderHistoryList() {
-  const el = document.getElementById("history");
-  const yearSelect = document.getElementById("yearSelect");
-  const monthSelect = document.getElementById("monthSelect");
-  
-  el.innerHTML = "";
-  if(!Array.isArray(historyData) || historyData.length === 0) return;
-
-  const selectedYear = yearSelect ? yearSelect.value : "all";
-  const selectedMonth = monthSelect ? monthSelect.value : "all";
-
-  let filteredHistory = historyData.filter(h => matchFilter(h, selectedYear, selectedMonth));
-
-  if(filteredHistory.length === 0) {
-    el.innerHTML = "該当する期間の履歴はありません。";
-    return;
-  }
-
-  [...filteredHistory].reverse().forEach((h) => {
-    let details = "";
-    h.players.forEach(p => {
-      details += `<div style="display:flex; justify-content:space-between; font-size:12px; margin-top:4px;"><span>${p.name}</span><span style="font-weight:600; color:${p.val>=0?'var(--green)':'var(--red)'}">${money(p.val)}</span></div>`;
-    });
-
-    const box = document.createElement("div");
-    box.className = "hist-item";
-    box.innerHTML = `
-      <div class="hist-actions">
-        <button class="delete-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
-      </div>
-      <div style="font-size:11px; color:var(--muted); font-weight:600; margin-bottom:4px;">記録日時</div>
-      <div style="font-weight:700; font-size:13px; color:var(--text); margin-bottom:6px;">${h.time}</div>
-      <div style="font-weight:800; margin-bottom:8px; font-size:14px;">合計 ${money(h.profit)}</div>
-      ${details}
-    `;
-    el.appendChild(box);
   });
 }
 
@@ -990,7 +998,7 @@ document.getElementById("calcBtn").onclick = async function() {
       if(p.amount <= 0 || r.amount <= 0) return;
       const move = Math.min(p.amount, r.amount);
       payList.innerHTML += `<div class="pay-row"><span><b>${p.name}</b> → ${r.name}</span><span style="color:var(--green);font-weight:800;">${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円</span></div>`;
-      msg += `・${p.name} → ${r.name} : ${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円\n`;
+      msg += `・${p.name} → ${r.name}：${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円\n`;
       p.amount -= move; r.amount -= move; hasPay = true;
     });
   });
