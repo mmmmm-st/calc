@@ -204,7 +204,6 @@ button:active { transform: scale(0.98); }
 .legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
-/* グラフをゆったり大きく見せるコンテナ */
 .chart-fit-wrap {
   width: 100%;
   background: #fff;
@@ -216,7 +215,7 @@ button:active { transform: scale(0.98); }
 }
 svg { 
   display: block; 
-  height: 270px; /* 高さをしっかり大きくしました */
+  height: 270px;
 }
 
 .personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
@@ -268,6 +267,23 @@ tr:last-child td { border-bottom: none; }
 
 .hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; position: relative; }
 .hist-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; align-items: center; }
+.hist-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--line);
+}
+.hist-per-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--accent-light);
+  color: var(--accent);
+}
 
 .accordion-header {
   display: flex;
@@ -518,6 +534,39 @@ function renderFilteredContent() {
   renderPersonalTotalsAndHistory();
 }
 
+// 過去の履歴データから、その回の精算時のお金の受け渡し（誰から誰へいくら）を再計算するヘルパー関数
+function calculateTransfers(players) {
+  if (!players || players.length === 0) return [];
+  const totalProfit = players.reduce((sum, p) => sum + Number(p.val || 0), 0);
+  const fairProfitPerPerson = totalProfit / players.length;
+
+  let receive = [], pay = [];
+  players.forEach(p => {
+    const invest = p.invest !== undefined ? Number(p.invest) : 0;
+    const cash = p.cash !== undefined ? Number(p.cash) : 0;
+    const targetAmount = invest + fairProfitPerPerson;
+    const diff = cash - targetAmount; 
+
+    if(diff > 1) {
+      pay.push({ name: p.name, amount: diff });
+    } else if(diff < -1) {
+      receive.push({ name: p.name, amount: -diff });
+    }
+  });
+
+  let transfers = [];
+  pay.forEach(p => {
+    receive.forEach(r => {
+      if(p.amount <= 0 || r.amount <= 0) return;
+      const move = Math.min(p.amount, r.amount);
+      transfers.push({ from: p.name, to: r.name, amount: Math.round(move) });
+      p.amount -= move; 
+      r.amount -= move;
+    });
+  });
+  return transfers;
+}
+
 function renderPersonalTotalsAndHistory() {
   const personalEl = document.getElementById("personalTotals");
   const histEl = document.getElementById("history");
@@ -584,10 +633,49 @@ function renderPersonalTotalsAndHistory() {
   });
 
   [...filteredHistory].reverse().forEach((h) => {
+    const memberCount = h.players.length > 0 ? h.players.length : 1;
+    const totalProfit = Number(h.profit || 0);
+    const perProfit = totalProfit / memberCount;
+
     let details = "";
     h.players.forEach(p => {
-      details += `<div style="display:flex; justify-content:space-between; font-size:12px; margin-top:4px;"><span>${p.name}</span><span style="font-weight:600; color:${p.val>=0?'var(--green)':'var(--red)'}">${money(p.val)}</span></div>`;
+      const pInvest = p.invest !== undefined ? Number(p.invest) : 0;
+      const pCash = p.cash !== undefined ? Number(p.cash) : 0;
+      details += `
+        <div style="background:#fff; border:1px solid var(--line); border-radius:8px; padding:6px 10px; margin-top:6px; font-size:12px;">
+          <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:2px;">
+            <span>👤 ${p.name}</span>
+            <span style="color:${p.val>=0?'var(--green)':'var(--red)'};">${money(p.val)}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:11px;">
+            <span>投資: ${new Intl.NumberFormat("ja-JP").format(pInvest)}円</span>
+            <span>回収: ${new Intl.NumberFormat("ja-JP").format(pCash)}円</span>
+          </div>
+        </div>
+      `;
     });
+
+    // お金の受け渡し指示の生成
+    const transfers = calculateTransfers(h.players);
+    let transferHtml = "";
+    if (transfers.length > 0) {
+      let rows = "";
+      transfers.forEach(t => {
+        rows += `<div style="display:flex; justify-content:space-between; font-size:12px; padding:3px 0; border-bottom:1px solid #dcfce7;"><span><b>${t.from}</b> → ${t.to}</span><span style="color:var(--green); font-weight:800;">${new Intl.NumberFormat("ja-JP").format(t.amount)}円</span></div>`;
+      });
+      transferHtml = `
+        <div style="margin-top:10px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:8px 10px;">
+          <div style="font-weight:700; color:#166534; font-size:11px; margin-bottom:4px;">💸 お金の受け渡し</div>
+          ${rows}
+        </div>
+      `;
+    } else {
+      transferHtml = `
+        <div style="margin-top:10px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:6px 10px; font-size:11px; color:#166534; font-weight:600;">
+          💸 お金の受け渡し：必要なし
+        </div>
+      `;
+    }
 
     const box = document.createElement("div");
     box.className = "hist-item";
@@ -595,10 +683,15 @@ function renderPersonalTotalsAndHistory() {
       <div class="hist-actions">
         <button class="delete-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
       </div>
-      <div style="font-size:11px; color:var(--muted); font-weight:600; margin-bottom:4px;">記録日時</div>
-      <div style="font-weight:700; font-size:13px; color:var(--text); margin-bottom:6px;">${h.time}</div>
-      <div style="font-weight:800; margin-bottom:8px; font-size:14px;">合計 ${money(h.profit)}</div>
+      <div style="font-size:11px; color:var(--muted); font-weight:600; margin-bottom:2px;">記録日時</div>
+      <div style="font-weight:700; font-size:13px; color:var(--text); margin-bottom:8px;">${h.time}</div>
+      <div class="hist-summary-row">
+        <span style="font-weight:800; font-size:14px;">合計 <span style="color:${totalProfit>=0?'var(--green)':'var(--red)'}">${money(totalProfit)}</span></span>
+        <span class="hist-per-badge">1人あたり：${money(perProfit)}</span>
+      </div>
+      <div style="font-size:11px; font-weight:600; color:var(--muted); margin-bottom:2px;">各メンバーの内訳</div>
       ${details}
+      ${transferHtml}
     `;
     histEl.appendChild(box);
   });
@@ -788,7 +881,6 @@ function renderExcelChart() {
 
   if(targetHistory.length === 0) return;
 
-  // 先頭を 0 スタートにし、次から各回の累計収支をプロット
   let groupSum = 0;
   let rawGroupData = targetHistory.map(h => groupSum += Number(h.profit || 0));
   const groupData = [0, ...rawGroupData];
@@ -814,24 +906,21 @@ function renderExcelChart() {
   let allValues = [...groupData];
   allNames.forEach(name => allValues.push(...memberSeries[name]));
 
-  // データ数に応じて横幅を大きく広げる（1点あたり約50px確保して見やすく）
   const totalPoints = groupData.length;
   const width = Math.max(580, totalPoints * 52);
   const height = 270;
   const paddingLeft = 58;
-  const paddingRight = 55; // 最後の日付が右端で見切れないよう十分な余白を確保
+  const paddingRight = 55;
   const paddingTop = 25;
   const paddingBottom = 32;
 
   svg.style.width = `${width}px`;
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
-  // 0を基準にキリの良い目盛り幅（1万, 2万, 5万, 10万...）を自動計算して文字の重なりを防止
   let rawMin = Math.min(0, ...allValues);
   let rawMax = Math.max(0, ...allValues);
   let rawSpan = Math.max(rawMax - rawMin, 20000);
 
-  // 目盛りの1ステップ幅をキリの良い金額にする
   let rawStep = rawSpan / 4;
   let stepUnit = 10000;
   if (rawStep > 100000) stepUnit = 100000;
@@ -841,7 +930,6 @@ function renderExcelChart() {
   else if (rawStep > 5000) stepUnit = 10000;
   else stepUnit = 5000;
 
-  // 0から上下に stepUnit 刻みで目盛りを作るため、文字同士が絶対に重ならない
   let minVal = Math.floor(rawMin / stepUnit) * stepUnit;
   let maxVal = Math.ceil(rawMax / stepUnit) * stepUnit;
   if (maxVal === minVal) maxVal += stepUnit;
@@ -850,7 +938,6 @@ function renderExcelChart() {
   const getX = (i) => paddingLeft + (i / (Math.max(totalPoints - 1, 1))) * (width - paddingLeft - paddingRight);
   const getY = (val) => height - paddingBottom - ((val - minVal) / range) * (height - paddingTop - paddingBottom);
 
-  // 左側の縦軸目盛り（必ず0が含まれ、等間隔で見やすく配置）
   for(let val = minVal; val <= maxVal + 1; val += stepUnit) {
     const y = getY(val);
     const isZero = (val === 0);
@@ -868,7 +955,6 @@ function renderExcelChart() {
     svg.innerHTML += `<text x="${paddingLeft - 10}" y="${y + 4}" fill="${isZero ? '#0f172a' : '#64748b'}" font-weight="${isZero ? '800' : '500'}" font-size="11" text-anchor="end">${labelText}</text>`;
   }
 
-  // X軸の縦線と日付ラベル（最後の点まで確実に日付を表示）
   let xStep = 1;
   if (totalPoints > 16) xStep = 3;
   else if (totalPoints > 9) xStep = 2;
@@ -877,12 +963,10 @@ function renderExcelChart() {
     const x = getX(i);
     svg.innerHTML += `<line x1="${x}" y1="${paddingTop}" x2="${x}" y2="${height - paddingBottom}" stroke="#f1f5f9" stroke-width="1"/>`;
     
-    // 最初は空文字（開始ラベル不要）、以降は間引きつつ最後の点は必ず表示
     if (i > 0 && (i === totalPoints - 1 || i % xStep === 0)) {
       let h = targetHistory[i - 1];
       let dateStr = "";
       if (h && h.time) {
-        // 「2026年11月12日」を「11/12」のようにコンパクトにして見切れを完全に防ぐ（または年付きも収まるよう調整）
         let m = h.time.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
         if (m) {
           dateStr = `${m[2]}/${m[3]}`;
@@ -1024,12 +1108,12 @@ document.getElementById("calcBtn").onclick = async function() {
     const tr = document.createElement("tr");
     tr.innerHTML = `<td><b>${p.name}</b></td><td>${new Intl.NumberFormat("ja-JP").format(p.invest)}円</td><td>${new Intl.NumberFormat("ja-JP").format(p.cash)}円</td><td style="color:${individualProfit>=0?'var(--green)':'var(--red)'}; font-weight:600;">${money(individualProfit)}</td><td style="font-weight:800; color:${isPay?'var(--red)':'var(--green)'}">${isPay ? '払う：' : '貰う：'}${new Intl.NumberFormat("ja-JP").format(Math.round(absDiff))}円</td>`;
     tbody.appendChild(tr);
-    snapshot.push({ name: p.name, val: individualProfit });
+    snapshot.push({ name: p.name, val: individualProfit, invest: p.invest, cash: p.cash });
   });
 
   let msg = `【ノリ打ち精算レポート】\n\n■ 今回の収支\n`;
   snapshot.forEach(p => msg += `・${p.name}：${money(p.val)}\n`);
-  msg += `合計：${money(totalProfit)}\n\n■ 受け渡し指示\n`;
+  msg += `合計：${money(totalProfit)}（1人あたり：${money(fairProfitPerPerson)}）\n\n■ 受け渡し指示\n`;
   let hasPay = false;
 
   pay.forEach(p => {
