@@ -265,24 +265,71 @@ tr:last-child td { border-bottom: none; }
 .pay-box { margin-top: 16px; border-radius: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; }
 .pay-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #fff; margin-bottom: 6px; border-radius: 8px; border: 1px solid #dcfce7; font-size: 13px; }
 
-.hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; position: relative; }
-.hist-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; align-items: center; }
+/* さらに洗練されたコンパクト履歴カード */
+.hist-item { 
+  background: #ffffff; 
+  border: 1px solid var(--line); 
+  border-radius: 14px; 
+  padding: 12px 14px; 
+  margin-bottom: 10px; 
+  position: relative; 
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.hist-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-right: 45px; /* 削除ボタンと被らないように */
+}
+.hist-date {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.hist-actions { 
+  position: absolute; 
+  top: 10px; 
+  right: 12px; 
+}
 .hist-summary-row {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  padding-bottom: 6px;
-  border-bottom: 1px dashed var(--line);
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
 }
 .hist-per-badge {
   font-size: 11px;
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
   background: var(--accent-light);
   color: var(--accent);
+}
+.hist-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.hist-players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.hist-player-mini {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11px;
 }
 
 .accordion-header {
@@ -642,14 +689,14 @@ function renderPersonalTotalsAndHistory() {
       const pInvest = p.invest !== undefined ? Number(p.invest) : 0;
       const pCash = p.cash !== undefined ? Number(p.cash) : 0;
       details += `
-        <div style="background:#fff; border:1px solid var(--line); border-radius:6px; padding:4px 8px; margin-top:4px; font-size:11px;">
-          <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:1px;">
-            <span>👤 ${p.name}</span>
+        <div class="hist-player-mini">
+          <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:2px;">
+            <span>${p.name}</span>
             <span style="color:${p.val>=0?'var(--green)':'var(--red)'};">${money(p.val)}</span>
           </div>
-          <div style="display:flex; justify-content:space-between; color:var(--muted);">
-            <span>投資: ${new Intl.NumberFormat("ja-JP").format(pInvest)}円</span>
-            <span>回収: ${new Intl.NumberFormat("ja-JP").format(pCash)}円</span>
+          <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px;">
+            <span>投:${new Intl.NumberFormat("ja-JP").format(pInvest)}</span>
+            <span>回:${new Intl.NumberFormat("ja-JP").format(pCash)}</span>
           </div>
         </div>
       `;
@@ -682,14 +729,17 @@ function renderPersonalTotalsAndHistory() {
       <div class="hist-actions">
         <button class="delete-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
       </div>
-      <div style="font-size:10px; color:var(--muted); font-weight:600; margin-bottom:1px;">記録日時</div>
-      <div style="font-weight:700; font-size:12px; color:var(--text); margin-bottom:6px;">${h.time}</div>
-      <div class="hist-summary-row">
-        <span style="font-weight:800; font-size:13px;">合計 <span style="color:${totalProfit>=0?'var(--green)':'var(--red)'}">${money(totalProfit)}</span></span>
-        <span class="hist-per-badge">1人あたり：${money(perProfit)}</span>
+      <div class="hist-header-flex">
+        <span class="hist-date">📅 ${h.time}</span>
       </div>
-      <div style="font-size:10px; font-weight:600; color:var(--muted); margin-bottom:1px;">各メンバーの内訳</div>
-      ${details}
+      <div class="hist-summary-row">
+        <span style="font-weight:800; font-size:13px;">合計: <span style="color:${totalProfit>=0?'var(--green)':'var(--red)'}">${money(totalProfit)}</span></span>
+        <span class="hist-per-badge">1人: ${money(perProfit)}</span>
+      </div>
+      <div class="hist-section-title">各メンバーの内訳</div>
+      <div class="hist-players-grid">
+        ${details}
+      </div>
       ${transferHtml}
     `;
     histEl.appendChild(box);
