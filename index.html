@@ -265,7 +265,6 @@ tr:last-child td { border-bottom: none; }
 .hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; position: relative; }
 .hist-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; align-items: center; }
 
-/* 履歴トグル用スタイル */
 .accordion-header {
   display: flex;
   justify-content: space-between;
@@ -280,7 +279,7 @@ tr:last-child td { border-bottom: none; }
   transition: transform 0.2s;
 }
 #historyContainer {
-  display: none; /* 初期状態は閉じている */
+  display: none;
   margin-top: 16px;
 }
 
@@ -366,7 +365,6 @@ tr:last-child td { border-bottom: none; }
     <div style="font-size: 11px; color: var(--muted); margin-bottom: 0px;">※最も収支が高かった（または負け額が少なかった）方に飯ストが自動で＋1されます。</div>
   </div>
 
-  <!-- 履歴一覧（折りたたみ式） -->
   <div class="card">
     <div class="accordion-header" onclick="toggleHistoryAccordion()">
       <h2 style="margin:0;">履歴一覧</h2>
@@ -401,7 +399,7 @@ function money(v){
 }
 
 let historyData = [];
-let serverMestLogs = [];
+let serverMestMap = {};
 let lastShareMessage = "";
 let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
 
@@ -427,7 +425,6 @@ function parseDateStrToObj(dateStr) {
   return isNaN(d.getTime()) ? new Date(0) : d;
 }
 
-// 履歴の開閉切り替え関数
 function toggleHistoryAccordion() {
   const container = document.getElementById("historyContainer");
   const icon = document.getElementById("accordionIcon");
@@ -448,10 +445,10 @@ async function loadHistory() {
     
     if (Array.isArray(jsonRes)) {
       historyData = jsonRes.map(item => ({ ...item, time: cleanTimeStr(item.time) }));
-      serverMestLogs = [];
+      serverMestMap = {};
     } else {
       historyData = (jsonRes.history || []).map(item => ({ ...item, time: cleanTimeStr(item.time) }));
-      serverMestLogs = jsonRes.mestLogs || [];
+      serverMestMap = jsonRes.mestMap || {};
     }
     
     historyData.sort((a, b) => parseDateStrToObj(a.time) - parseDateStrToObj(b.time));
@@ -460,11 +457,12 @@ async function loadHistory() {
   } catch (e) { 
     historyEl.innerHTML = "履歴の読み込みに失敗しました。";
     historyData = [];
-    serverMestLogs = [];
+    serverMestMap = {};
     renderAll();
   }
 }
 
+// 飯スト消費：直接スプレッドシート上の数値を-1して即同期
 window.updateMemberMest = async function(name, delta) {
   document.getElementById("loading").style.display = "block";
   try {
@@ -806,7 +804,7 @@ function renderHistoryList() {
   filteredHistory.forEach((h) => {
     h.players.forEach(p => {
       if(!pStats[p.name]) {
-        pStats[p.name] = { total: 0, count: 0, wins: 0, autoMest: 0 };
+        pStats[p.name] = { total: 0, count: 0, wins: 0 };
       }
       pStats[p.name].total += Number(p.val);
       pStats[p.name].count += 1;
@@ -816,28 +814,12 @@ function renderHistoryList() {
     });
   });
 
-  historyData.forEach(h => {
-    if (h.players && h.players.length > 0) {
-      let sorted = [...h.players].sort((a, b) => b.val - a.val);
-      let best = sorted[0];
-      if (best && pStats[best.name]) {
-        pStats[best.name].autoMest = (pStats[best.name].autoMest || 0) + 1;
-      }
-    }
-  });
-
-  let mestOffsets = {};
-  serverMestLogs.forEach(log => {
-    mestOffsets[log.name] = (mestOffsets[log.name] || 0) + Number(log.delta);
-  });
-
   Object.keys(pStats).sort().forEach(name => {
     const s = pStats[name];
     const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
     
-    let autoMest = s.autoMest || 0;
-    let offset = mestOffsets[name] || 0;
-    let mestCount = Math.max(0, autoMest + offset);
+    // スプレッドシート側の専用管理数値を直接使用（消費で確実に減る）
+    let mestCount = serverMestMap[name] || 0;
 
     const pCard = document.createElement("div");
     pCard.className = "personal-card";
