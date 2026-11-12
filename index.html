@@ -356,7 +356,7 @@ tr:last-child td { border-bottom: none; }
     </div>
 
     <div class="chart-card" id="graphsArea" style="display:none;">
-      <div class="chart-title">📈 収支推移グラフ (起点: 0円)</div>
+      <div class="chart-title">📈 収支推移グラフ</div>
       <div class="chart-legend" id="chartLegend"></div>
       <div class="chart-fit-wrap">
         <svg id="excelLineChart"></svg>
@@ -462,7 +462,6 @@ async function loadHistory() {
   }
 }
 
-// ③ 飯スト消費（確認ポップアップ付き）
 window.updateMemberMest = async function(name, delta) {
   let currentCount = serverMestMap[name] || 0;
   if(delta < 0 && currentCount <= 0) {
@@ -520,7 +519,6 @@ function renderFilteredContent() {
   renderPersonalTotalsAndHistory();
 }
 
-// ① & ② フィルターで絞り込まれた履歴とメンバーのみを表示
 function renderPersonalTotalsAndHistory() {
   const personalEl = document.getElementById("personalTotals");
   const histEl = document.getElementById("history");
@@ -535,7 +533,6 @@ function renderPersonalTotalsAndHistory() {
   const selectedYear = yearSelect ? yearSelect.value : "all";
   const selectedMonth = monthSelect ? monthSelect.value : "all";
 
-  // フィルターに一致する履歴だけを抽出
   let filteredHistory = historyData.filter(h => {
     const names = h.players.map(p => p.name).sort().join(", ");
     if(selectedCombo && names !== selectedCombo) return false;
@@ -548,7 +545,6 @@ function renderPersonalTotalsAndHistory() {
     return;
   }
 
-  // ① 絞り込まれた履歴に登場するメンバーを集計
   let pStats = {};
   filteredHistory.forEach((h) => {
     h.players.forEach(p => {
@@ -557,7 +553,8 @@ function renderPersonalTotalsAndHistory() {
       }
       pStats[p.name].total += Number(p.val);
       pStats[p.name].count += 1;
-      if(Number(p.val) > 0) {
+      // 収支0円も勝ち扱い（>= 0）にする
+      if(Number(p.val) >= 0) {
         pStats[p.name].wins += 1;
       }
     });
@@ -588,7 +585,6 @@ function renderPersonalTotalsAndHistory() {
     personalEl.appendChild(pCard);
   });
 
-  // ② 絞り込まれた履歴一覧を描画
   [...filteredHistory].reverse().forEach((h) => {
     let details = "";
     h.players.forEach(p => {
@@ -640,7 +636,8 @@ function renderGrandTotals() {
         const profit = Number(h.profit || 0);
         gTotal += profit;
         totalSessions += 1;
-        if(profit > 0) {
+        // グループ収支0円も勝ち扱い（>= 0）にする
+        if(profit >= 0) {
           winSessions += 1;
         }
       }
@@ -770,7 +767,6 @@ function matchFilter(h, yearVal, monthVal) {
   return true;
 }
 
-// ④ グラフの起点を 0 に固定して描画
 function renderExcelChart() {
   const svg = document.getElementById("excelLineChart");
   const legendContainer = document.getElementById("chartLegend");
@@ -825,7 +821,6 @@ function renderExcelChart() {
 
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
-  // 起点を強制的に 0 に設定（最小値が0未満なら最小値、プラスなら0スタート）
   const minVal = Math.min(0, ...allValues);
   const maxVal = Math.max(0, ...allValues);
   const range = (maxVal - minVal) === 0 ? 1 : (maxVal - minVal);
