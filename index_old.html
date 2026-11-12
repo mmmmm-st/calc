@@ -200,24 +200,23 @@ button:active { transform: scale(0.98); }
 }
 .chart-title { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
 
-.chart-legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; font-weight: 600; margin-bottom: 12px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
 .legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
+/* グラフをゆったり大きく見せるコンテナ */
 .chart-fit-wrap {
   width: 100%;
   background: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid var(--line);
-  padding: 6px 0;
+  padding: 8px 0;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 svg { 
   display: block; 
-  width: 100%; 
-  min-width: 450px;
-  height: 180px; 
-  overflow: visible; 
+  height: 270px; /* 高さをしっかり大きくしました */
 }
 
 .personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
@@ -270,7 +269,6 @@ tr:last-child td { border-bottom: none; }
 .hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; position: relative; }
 .hist-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; align-items: center; }
 
-/* 履歴トグル用スタイル */
 .accordion-header {
   display: flex;
   justify-content: space-between;
@@ -368,7 +366,7 @@ tr:last-child td { border-bottom: none; }
   <div class="card">
     <h2>個人別実績・飯スト</h2>
     <div id="personalTotals" class="personal-total-grid"></div>
-    <div style="font-size: 11px; color: var(--muted); margin-bottom: 0px;">※最も収支が高かった（または負け額が少なかった）方に飯ストが自動で＋1されます。</div>
+    <div style="font-size: 11px; color: var(--muted); margin-bottom: 0px;">※選択中の組み合わせ・期間に参加しているメンバーのみ表示されます。</div>
   </div>
 
   <div class="card">
@@ -464,6 +462,14 @@ async function loadHistory() {
 }
 
 window.updateMemberMest = async function(name, delta) {
+  let currentCount = serverMestMap[name] || 0;
+  if(delta < 0 && currentCount <= 0) {
+    alert("消費できる飯ストがありません。");
+    return;
+  }
+  
+  if(!confirm(`「${name}」の飯ストを1つ消費しますか？`)) return;
+
   document.getElementById("loading").style.display = "block";
   try {
     await fetch(GAS_URL, { 
@@ -496,7 +502,7 @@ function renderAll() {
   if(!Array.isArray(historyData) || historyData.length === 0){
     graphsArea.style.display = "none";
     document.getElementById("history").innerHTML = "履歴はありません。";
-    renderPersonalTotalsOnly();
+    document.getElementById("personalTotals").innerHTML = "";
     document.getElementById("grandTotalDisplay").textContent = "0円";
     document.getElementById("grandWinRateDisplay").textContent = "0%";
     return;
@@ -506,35 +512,55 @@ function renderAll() {
   renderFilteredContent();
 }
 
-function renderPersonalTotalsOnly() {
+function renderFilteredContent() {
+  renderGrandTotals();
+  renderExcelChart();
+  renderPersonalTotalsAndHistory();
+}
+
+function renderPersonalTotalsAndHistory() {
   const personalEl = document.getElementById("personalTotals");
+  const histEl = document.getElementById("history");
+  const comboSelect = document.getElementById("combinationSelect");
+  const yearSelect = document.getElementById("yearSelect");
+  const monthSelect = document.getElementById("monthSelect");
+
   personalEl.innerHTML = "";
-  
+  histEl.innerHTML = "";
+
+  const selectedCombo = comboSelect ? comboSelect.value : "";
+  const selectedYear = yearSelect ? yearSelect.value : "all";
+  const selectedMonth = monthSelect ? monthSelect.value : "all";
+
+  let filteredHistory = historyData.filter(h => {
+    const names = h.players.map(p => p.name).sort().join(", ");
+    if(selectedCombo && names !== selectedCombo) return false;
+    return matchFilter(h, selectedYear, selectedMonth);
+  });
+
+  if(filteredHistory.length === 0) {
+    personalEl.innerHTML = "<div style='font-size:12px; color:var(--muted); grid-column: 1/-1;'>該当するメンバー・期間の実績はありません。</div>";
+    histEl.innerHTML = "該当する期間の履歴はありません。";
+    return;
+  }
+
   let pStats = {};
-  historyData.forEach((h) => {
+  filteredHistory.forEach((h) => {
     h.players.forEach(p => {
       if(!pStats[p.name]) {
         pStats[p.name] = { total: 0, count: 0, wins: 0 };
       }
       pStats[p.name].total += Number(p.val);
       pStats[p.name].count += 1;
-      if(Number(p.val) > 0) {
+      if(Number(p.val) >= 0) {
         pStats[p.name].wins += 1;
       }
     });
   });
 
-  storedMembers.forEach(m => {
-    if(!pStats[m]) {
-      pStats[m] = { total: 0, count: 0, wins: 0 };
-    }
-  });
-
   Object.keys(pStats).sort().forEach(name => {
     const s = pStats[name];
     const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
-    
-    // 別シートの数値を直接表示
     let mestCount = serverMestMap[name] || 0;
     const canConsume = mestCount > 0;
 
@@ -556,13 +582,26 @@ function renderPersonalTotalsOnly() {
     `;
     personalEl.appendChild(pCard);
   });
-}
 
-function renderFilteredContent() {
-  renderGrandTotals();
-  renderExcelChart();
-  renderPersonalTotalsOnly();
-  renderHistoryList();
+  [...filteredHistory].reverse().forEach((h) => {
+    let details = "";
+    h.players.forEach(p => {
+      details += `<div style="display:flex; justify-content:space-between; font-size:12px; margin-top:4px;"><span>${p.name}</span><span style="font-weight:600; color:${p.val>=0?'var(--green)':'var(--red)'}">${money(p.val)}</span></div>`;
+    });
+
+    const box = document.createElement("div");
+    box.className = "hist-item";
+    box.innerHTML = `
+      <div class="hist-actions">
+        <button class="delete-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
+      </div>
+      <div style="font-size:11px; color:var(--muted); font-weight:600; margin-bottom:4px;">記録日時</div>
+      <div style="font-weight:700; font-size:13px; color:var(--text); margin-bottom:6px;">${h.time}</div>
+      <div style="font-weight:800; margin-bottom:8px; font-size:14px;">合計 ${money(h.profit)}</div>
+      ${details}
+    `;
+    histEl.appendChild(box);
+  });
 }
 
 function renderGrandTotals() {
@@ -595,7 +634,7 @@ function renderGrandTotals() {
         const profit = Number(h.profit || 0);
         gTotal += profit;
         totalSessions += 1;
-        if(profit > 0) {
+        if(profit >= 0) {
           winSessions += 1;
         }
       }
@@ -749,8 +788,10 @@ function renderExcelChart() {
 
   if(targetHistory.length === 0) return;
 
+  // 先頭を 0 スタートにし、次から各回の累計収支をプロット
   let groupSum = 0;
-  const groupData = targetHistory.map(h => groupSum += Number(h.profit || 0));
+  let rawGroupData = targetHistory.map(h => groupSum += Number(h.profit || 0));
+  const groupData = [0, ...rawGroupData];
 
   let allNames = [];
   targetHistory.forEach(h => {
@@ -762,51 +803,96 @@ function renderExcelChart() {
   let memberSeries = {};
   allNames.forEach(name => {
     let pSum = 0;
-    memberSeries[name] = targetHistory.map(h => {
+    let rawSeries = targetHistory.map(h => {
       const p = h.players.find(x => x.name === name);
       if(p) pSum += Number(p.val || 0);
       return pSum;
     });
+    memberSeries[name] = [0, ...rawSeries];
   });
 
   let allValues = [...groupData];
   allNames.forEach(name => allValues.push(...memberSeries[name]));
 
-  const width = 600;
-  const height = 180;
-  const paddingX = 45; 
-  const paddingY = 20;
+  // データ数に応じて横幅を大きく広げる（1点あたり約50px確保して見やすく）
+  const totalPoints = groupData.length;
+  const width = Math.max(580, totalPoints * 52);
+  const height = 270;
+  const paddingLeft = 58;
+  const paddingRight = 55; // 最後の日付が右端で見切れないよう十分な余白を確保
+  const paddingTop = 25;
+  const paddingBottom = 32;
 
+  svg.style.width = `${width}px`;
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
-  const minVal = Math.min(0, ...allValues);
-  const maxVal = Math.max(0, ...allValues);
-  const range = (maxVal - minVal) === 0 ? 1 : (maxVal - minVal);
+  // 0を基準にキリの良い目盛り幅（1万, 2万, 5万, 10万...）を自動計算して文字の重なりを防止
+  let rawMin = Math.min(0, ...allValues);
+  let rawMax = Math.max(0, ...allValues);
+  let rawSpan = Math.max(rawMax - rawMin, 20000);
 
-  const getX = (i) => paddingX + (i / (Math.max(targetHistory.length - 1, 1))) * (width - paddingX - 15);
-  const getY = (val) => height - paddingY - ((val - minVal) / range) * (height - paddingY * 2);
+  // 目盛りの1ステップ幅をキリの良い金額にする
+  let rawStep = rawSpan / 4;
+  let stepUnit = 10000;
+  if (rawStep > 100000) stepUnit = 100000;
+  else if (rawStep > 50000) stepUnit = 50000;
+  else if (rawStep > 20000) stepUnit = 25000;
+  else if (rawStep > 10000) stepUnit = 20000;
+  else if (rawStep > 5000) stepUnit = 10000;
+  else stepUnit = 5000;
 
-  const gridSteps = 4;
-  for(let s = 0; s <= gridSteps; s++) {
-    const val = minVal + (range / gridSteps) * s;
+  // 0から上下に stepUnit 刻みで目盛りを作るため、文字同士が絶対に重ならない
+  let minVal = Math.floor(rawMin / stepUnit) * stepUnit;
+  let maxVal = Math.ceil(rawMax / stepUnit) * stepUnit;
+  if (maxVal === minVal) maxVal += stepUnit;
+  let range = maxVal - minVal;
+
+  const getX = (i) => paddingLeft + (i / (Math.max(totalPoints - 1, 1))) * (width - paddingLeft - paddingRight);
+  const getY = (val) => height - paddingBottom - ((val - minVal) / range) * (height - paddingTop - paddingBottom);
+
+  // 左側の縦軸目盛り（必ず0が含まれ、等間隔で見やすく配置）
+  for(let val = minVal; val <= maxVal + 1; val += stepUnit) {
     const y = getY(val);
-    svg.innerHTML += `<line x1="${paddingX}" y1="${y}" x2="${width - 10}" y2="${y}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2,2"/>`;
-    let labelText = Math.round(val / 10000) + "万";
-    if(val === 0) labelText = "0";
-    svg.innerHTML += `<text x="${paddingX - 6}" y="${y + 3.5}" fill="#64748b" font-size="9" text-anchor="end">${labelText}</text>`;
+    const isZero = (val === 0);
+    svg.innerHTML += `<line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="${isZero ? '#64748b' : '#e2e8f0'}" stroke-width="${isZero ? '1.8' : '1'}" ${isZero ? '' : 'stroke-dasharray="3,3"'}/>`;
+    
+    let labelText = "";
+    if (isZero) {
+      labelText = "0";
+    } else if (Math.abs(val) >= 10000) {
+      labelText = (val / 10000) + "万";
+    } else {
+      labelText = (val / 1000) + "千";
+    }
+
+    svg.innerHTML += `<text x="${paddingLeft - 10}" y="${y + 4}" fill="${isZero ? '#0f172a' : '#64748b'}" font-weight="${isZero ? '800' : '500'}" font-size="11" text-anchor="end">${labelText}</text>`;
   }
 
-  const totalCount = targetHistory.length;
-  let step = 1;
-  if (totalCount > 10) step = 3;
-  else if (totalCount > 5) step = 2;
+  // X軸の縦線と日付ラベル（最後の点まで確実に日付を表示）
+  let xStep = 1;
+  if (totalPoints > 16) xStep = 3;
+  else if (totalPoints > 9) xStep = 2;
 
-  targetHistory.forEach((h, i) => {
+  groupData.forEach((val, i) => {
     const x = getX(i);
-    svg.innerHTML += `<line x1="${x}" y1="${paddingY}" x2="${x}" y2="${height - paddingY}" stroke="#f1f5f9" stroke-width="1"/>`;
-    if (i === 0 || i === totalCount - 1 || i % step === 0) {
-      const dateStr = h.time ? h.time.split(' ')[0] : `#${i+1}`;
-      svg.innerHTML += `<text x="${x}" y="${height - 5}" fill="#64748b" font-size="9" text-anchor="middle">${dateStr}</text>`;
+    svg.innerHTML += `<line x1="${x}" y1="${paddingTop}" x2="${x}" y2="${height - paddingBottom}" stroke="#f1f5f9" stroke-width="1"/>`;
+    
+    // 最初は空文字（開始ラベル不要）、以降は間引きつつ最後の点は必ず表示
+    if (i > 0 && (i === totalPoints - 1 || i % xStep === 0)) {
+      let h = targetHistory[i - 1];
+      let dateStr = "";
+      if (h && h.time) {
+        // 「2026年11月12日」を「11/12」のようにコンパクトにして見切れを完全に防ぐ（または年付きも収まるよう調整）
+        let m = h.time.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+        if (m) {
+          dateStr = `${m[2]}/${m[3]}`;
+        } else {
+          dateStr = h.time.split(' ')[0];
+        }
+      } else {
+        dateStr = `#${i}`;
+      }
+      svg.innerHTML += `<text x="${x}" y="${height - 10}" fill="#64748b" font-size="11" font-weight="600" text-anchor="middle">${dateStr}</text>`;
     }
   });
 
@@ -818,10 +904,10 @@ function renderExcelChart() {
     data.forEach((val, i) => points.push(`${getX(i)},${getY(val)}`));
 
     if(data.length > 1) {
-      svg.innerHTML += `<polyline fill="none" stroke="${color}" stroke-width="2.5" points="${points.join(" ")}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      svg.innerHTML += `<polyline fill="none" stroke="${color}" stroke-width="3" points="${points.join(" ")}" stroke-linecap="round" stroke-linejoin="round"/>`;
     }
     data.forEach((val, i) => {
-      svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="3.5" fill="#fff" stroke="${color}" stroke-width="2"/>`;
+      svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="4.5" fill="#fff" stroke="${color}" stroke-width="2.5"/>`;
     });
 
     legendContainer.innerHTML += `
@@ -836,45 +922,6 @@ function renderExcelChart() {
   allNames.forEach((name, idx) => {
     const color = colors[(idx + 1) % colors.length];
     drawLineAndDots(memberSeries[name], color, name);
-  });
-}
-
-function renderHistoryList() {
-  const el = document.getElementById("history");
-  const yearSelect = document.getElementById("yearSelect");
-  const monthSelect = document.getElementById("monthSelect");
-  
-  el.innerHTML = "";
-  if(!Array.isArray(historyData) || historyData.length === 0) return;
-
-  const selectedYear = yearSelect ? yearSelect.value : "all";
-  const selectedMonth = monthSelect ? monthSelect.value : "all";
-
-  let filteredHistory = historyData.filter(h => matchFilter(h, selectedYear, selectedMonth));
-
-  if(filteredHistory.length === 0) {
-    el.innerHTML = "該当する期間の履歴はありません。";
-    return;
-  }
-
-  [...filteredHistory].reverse().forEach((h) => {
-    let details = "";
-    h.players.forEach(p => {
-      details += `<div style="display:flex; justify-content:space-between; font-size:12px; margin-top:4px;"><span>${p.name}</span><span style="font-weight:600; color:${p.val>=0?'var(--green)':'var(--red)'}">${money(p.val)}</span></div>`;
-    });
-
-    const box = document.createElement("div");
-    box.className = "hist-item";
-    box.innerHTML = `
-      <div class="hist-actions">
-        <button class="delete-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
-      </div>
-      <div style="font-size:11px; color:var(--muted); font-weight:600; margin-bottom:4px;">記録日時</div>
-      <div style="font-weight:700; font-size:13px; color:var(--text); margin-bottom:6px;">${h.time}</div>
-      <div style="font-weight:800; margin-bottom:8px; font-size:14px;">合計 ${money(h.profit)}</div>
-      ${details}
-    `;
-    el.appendChild(box);
   });
 }
 
@@ -990,7 +1037,7 @@ document.getElementById("calcBtn").onclick = async function() {
       if(p.amount <= 0 || r.amount <= 0) return;
       const move = Math.min(p.amount, r.amount);
       payList.innerHTML += `<div class="pay-row"><span><b>${p.name}</b> → ${r.name}</span><span style="color:var(--green);font-weight:800;">${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円</span></div>`;
-      msg += `・${p.name} → ${r.name} : ${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円\n`;
+      msg += `・${p.name} → ${r.name}：${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円\n`;
       p.amount -= move; r.amount -= move; hasPay = true;
     });
   });
