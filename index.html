@@ -247,6 +247,11 @@ svg {
   font-weight: 700; 
   width: auto !important; 
 }
+.mest-btn:disabled {
+  background: #f1f5f9;
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
 
 .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
 .box { padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--line); }
@@ -401,7 +406,6 @@ function money(v){
 }
 
 let historyData = [];
-let serverMestLogs = [];
 let lastShareMessage = "";
 let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
 
@@ -446,25 +450,18 @@ async function loadHistory() {
     const res = await fetch(GAS_URL);
     let jsonRes = await res.json();
     
-    if (Array.isArray(jsonRes)) {
-      historyData = jsonRes.map(item => ({ ...item, time: cleanTimeStr(item.time) }));
-      serverMestLogs = [];
-    } else {
-      historyData = (jsonRes.history || []).map(item => ({ ...item, time: cleanTimeStr(item.time) }));
-      serverMestLogs = jsonRes.mestLogs || [];
-    }
-    
+    historyData = (jsonRes || []).map(item => ({ ...item, time: cleanTimeStr(item.time) }));
     historyData.sort((a, b) => parseDateStrToObj(a.time) - parseDateStrToObj(b.time));
     
     renderAll();
   } catch (e) { 
     historyEl.innerHTML = "履歴の読み込みに失敗しました。";
     historyData = [];
-    serverMestLogs = [];
     renderAll();
   }
 }
 
+// 消費ボタン：押すとスプレッドシートに「消費履歴」が追加され、全員の画面で数が減る
 window.updateMemberMest = async function(name, delta) {
   document.getElementById("loading").style.display = "block";
   try {
@@ -495,10 +492,14 @@ async function deleteHistory(rowIdx) {
 
 function renderAll() {
   const graphsArea = document.getElementById("graphsArea");
-  if(!Array.isArray(historyData) || historyData.length === 0){
+  
+  // 通常のセッション履歴のみ抽出
+  const sessionHistory = historyData.filter(h => h.type !== "MEST_CONSUME");
+
+  if(!Array.isArray(sessionHistory) || sessionHistory.length === 0){
     graphsArea.style.display = "none";
     document.getElementById("history").innerHTML = "履歴はありません。";
-    document.getElementById("personalTotals").innerHTML = "";
+    renderPersonalTotalsOnly();
     document.getElementById("grandTotalDisplay").textContent = "0円";
     document.getElementById("grandWinRateDisplay").textContent = "0%";
     return;
@@ -508,9 +509,81 @@ function renderAll() {
   renderFilteredContent();
 }
 
+function renderPersonalTotalsOnly() {
+  const personalEl = document.getElementById("personalTotals");
+  personalEl.innerHTML = "";
+  
+  let pStats = {};
+  
+  // 通常セッションから収支と回数を集計
+  historyData.filter(h => h.type !== "MEST_CONSUME").forEach((h) => {
+    h.players.forEach(p => {
+      if(!pStats[p.name]) {
+        pStats[p.name] = { total: 0, count: 0, wins: 0, autoMest: 0, consumedMest: 0 };
+      }
+      pStats[p.name].total += Number(p.val);
+      pStats[p.name].count += 1;
+      if(Number(p.val) > 0) {
+        pStats[p.name].wins += 1;
+      }
+    });
+  });
+
+  // セッションごとの自動＋1（一番勝った人）
+  historyData.filter(h => h.type !== "MEST_CONSUME").forEach(h => {
+    if (h.players && h.players.length > 0) {
+      let sorted = [...h.players].sort((a, b) => b.val - a.val);
+      let best = sorted[0];
+      if (best && pStats[best.name]) {
+        pStats[best.name].autoMest = (pStats[best.name].autoMest || 0) + 1;
+      }
+    }
+  });
+
+  // 消費調整アクション分をカウント
+  historyData.filter(h => h.type === "MEST_CONSUME").forEach(h => {
+    if (h.targetName && pStats[h.targetName]) {
+      pStats[h.targetName].consumedMest = (pStats[h.targetName].consumedMest || 0) + 1;
+    }
+  });
+
+  storedMembers.forEach(m => {
+    if(!pStats[m]) {
+      pStats[m] = { total: 0, count: 0, wins: 0, autoMest: 0, consumedMest: 0 };
+    }
+  });
+
+  Object.keys(pStats).sort().forEach(name => {
+    const s = pStats[name];
+    const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
+    
+    let mestCount = Math.max(0, (s.autoMest || 0) - (s.consumedMest || 0));
+    const canConsume = mestCount > 0;
+
+    const pCard = document.createElement("div");
+    pCard.className = "personal-card";
+    pCard.innerHTML = `
+      <div>
+        <div class="name-label">${name}</div>
+        <div class="amount-value" style="color:${s.total>=0?'var(--green)':'var(--red)'}">${money(s.total)}</div>
+        <div class="sub-info">
+          <span>勝率: ${winRate}%</span>
+          <span>(${s.wins}勝/${s.count}回)</span>
+        </div>
+      </div>
+      <div class="mest-row">
+        <span class="mest-text">飯スト: <b style="color:var(--accent);">${mestCount}</b></span>
+        <button class="mest-btn" ${!canConsume ? 'disabled style="background:#f1f5f9;color:#cbd5e1;cursor:not-allowed;"' : ''} onclick="updateMemberMest('${name}', -1)">消費</button>
+      </div>
+    `;
+    personalEl.appendChild(pCard);
+  });
+}
+
 function renderFilteredContent() {
   renderGrandTotals();
   renderExcelChart();
+  renderPersonalTotalsOnly();
   renderHistoryList();
 }
 
@@ -536,20 +609,18 @@ function renderGrandTotals() {
   let totalSessions = 0;
   let winSessions = 0;
 
-  if(Array.isArray(historyData)) {
-    historyData.forEach(h => {
-      const names = h.players.map(p => p.name).sort().join(", ");
-      if(selectedCombo && names !== selectedCombo) return;
-      if(matchFilter(h, selectedYear, selectedMonth)) {
-        const profit = Number(h.profit || 0);
-        gTotal += profit;
-        totalSessions += 1;
-        if(profit > 0) {
-          winSessions += 1;
-        }
+  historyData.filter(h => h.type !== "MEST_CONSUME").forEach(h => {
+    const names = h.players.map(p => p.name).sort().join(", ");
+    if(selectedCombo && names !== selectedCombo) return;
+    if(matchFilter(h, selectedYear, selectedMonth)) {
+      const profit = Number(h.profit || 0);
+      gTotal += profit;
+      totalSessions += 1;
+      if(profit > 0) {
+        winSessions += 1;
       }
-    });
-  }
+    }
+  });
 
   const groupWinRate = totalSessions > 0 ? Math.round((winSessions / totalSessions) * 100) : 0;
   grandEl.textContent = money(gTotal);
@@ -560,7 +631,7 @@ function getAvailableYearsAndMonths() {
   let yearsSet = new Set();
   let yearMonthMap = {};
 
-  historyData.forEach(h => {
+  historyData.filter(h => h.type !== "MEST_CONSUME").forEach(h => {
     if(!h.time) return;
     let timeStr = String(h.time);
     let yMatch = timeStr.match(/(\d{4})年/);
@@ -590,7 +661,7 @@ function updateFilterSelectOptions() {
   const currentYear = yearSelect.value || "all";
 
   let combos = {}; 
-  historyData.forEach(h => {
+  historyData.filter(h => h.type !== "MEST_CONSUME").forEach(h => {
     const names = h.players.map(p => p.name).sort().join(", ");
     if(names) {
       combos[names] = `👥 ${names} (${h.players.length}人)`;
@@ -684,13 +755,14 @@ function renderExcelChart() {
   svg.innerHTML = "";
   legendContainer.innerHTML = "";
 
-  if(!historyData || historyData.length === 0 || comboSelect.options.length === 0) return;
+  const sessionHistory = historyData.filter(h => h.type !== "MEST_CONSUME");
+  if(sessionHistory.length === 0 || comboSelect.options.length === 0) return;
 
   const selectedCombo = comboSelect.value;
   const selectedYear = yearSelect.value;
   const selectedMonth = monthSelect.value;
 
-  let targetHistory = historyData.filter(h => {
+  let targetHistory = sessionHistory.filter(h => {
     const names = h.players.map(p => p.name).sort().join(", ");
     if(names !== selectedCombo) return false;
     return matchFilter(h, selectedYear, selectedMonth);
@@ -790,73 +862,13 @@ function renderExcelChart() {
 
 function renderHistoryList() {
   const el = document.getElementById("history");
-  const personalEl = document.getElementById("personalTotals");
-  const yearSelect = document.getElementById("yearSelect");
-  const monthSelect = document.getElementById("monthSelect");
+  el.innerHTML = "";
   
-  el.innerHTML = ""; personalEl.innerHTML = "";
-  if(!Array.isArray(historyData) || historyData.length === 0) return;
+  const sessionHistory = historyData.filter(h => h.type !== "MEST_CONSUME");
+  const selectedYear = document.getElementById("yearSelect") ? document.getElementById("yearSelect").value : "all";
+  const selectedMonth = document.getElementById("monthSelect") ? document.getElementById("monthSelect").value : "all";
 
-  const selectedYear = yearSelect ? yearSelect.value : "all";
-  const selectedMonth = monthSelect ? monthSelect.value : "all";
-
-  let filteredHistory = historyData.filter(h => matchFilter(h, selectedYear, selectedMonth));
-
-  let pStats = {};
-  filteredHistory.forEach((h) => {
-    h.players.forEach(p => {
-      if(!pStats[p.name]) {
-        pStats[p.name] = { total: 0, count: 0, wins: 0, autoMest: 0 };
-      }
-      pStats[p.name].total += Number(p.val);
-      pStats[p.name].count += 1;
-      if(Number(p.val) > 0) {
-        pStats[p.name].wins += 1;
-      }
-    });
-  });
-
-  historyData.forEach(h => {
-    if (h.players && h.players.length > 0) {
-      let sorted = [...h.players].sort((a, b) => b.val - a.val);
-      let best = sorted[0];
-      if (best && pStats[best.name]) {
-        pStats[best.name].autoMest = (pStats[best.name].autoMest || 0) + 1;
-      }
-    }
-  });
-
-  let mestOffsets = {};
-  serverMestLogs.forEach(log => {
-    mestOffsets[log.name] = (mestOffsets[log.name] || 0) + Number(log.delta);
-  });
-
-  Object.keys(pStats).sort().forEach(name => {
-    const s = pStats[name];
-    const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
-    
-    let autoMest = s.autoMest || 0;
-    let offset = mestOffsets[name] || 0;
-    let mestCount = Math.max(0, autoMest + offset);
-
-    const pCard = document.createElement("div");
-    pCard.className = "personal-card";
-    pCard.innerHTML = `
-      <div>
-        <div class="name-label">${name}</div>
-        <div class="amount-value" style="color:${s.total>=0?'var(--green)':'var(--red)'}">${money(s.total)}</div>
-        <div class="sub-info">
-          <span>勝率: ${winRate}%</span>
-          <span>(${s.wins}勝/${s.count}回)</span>
-        </div>
-      </div>
-      <div class="mest-row">
-        <span class="mest-text">飯スト: <b style="color:var(--accent);">${mestCount}</b></span>
-        <button class="mest-btn" onclick="updateMemberMest('${name}', -1)">消費</button>
-      </div>
-    `;
-    personalEl.appendChild(pCard);
-  });
+  let filteredHistory = sessionHistory.filter(h => matchFilter(h, selectedYear, selectedMonth));
 
   if(filteredHistory.length === 0) {
     el.innerHTML = "該当する期間の履歴はありません。";
