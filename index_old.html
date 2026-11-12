@@ -3,77 +3,315 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ノリ打ち精算 Pro</title>
+<title>ノリ打ち精算</title>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
-:root{ --bg:#f8fafc; --card:#ffffff; --line:#f1f5f9; --input-border:#e2e8f0; --text:#1e293b; --muted:#64748b; --green:#10b981; --red:#ef4444; --accent:#4f46e5; --line-green:#06c755; --gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); }
-*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-body{ margin:0; padding:20px 10px; background:var(--bg); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:var(--text); }
-.wrap{max-width:800px; margin:auto;}
-.card{ background:var(--card); border-radius:20px; padding:20px; margin-bottom:16px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); }
-h1{ font-size:22px; margin:0 0 15px; font-weight:800; }
-h2{ font-size:18px; margin:0 0 16px; font-weight:700; }
-.grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:12px; }
-.third{ grid-column:span 4; }
-label{ display:block; margin-bottom:6px; font-weight:700; font-size:13px; }
-input{ width:100%; padding:12px; border-radius:10px; border:1.5px solid var(--input-border); font-size:16px; color:var(--text); }
-.player{ background:#fff; border:1px solid #f1f5f9; border-radius:16px; padding:20px; margin-bottom:12px; }
-.player-top { display: flex; justify-content: space-between; margin-bottom: 12px; }
-.result-label { font-size: 11px; font-weight: 700; margin-bottom: 4px; text-align:right; color:var(--muted);}
-.result-value { font-size: 18px; font-weight: 800; color: #cbd5e1; text-align:right;}
-.unused-display { font-size: 11px; color: var(--muted); margin-top: 4px; }
-button{ border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; }
-.main-btn{ background:var(--accent); color:white; width:100%; margin:10px 0 10px; }
-.line-btn{ background:var(--line-green); color:white; width:100%; margin-bottom: 10px; }
-.sub-btn{ background:#f1f5f9; color:var(--text); width:100%; }
-.delete-btn{ background:#fee2e2; color:var(--red); width:100%; }
+:root {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --line: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+  --green: #059669;
+  --red: #dc2626;
+  --accent: #6366f1;
+  --accent-light: #e0e7ff;
+  --line-green: #06c755;
+  --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.08), 0 8px 10px -6px rgba(99, 102, 241, 0.08);
+  --radius: 20px;
+}
 
-.grand-total-box { background: var(--gradient); border-radius: 20px; padding: 25px 20px; color: white; margin-bottom: 16px; }
-.grand-total-label { font-size: 13px; opacity: 0.9; margin-bottom: 5px; }
-.grand-total-value { font-size: 36px; font-weight: 900; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 24px; }
-.personal-card { background: #f8fafc; border-radius: 12px; padding: 12px; border: 1px solid rgba(0,0,0,0.03); }
-.personal-card .name-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-.personal-card .amount-value { font-size: 16px; font-weight: 800; }
+body {
+  margin: 0;
+  padding: 16px 8px;
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
 
-.summary{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-.box{ padding:12px; border-radius:12px; background:#f8fafc; border:1px solid var(--line); }
-.box-title{ font-size:11px; color:var(--muted); margin-bottom:2px;}
-.box-value{ font-size:16px; font-weight:800; }
-.table-wrapper{ overflow-x:auto; margin-top:15px; }
-table{ width:100%; border-collapse:collapse; font-size:13px; min-width: 400px;}
-th, td{ padding:12px 8px; border-bottom:1px solid var(--line); text-align:left; }
-.pay-box{ margin-top:20px; border-radius:12px; background:#f0fdf4; padding:10px; }
-.pay-row{ display:flex; justify-content:space-between; padding:8px; background:#fff; margin-bottom:5px; border-radius:8px; }
+.wrap { max-width: 680px; margin: auto; width: 100%; overflow-x: hidden; }
 
-.hist-item { background:#fff; border-bottom: 1px solid var(--line); padding:15px 0; position:relative; }
-.hist-item:last-child { border-bottom: none; }
-.hist-del-btn { position:absolute; top:12px; right:0; color:var(--red); font-size:11px; font-weight:700; background:none;}
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  width: 100%;
+}
+
+@media (min-width: 480px) {
+  .card { padding: 24px; }
+  body { padding: 24px 12px; }
+}
+
+h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.025em; color: var(--text); }
+h2 { font-size: 16px; margin: 0 0 16px; font-weight: 700; letter-spacing: -0.025em; display: flex; align-items: center; gap: 8px; }
+
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; width: 100%; }
+.half { grid-column: span 6; }
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+input, select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--line);
+  font-size: 16px;
+  color: var(--text);
+  background: #f8fafc;
+  transition: all 0.2s ease;
+  outline: none;
+  font-weight: 500;
+}
+
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #f8fafc;
+  text-align: center;
+}
+
+input:focus, select:focus {
+  background: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.player {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.player-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.result-label { font-size: 11px; font-weight: 600; margin-bottom: 2px; text-align: right; color: var(--muted); }
+.result-value { font-size: 16px; font-weight: 800; text-align: right; }
+
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s;
+  width: 100%;
+}
+button:active { transform: scale(0.98); }
+
+.main-btn { background: var(--gradient); color: white; margin: 8px 0; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
+.line-btn { background: var(--line-green); color: white; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(6, 199, 85, 0.35); }
+.sub-btn { background: #f1f5f9; color: var(--text); border: 1px solid var(--line); }
+.sub-btn:hover { background: #e2e8f0; }
+
+.delete-btn { background: #fee2e2; color: var(--red); width: auto; padding: 6px 12px; font-size: 11px; border-radius: 6px; }
+
+.grand-total-box {
+  background: var(--gradient);
+  border-radius: 16px;
+  padding: 16px;
+  color: white;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (min-width: 480px) {
+  .grand-total-box {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+  }
+}
+.grand-total-label { font-size: 11px; opacity: 0.85; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.grand-total-value { font-size: 24px; font-weight: 900; letter-spacing: -0.03em; }
+.grand-winrate-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 14px;
+  border-radius: 12px;
+  text-align: left;
+  backdrop-filter: blur(4px);
+}
+@media (min-width: 480px) {
+  .grand-winrate-badge { text-align: right; }
+}
+.grand-winrate-label { font-size: 10px; opacity: 0.85; font-weight: 600; text-transform: uppercase; }
+.grand-winrate-value { font-size: 16px; font-weight: 800; }
+
+.global-filter-card {
+  background: #f1f5f9;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.filter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+@media (min-width: 480px) {
+  .filter-grid {
+    grid-template-columns: 1.2fr 1fr 1fr;
+  }
+}
+.filter-grid select {
+  background: #fff;
+  font-size: 13px;
+  padding: 10px 12px;
+  font-weight: 600;
+}
+
+.chart-card {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  overflow: hidden;
+}
+.chart-title { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.chart-legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; font-weight: 600; margin-bottom: 12px; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+.chart-fit-wrap {
+  width: 100%;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  padding: 6px 0;
+  overflow-x: auto;
+}
+svg { 
+  display: block; 
+  width: 100%; 
+  min-width: 450px;
+  height: 180px; 
+  overflow: visible; 
+}
+
+.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.personal-card { background: #f8fafc; border-radius: 14px; padding: 12px; border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
+.personal-card .name-label { font-size: 13px; color: var(--text); font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.personal-card .amount-value { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+.personal-card .sub-info { font-size: 11px; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 8px; }
+
+.mest-row { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  border-top: 1px solid var(--line); 
+  padding-top: 8px; 
+  margin-top: 4px; 
+  font-size: 12px; 
+  font-weight: 700; 
+  gap: 4px;
+}
+.mest-text { white-space: nowrap; }
+.mest-btn { 
+  padding: 4px 8px; 
+  font-size: 11px; 
+  background: #fee2e2; 
+  color: var(--red); 
+  border-radius: 6px; 
+  font-weight: 700; 
+  width: auto !important; 
+}
+.mest-btn:disabled {
+  background: #f1f5f9;
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+.box { padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--line); }
+.box-title { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+.box-value { font-size: 15px; font-weight: 800; }
+
+.table-wrapper { overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 380px; background: #fff; }
+th { background: #f8fafc; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+tr:last-child td { border-bottom: none; }
+
+.pay-box { margin-top: 16px; border-radius: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; }
+.pay-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #fff; margin-bottom: 6px; border-radius: 8px; border: 1px solid #dcfce7; font-size: 13px; }
+
+.hist-item { background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 12px; position: relative; }
+.hist-actions { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; align-items: center; }
+
+/* 履歴トグル用スタイル */
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+.accordion-icon {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  transition: transform 0.2s;
+}
+#historyContainer {
+  display: none;
+  margin-top: 16px;
+}
+
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
+.modal-content { background: #fff; padding: 20px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="card">
-    <h1>ノリ打ち精算</h1>
-    <div class="grid">
-      <div class="third"><label>基準投資</label><input id="baseInvest" type="number" value="40000" oninput="updateAllUnused()"></div>
-      <div class="third"><label>交換率</label><input id="rate" type="number" value="20"></div>
-      <div class="third"><label>換金単位</label><input id="roundUnit" type="number" value="500"></div>
-    </div>
+  <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px;">
+    <h1>🎰 ノリ打ち精算</h1>
+    <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 8px 12px; font-size: 12px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
   </div>
 
   <div class="card">
-    <h2>参加者</h2>
+    <h2>参加者 & 日付</h2>
+    <div style="margin-bottom: 16px;">
+      <label>実践日</label>
+      <input type="date" id="recordDateInput">
+    </div>
     <div id="players"></div>
-    <div class="grid">
-      <div style="grid-column: span 6;"><button class="sub-btn" id="addBtn">追加</button></div>
-      <div style="grid-column: span 6;"><button class="sub-btn" id="saveMemberBtn">名前保存</button></div>
-    </div>
+    <button class="sub-btn" id="addBtn" style="border-style: dashed; border-color: #cbd5e1; color: var(--accent); font-weight: 600;">＋ 参加者を追加</button>
   </div>
 
-  <button class="main-btn" id="calcBtn">計算を実行して共有保存</button>
-  <div id="loading" style="display:none; text-align:center; padding:10px; color:var(--accent); font-weight:bold;">データ処理中...</div>
+  <button class="main-btn" id="calcBtn">計算を実行して保存</button>
+  <div id="loading" style="display:none; text-align:center; padding:10px; color:var(--accent); font-weight:bold;">処理中...</div>
   <button class="line-btn" id="lineSendBtn" style="display:none;">LINEに結果を送る</button>
 
   <div class="card" id="resultCard" style="display:none;">
@@ -81,221 +319,790 @@ th, td{ padding:12px 8px; border-bottom:1px solid var(--line); text-align:left; 
     <div class="summary">
       <div class="box"><div class="box-title">グループ総損益</div><div class="box-value" id="profitTotal" style="color:var(--accent)">-</div></div>
       <div class="box"><div class="box-title">1人あたり純利益</div><div id="perProfit" class="box-value">-</div></div>
-      <div class="box"><div class="box-title">回収</div><div id="cashTotal" class="box-value">-</div></div>
-      <div class="box"><div class="box-title">未投資</div><div id="remainTotal" class="box-value">-</div></div>
+      <div class="box"><div class="box-title">総投資額</div><div id="investTotal" class="box-value">-</div></div>
+      <div class="box"><div class="box-title">総回収額</div><div id="cashTotal" class="box-value">-</div></div>
     </div>
     <div class="table-wrapper">
       <table>
-        <thead><tr><th>名前</th><th>収支</th><th>手持ち</th><th>精算額</th></tr></thead>
+        <thead><tr><th>名前</th><th>投資</th><th>回収</th><th>収支</th><th>精算額</th></tr></thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
     <div class="pay-box" id="payBox">
-      <div style="font-weight:800; color:#065f46; margin-bottom:10px;">お金の受け渡し指示</div>
+      <div style="font-weight: 700; color: #166534; font-size: 13px; margin-bottom: 8px;">💸 お金の受け渡し指示</div>
       <div id="payList"></div>
     </div>
   </div>
 
-  <div class="card">
-    <h2>履歴と累計</h2>
-    <div class="grand-total-box">
-      <div class="grand-total-label">グループ全体の累計収支</div>
-      <div class="grand-total-value" id="grandTotalDisplay">0円</div>
+  <div class="global-filter-card">
+    <div style="font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">🔍 表示フィルター</div>
+    <div class="filter-grid">
+      <select id="combinationSelect" onchange="onFilterChange()"></select>
+      <select id="yearSelect" onchange="onYearChange()"></select>
+      <select id="monthSelect" onchange="onFilterChange()"></select>
     </div>
+  </div>
+
+  <div class="card">
+    <h2>統計グラフ</h2>
+    <div class="grand-total-box">
+      <div>
+        <div class="grand-total-label" id="grandTotalLabel">グループ選択期間の累計収支</div>
+        <div class="grand-total-value" id="grandTotalDisplay">0円</div>
+      </div>
+      <div class="grand-winrate-badge">
+        <div class="grand-winrate-label">グループ勝率</div>
+        <div class="grand-winrate-value" id="grandWinRateDisplay">0%</div>
+      </div>
+    </div>
+
+    <div class="chart-card" id="graphsArea" style="display:none;">
+      <div class="chart-title">📈 収支推移グラフ</div>
+      <div class="chart-legend" id="chartLegend"></div>
+      <div class="chart-fit-wrap">
+        <svg id="excelLineChart"></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>個人別実績・飯スト</h2>
     <div id="personalTotals" class="personal-total-grid"></div>
-    <div id="history">読み込み中...</div>
+    <div style="font-size: 11px; color: var(--muted); margin-bottom: 0px;">※最も収支が高かった（または負け額が少なかった）方に飯ストが自動で＋1されます。</div>
+  </div>
+
+  <div class="card">
+    <div class="accordion-header" onclick="toggleHistoryAccordion()">
+      <h2 style="margin:0;">履歴一覧</h2>
+      <span class="accordion-icon" id="accordionIcon">▼ 表示する</span>
+    </div>
+    <div id="historyContainer">
+      <div id="history" style="color: var(--muted); font-size: 13px;">読み込み中...</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="memberModal">
+  <div class="modal-content">
+    <h2>メンバー管理</h2>
+    <p style="font-size: 12px; color: var(--muted); margin-bottom: 16px;">よく参加するメンバーの名前を登録できます。</p>
+    <div id="memberListEdit" style="margin-bottom: 16px; max-height: 200px; overflow-y: auto;"></div>
+    <div class="grid" style="margin-bottom: 12px;">
+      <div class="half"><input type="text" id="newMemberName" placeholder="新しい名前"></div>
+      <div class="half"><button class="sub-btn" id="addMemberStoreBtn" style="background: var(--accent); color: #fff; border:none; height: 100%;">追加</button></div>
+    </div>
+    <button class="sub-btn" id="closeModalBtn" style="background: #f1f5f9;">閉じる</button>
   </div>
 </div>
 
 <script>
-// LIFF ID と GAS URL を適宜書き換えてください
 const LIFF_ID = "2010062599-fM2vPvTM"; 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxKfYnLQu72GtdLcQKipGZXNGxtZkwaf3haW_LarpZctI3aK5qTcRoVr_bxCcRSvPOvQA/exec"; 
-
-function money(v){ return (v >= 0 ? "+" : "") + new Intl.NumberFormat("ja-JP").format(Math.round(v)) + "円"; }
+const GAS_URL = "https://script.google.com/macros/s/AKfycby7oUyS6AHE-B5b_v1xtSuIFEIOsS0s_1kN6JeskN7tm1wp3cxkBHBrNvTs-6TQMrxG8g/exec"; 
+  
+function money(v){
+  if (v === 0) return "0円";
+  return (v > 0 ? "+" : "") + new Intl.NumberFormat("ja-JP").format(Math.round(v)) + "円";
+}
 
 let historyData = [];
+let serverMestMap = {};
 let lastShareMessage = "";
+let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
+
+function cleanTimeStr(rawTime) {
+  if (!rawTime) return "";
+  let str = String(rawTime);
+  if (str.includes("T") || str.includes("-")) {
+    let d = new Date(str);
+    if (!isNaN(d.getTime())) {
+      return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+    }
+  }
+  return str;
+}
+
+function parseDateStrToObj(dateStr) {
+  if (!dateStr) return new Date(0);
+  let match = dateStr.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+  if (match) {
+    return new Date(match[1], match[2] - 1, match[3]);
+  }
+  let d = new Date(dateStr);
+  return isNaN(d.getTime()) ? new Date(0) : d;
+}
+
+function toggleHistoryAccordion() {
+  const container = document.getElementById("historyContainer");
+  const icon = document.getElementById("accordionIcon");
+  if (container.style.display === "block") {
+    container.style.display = "none";
+    icon.textContent = "▼ 表示する";
+  } else {
+    container.style.display = "block";
+    icon.textContent = "▲ 閉じる";
+  }
+}
 
 async function loadHistory() {
   const historyEl = document.getElementById("history");
   try {
     const res = await fetch(GAS_URL);
-    historyData = await res.json();
-    renderHistory();
+    let jsonRes = await res.json();
+    
+    historyData = (jsonRes.history || []).map(item => ({ ...item, time: cleanTimeStr(item.time) }));
+    serverMestMap = jsonRes.mestMap || {};
+    
+    historyData.sort((a, b) => parseDateStrToObj(a.time) - parseDateStrToObj(b.time));
+    
+    renderAll();
   } catch (e) { 
-    historyEl.innerHTML = "履歴を取得できません。";
+    historyEl.innerHTML = "履歴の読み込みに失敗しました。";
+    historyData = [];
+    serverMestMap = {};
+    renderAll();
   }
 }
 
-async function saveToDB(newData) {
+window.updateMemberMest = async function(name, delta) {
   document.getElementById("loading").style.display = "block";
   try {
     await fetch(GAS_URL, { 
       method: "POST", 
       mode: "no-cors", 
-      body: JSON.stringify(newData) 
+      body: JSON.stringify({ method: "UPDATE_MEST", name: name, delta: delta }) 
     });
-    // 保存後、少し待ってから履歴を再読み込み
-    setTimeout(loadHistory, 1500);
-  } catch (e) { console.error(e); }
-}
+    await loadHistory();
+  } catch(e) {
+    console.error(e);
+  }
+  document.getElementById("loading").style.display = "none";
+};
 
-async function deleteHistory(idx) {
+async function deleteHistory(rowIdx) {
   if(!confirm("この履歴を削除しますか？")) return;
+  
   document.getElementById("loading").style.display = "block";
-  await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: idx }) });
-  setTimeout(loadHistory, 1500);
+  try {
+    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: rowIdx }) });
+  } catch(e) {
+    console.error(e);
+  }
+  await loadHistory();
+  document.getElementById("loading").style.display = "none";
 }
 
-function renderHistory(){
-  const el=document.getElementById("history");
-  const personalEl=document.getElementById("personalTotals");
-  const grandEl = document.getElementById("grandTotalDisplay");
-  el.innerHTML=""; personalEl.innerHTML="";
-  
-  let pMap = {};
-  let gTotal = 0;
-  
+function renderAll() {
+  const graphsArea = document.getElementById("graphsArea");
   if(!Array.isArray(historyData) || historyData.length === 0){
-    el.innerHTML = "履歴はありません。";
-    grandEl.textContent = "0円";
+    graphsArea.style.display = "none";
+    document.getElementById("history").innerHTML = "履歴はありません。";
+    renderPersonalTotalsOnly();
+    document.getElementById("grandTotalDisplay").textContent = "0円";
+    document.getElementById("grandWinRateDisplay").textContent = "0%";
+    return;
+  }
+  graphsArea.style.display = "block";
+  updateFilterSelectOptions();
+  renderFilteredContent();
+}
+
+function renderPersonalTotalsOnly() {
+  const personalEl = document.getElementById("personalTotals");
+  personalEl.innerHTML = "";
+  
+  let pStats = {};
+  historyData.forEach((h) => {
+    h.players.forEach(p => {
+      if(!pStats[p.name]) {
+        pStats[p.name] = { total: 0, count: 0, wins: 0 };
+      }
+      pStats[p.name].total += Number(p.val);
+      pStats[p.name].count += 1;
+      if(Number(p.val) > 0) {
+        pStats[p.name].wins += 1;
+      }
+    });
+  });
+
+  storedMembers.forEach(m => {
+    if(!pStats[m]) {
+      pStats[m] = { total: 0, count: 0, wins: 0 };
+    }
+  });
+
+  Object.keys(pStats).sort().forEach(name => {
+    const s = pStats[name];
+    const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
+    
+    // 別シートの数値を直接表示
+    let mestCount = serverMestMap[name] || 0;
+    const canConsume = mestCount > 0;
+
+    const pCard = document.createElement("div");
+    pCard.className = "personal-card";
+    pCard.innerHTML = `
+      <div>
+        <div class="name-label">${name}</div>
+        <div class="amount-value" style="color:${s.total>=0?'var(--green)':'var(--red)'}">${money(s.total)}</div>
+        <div class="sub-info">
+          <span>勝率: ${winRate}%</span>
+          <span>(${s.wins}勝/${s.count}回)</span>
+        </div>
+      </div>
+      <div class="mest-row">
+        <span class="mest-text">飯スト: <b style="color:var(--accent);">${mestCount}</b></span>
+        <button class="mest-btn" ${!canConsume ? 'disabled style="background:#f1f5f9;color:#cbd5e1;cursor:not-allowed;"' : ''} onclick="updateMemberMest('${name}', -1)">消費</button>
+      </div>
+    `;
+    personalEl.appendChild(pCard);
+  });
+}
+
+function renderFilteredContent() {
+  renderGrandTotals();
+  renderExcelChart();
+  renderPersonalTotalsOnly();
+  renderHistoryList();
+}
+
+function renderGrandTotals() {
+  const grandEl = document.getElementById("grandTotalDisplay");
+  const grandWinRateEl = document.getElementById("grandWinRateDisplay");
+  const grandLabelEl = document.getElementById("grandTotalLabel");
+  const comboSelect = document.getElementById("combinationSelect");
+  const yearSelect = document.getElementById("yearSelect");
+  const monthSelect = document.getElementById("monthSelect");
+
+  const selectedCombo = comboSelect ? comboSelect.value : "";
+  const selectedYear = yearSelect ? yearSelect.value : "all";
+  const selectedMonth = monthSelect ? monthSelect.value : "all";
+
+  let labelStr = "グループ累計収支";
+  if(selectedYear !== "all") {
+    labelStr = selectedMonth !== "all" ? `${selectedYear}年${selectedMonth}月のグループ収支` : `${selectedYear}年のグループ累計収支`;
+  }
+  grandLabelEl.textContent = labelStr;
+
+  let gTotal = 0;
+  let totalSessions = 0;
+  let winSessions = 0;
+
+  if(Array.isArray(historyData)) {
+    historyData.forEach(h => {
+      const names = h.players.map(p => p.name).sort().join(", ");
+      if(selectedCombo && names !== selectedCombo) return;
+      if(matchFilter(h, selectedYear, selectedMonth)) {
+        const profit = Number(h.profit || 0);
+        gTotal += profit;
+        totalSessions += 1;
+        if(profit > 0) {
+          winSessions += 1;
+        }
+      }
+    });
+  }
+
+  const groupWinRate = totalSessions > 0 ? Math.round((winSessions / totalSessions) * 100) : 0;
+  grandEl.textContent = money(gTotal);
+  grandWinRateEl.textContent = `${groupWinRate}% (${winSessions}/${totalSessions}勝)`;
+}
+
+function getAvailableYearsAndMonths() {
+  let yearsSet = new Set();
+  let yearMonthMap = {};
+
+  historyData.forEach(h => {
+    if(!h.time) return;
+    let timeStr = String(h.time);
+    let yMatch = timeStr.match(/(\d{4})年/);
+    let year = yMatch ? yMatch[1] : "2026";
+    yearsSet.add(year);
+
+    if(!yearMonthMap[year]) yearMonthMap[year] = new Set();
+    let mMatch = timeStr.match(/(\d{1,2})月/);
+    if(mMatch) {
+      yearMonthMap[year].add(mMatch[1]);
+    }
+  });
+
+  let years = Array.from(yearsSet).sort().reverse();
+  let formattedMap = {};
+  Object.keys(yearMonthMap).forEach(y => {
+    formattedMap[y] = Array.from(yearMonthMap[y]).sort((a,b)=>Number(b)-Number(a));
+  });
+
+  return { years, yearMonthMap: formattedMap };
+}
+
+function updateFilterSelectOptions() {
+  const comboSelect = document.getElementById("combinationSelect");
+  const yearSelect = document.getElementById("yearSelect");
+  const currentCombo = comboSelect.value;
+  const currentYear = yearSelect.value || "all";
+
+  let combos = {}; 
+  historyData.forEach(h => {
+    const names = h.players.map(p => p.name).sort().join(", ");
+    if(names) {
+      combos[names] = `👥 ${names} (${h.players.length}人)`;
+    }
+  });
+
+  const comboKeys = Object.keys(combos);
+  comboSelect.innerHTML = "";
+  comboKeys.forEach((key, index) => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = combos[key];
+    if(key === currentCombo || (!currentCombo && index === 0)) opt.selected = true;
+    comboSelect.appendChild(opt);
+  });
+
+  let { years } = getAvailableYearsAndMonths();
+  yearSelect.innerHTML = `<option value="all">📅 全期間</option>`;
+  years.forEach(y => {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = `📁 ${y}年`;
+    yearSelect.appendChild(opt);
+  });
+  if([...yearSelect.options].some(o => o.value === currentYear)) {
+    yearSelect.value = currentYear;
+  } else {
+    yearSelect.value = "all";
+  }
+
+  updateMonthOptions();
+}
+
+function onYearChange() {
+  updateMonthOptions();
+  renderFilteredContent();
+}
+
+function onFilterChange() {
+  renderFilteredContent();
+}
+
+function updateMonthOptions() {
+  const yearSel = document.getElementById("yearSelect");
+  const monthSel = document.getElementById("monthSelect");
+  const selectedYear = yearSel.value;
+  const currentMonth = monthSel.value;
+  let { yearMonthMap } = getAvailableYearsAndMonths();
+
+  if(selectedYear === "all") {
+    monthSel.innerHTML = `<option value="all">📄 すべての月</option>`;
+    monthSel.value = "all";
+  } else {
+    monthSel.innerHTML = `<option value="all">📄 ${selectedYear}年すべての月</option>`;
+    let months = yearMonthMap[selectedYear] || [];
+    months.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = `└ ${m}月`;
+      monthSel.appendChild(opt);
+    });
+
+    if([...monthSel.options].some(o => o.value === currentMonth)) {
+      monthSel.value = currentMonth;
+    } else {
+      monthSel.value = "all";
+    }
+  }
+}
+
+function matchFilter(h, yearVal, monthVal) {
+  if(!h.time) return false;
+  let timeStr = String(h.time);
+  let yM = timeStr.match(/(\d{4})年/);
+  let year = yM ? yM[1] : "2026";
+  let mM = timeStr.match(/(\d{1,2})月/);
+  let month = mM ? mM[1] : "";
+
+  if(yearVal !== "all" && yearVal !== year) return false;
+  if(monthVal !== "all" && monthVal !== month) return false;
+  return true;
+}
+
+function renderExcelChart() {
+  const svg = document.getElementById("excelLineChart");
+  const legendContainer = document.getElementById("chartLegend");
+  const comboSelect = document.getElementById("combinationSelect");
+  const yearSelect = document.getElementById("yearSelect");
+  const monthSelect = document.getElementById("monthSelect");
+  
+  svg.innerHTML = "";
+  legendContainer.innerHTML = "";
+
+  if(!historyData || historyData.length === 0 || comboSelect.options.length === 0) return;
+
+  const selectedCombo = comboSelect.value;
+  const selectedYear = yearSelect.value;
+  const selectedMonth = monthSelect.value;
+
+  let targetHistory = historyData.filter(h => {
+    const names = h.players.map(p => p.name).sort().join(", ");
+    if(names !== selectedCombo) return false;
+    return matchFilter(h, selectedYear, selectedMonth);
+  });
+
+  if(targetHistory.length === 0) return;
+
+  let groupSum = 0;
+  const groupData = targetHistory.map(h => groupSum += Number(h.profit || 0));
+
+  let allNames = [];
+  targetHistory.forEach(h => {
+    h.players.forEach(p => {
+      if(!allNames.includes(p.name)) allNames.push(p.name);
+    });
+  });
+
+  let memberSeries = {};
+  allNames.forEach(name => {
+    let pSum = 0;
+    memberSeries[name] = targetHistory.map(h => {
+      const p = h.players.find(x => x.name === name);
+      if(p) pSum += Number(p.val || 0);
+      return pSum;
+    });
+  });
+
+  let allValues = [...groupData];
+  allNames.forEach(name => allValues.push(...memberSeries[name]));
+
+  const width = 600;
+  const height = 180;
+  const paddingX = 45; 
+  const paddingY = 20;
+
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+  const minVal = Math.min(0, ...allValues);
+  const maxVal = Math.max(0, ...allValues);
+  const range = (maxVal - minVal) === 0 ? 1 : (maxVal - minVal);
+
+  const getX = (i) => paddingX + (i / (Math.max(targetHistory.length - 1, 1))) * (width - paddingX - 15);
+  const getY = (val) => height - paddingY - ((val - minVal) / range) * (height - paddingY * 2);
+
+  const gridSteps = 4;
+  for(let s = 0; s <= gridSteps; s++) {
+    const val = minVal + (range / gridSteps) * s;
+    const y = getY(val);
+    svg.innerHTML += `<line x1="${paddingX}" y1="${y}" x2="${width - 10}" y2="${y}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="2,2"/>`;
+    let labelText = Math.round(val / 10000) + "万";
+    if(val === 0) labelText = "0";
+    svg.innerHTML += `<text x="${paddingX - 6}" y="${y + 3.5}" fill="#64748b" font-size="9" text-anchor="end">${labelText}</text>`;
+  }
+
+  const totalCount = targetHistory.length;
+  let step = 1;
+  if (totalCount > 10) step = 3;
+  else if (totalCount > 5) step = 2;
+
+  targetHistory.forEach((h, i) => {
+    const x = getX(i);
+    svg.innerHTML += `<line x1="${x}" y1="${paddingY}" x2="${x}" y2="${height - paddingY}" stroke="#f1f5f9" stroke-width="1"/>`;
+    if (i === 0 || i === totalCount - 1 || i % step === 0) {
+      const dateStr = h.time ? h.time.split(' ')[0] : `#${i+1}`;
+      svg.innerHTML += `<text x="${x}" y="${height - 5}" fill="#64748b" font-size="9" text-anchor="middle">${dateStr}</text>`;
+    }
+  });
+
+  const colors = ["#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6"];
+
+  const drawLineAndDots = (data, color, label) => {
+    if(data.length === 0) return;
+    let points = [];
+    data.forEach((val, i) => points.push(`${getX(i)},${getY(val)}`));
+
+    if(data.length > 1) {
+      svg.innerHTML += `<polyline fill="none" stroke="${color}" stroke-width="2.5" points="${points.join(" ")}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    }
+    data.forEach((val, i) => {
+      svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="3.5" fill="#fff" stroke="${color}" stroke-width="2"/>`;
+    });
+
+    legendContainer.innerHTML += `
+      <div class="legend-item">
+        <div class="legend-dot" style="background: ${color};"></div>
+        <span>${label}</span>
+      </div>
+    `;
+  };
+
+  drawLineAndDots(groupData, "var(--accent)", "ノリ打ち全体");
+  allNames.forEach((name, idx) => {
+    const color = colors[(idx + 1) % colors.length];
+    drawLineAndDots(memberSeries[name], color, name);
+  });
+}
+
+function renderHistoryList() {
+  const el = document.getElementById("history");
+  const yearSelect = document.getElementById("yearSelect");
+  const monthSelect = document.getElementById("monthSelect");
+  
+  el.innerHTML = "";
+  if(!Array.isArray(historyData) || historyData.length === 0) return;
+
+  const selectedYear = yearSelect ? yearSelect.value : "all";
+  const selectedMonth = monthSelect ? monthSelect.value : "all";
+
+  let filteredHistory = historyData.filter(h => matchFilter(h, selectedYear, selectedMonth));
+
+  if(filteredHistory.length === 0) {
+    el.innerHTML = "該当する期間の履歴はありません。";
     return;
   }
 
-  [...historyData].reverse().forEach((h) => {
-    gTotal += Number(h.profit || 0);
-    let details="";
+  [...filteredHistory].reverse().forEach((h) => {
+    let details = "";
     h.players.forEach(p => {
-      pMap[p.name] = (pMap[p.name] || 0) + Number(p.val);
-      details += `<div style="display:flex; justify-content:space-between; font-size:12px;"><span>${p.name}</span><span style="color:${p.val>=0?'var(--green)':'var(--red)'}">${money(p.val)}</span></div>`;
+      details += `<div style="display:flex; justify-content:space-between; font-size:12px; margin-top:4px;"><span>${p.name}</span><span style="font-weight:600; color:${p.val>=0?'var(--green)':'var(--red)'}">${money(p.val)}</span></div>`;
     });
 
     const box = document.createElement("div");
     box.className = "hist-item";
-    box.innerHTML = `<div class="hist-del-btn" onclick="deleteHistory(${h.id})">削除</div><div style="font-size:10px; color:var(--muted)">${h.time}</div><div style="font-weight:800; margin-bottom:5px;">合計 ${money(h.profit)}</div>${details}`;
+    box.innerHTML = `
+      <div class="hist-actions">
+        <button class="delete-btn" onclick="deleteHistory(${h.rowIdx})">削除</button>
+      </div>
+      <div style="font-size:11px; color:var(--muted); font-weight:600; margin-bottom:4px;">記録日時</div>
+      <div style="font-weight:700; font-size:13px; color:var(--text); margin-bottom:6px;">${h.time}</div>
+      <div style="font-weight:800; margin-bottom:8px; font-size:14px;">合計 ${money(h.profit)}</div>
+      ${details}
+    `;
     el.appendChild(box);
   });
-
-  grandEl.textContent = money(gTotal);
-  Object.keys(pMap).sort().forEach(name => {
-    const pCard = document.createElement("div");
-    pCard.className = "personal-card";
-    pCard.innerHTML = `<div class="name-label">${name} 累計</div><div class="amount-value" style="color:${pMap[name]>=0?'var(--green)':'var(--red)'}">${money(pMap[name])}</div>`;
-    personalEl.appendChild(pCard);
-  });
-  document.getElementById("loading").style.display = "none";
 }
 
-function updateAllUnused() {
-  const base = +(document.getElementById("baseInvest").value || 0);
-  document.querySelectorAll(".player").forEach(node => {
-    const invest = +(node.querySelector(".invest").value || 0);
-    node.querySelector(".unused-val").textContent = (base - invest) + "円";
+function addPlayer(selectedName = "", investVal = "", cashVal = ""){
+  const div = document.createElement("div");
+  div.className = "player";
+  let options = '<option value="">選択してください</option>';
+  storedMembers.forEach(m => {
+    const selected = (m === selectedName) ? 'selected' : '';
+    options += `<option value="${m}" ${selected}>${m}</option>`;
   });
-}
 
-function addPlayer(name="", investValue=40000){
-  const div=document.createElement("div");
-  div.className="player";
-  div.innerHTML=`<div class="player-top"><div style="width:60%;"><label>名前</label><input class="name" value="${name}"></div><div><div class="result-label">収支</div><div class="result-value">-</div></div></div><div class="grid"><div class="third"><label>投資</label><input class="invest" type="number" value="${investValue}" oninput="updateAllUnused()"><div class="unused-display">余り:<span class="unused-val">0円</span></div></div><div class="third"><label>枚数</label><input class="coins" type="number" value="0"></div><div class="third"><label style="color:transparent;">削</label><button class="delete-btn" onclick="this.closest('.player').remove()">×</button></div></div>`;
+  div.innerHTML = `
+    <div class="player-top">
+      <div style="width:60%;">
+        <label>名前</label>
+        <select class="name-select">${options}</select>
+      </div>
+      <div>
+        <div class="result-label">個人の収支</div>
+        <div class="result-value">-</div>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="half">
+        <label>投資額</label>
+        <input class="invest" type="number" inputmode="numeric" pattern="[0-9]*" value="${investVal}" placeholder="0">
+      </div>
+      <div class="half">
+        <label>回収額</label>
+        <input class="cash" type="number" inputmode="numeric" pattern="[0-9]*" value="${cashVal}" placeholder="0">
+      </div>
+    </div>
+    <div style="margin-top:12px; display:flex; justify-content:flex-end;">
+      <button class="delete-btn" onclick="this.closest('.player').remove()">削除</button>
+    </div>`;
   document.getElementById("players").appendChild(div);
-  updateAllUnused();
 }
 
 document.getElementById("calcBtn").onclick = async function() {
-  const baseAmt = +(document.getElementById("baseInvest").value || 0);
-  const rate = +(document.getElementById("rate").value || 0);
-  const unit = +(document.getElementById("roundUnit").value || 1);
   const pNodes = document.querySelectorAll(".player");
+  if(pNodes.length === 0) {
+    alert("参加者を1人以上追加してください");
+    return;
+  }
+
   let players = [];
-  
+  let hasError = false;
+
   pNodes.forEach(node => {
-    const name = node.querySelector(".name").value || "匿名";
-    const invest = +(node.querySelector(".invest").value || 0);
-    const coins = +(node.querySelector(".coins").value || 0);
-    const cash = Math.floor((coins * rate) / unit) * unit;
-    players.push({ name, invest, coins, cash, node });
+    const name = node.querySelector(".name-select").value;
+    const investStr = node.querySelector(".invest").value;
+    const cashStr = node.querySelector(".cash").value;
+    const invest = investStr === "" ? 0 : +investStr;
+    const cash = cashStr === "" ? 0 : +cashStr;
+
+    if(!name) hasError = true;
+    players.push({ name, invest, cash, node });
   });
+
+  if(hasError) {
+    alert("名前が未選択の参加者がいます。");
+    return;
+  }
 
   const totalInvest = players.reduce((s, p) => s + p.invest, 0);
   const totalCash = players.reduce((s, p) => s + p.cash, 0);
-  const totalUnused = (baseAmt * players.length) - totalInvest;
   const totalProfit = totalCash - totalInvest;
-  const perProfit = totalProfit / players.length;
-  const fairShare = (totalCash + totalUnused) / players.length;
+  const fairProfitPerPerson = totalProfit / players.length;
 
   document.getElementById("resultCard").style.display = "block";
   document.getElementById("lineSendBtn").style.display = "block";
   document.getElementById("profitTotal").textContent = money(totalProfit);
-  document.getElementById("perProfit").textContent = money(perProfit);
-  document.getElementById("cashTotal").textContent = money(totalCash);
-  document.getElementById("remainTotal").textContent = money(totalUnused);
+  document.getElementById("perProfit").textContent = money(fairProfitPerPerson);
+  document.getElementById("investTotal").textContent = new Intl.NumberFormat("ja-JP").format(totalInvest) + "円";
+  document.getElementById("cashTotal").textContent = new Intl.NumberFormat("ja-JP").format(totalCash) + "円";
   
   const tbody = document.getElementById("tbody"); tbody.innerHTML = "";
   const payList = document.getElementById("payList"); payList.innerHTML = "";
   let receive = [], pay = [], snapshot = [];
 
   players.forEach(p => {
-    const myProfit = p.cash - p.invest;
-    const myHand = p.cash + (baseAmt - p.invest);
-    const diff = fairShare - myHand;
+    const individualProfit = p.cash - p.invest;
+    const targetAmount = p.invest + fairProfitPerPerson;
+    const diff = p.cash - targetAmount; 
+
     const resVal = p.node.querySelector(".result-value");
-    resVal.textContent = money(myProfit);
-    resVal.style.color = myProfit >= 0 ? "var(--green)" : "var(--red)";
-    if(diff > 1) receive.push({ name: p.name, amount: diff });
-    if(diff < -1) pay.push({ name: p.name, amount: -diff });
+    resVal.textContent = money(individualProfit);
+    resVal.style.color = individualProfit >= 0 ? "var(--green)" : "var(--red)";
+
+    if(diff > 1) {
+      pay.push({ name: p.name, amount: diff });
+    } else if(diff < -1) {
+      receive.push({ name: p.name, amount: -diff });
+    }
+
+    const isPay = diff > 0;
+    const absDiff = Math.abs(diff);
     
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td><b>${p.name}</b></td><td style="color:${myProfit>=0?'var(--green)':'var(--red)'}">${money(myProfit)}</td><td>${money(myHand)}</td><td style="font-weight:800; color:${diff>=0?'var(--green)':'var(--red)'}">${diff >= 0 ? '貰う：' : '払う：'}${money(Math.abs(diff))}</td>`;
+    tr.innerHTML = `<td><b>${p.name}</b></td><td>${new Intl.NumberFormat("ja-JP").format(p.invest)}円</td><td>${new Intl.NumberFormat("ja-JP").format(p.cash)}円</td><td style="color:${individualProfit>=0?'var(--green)':'var(--red)'}; font-weight:600;">${money(individualProfit)}</td><td style="font-weight:800; color:${isPay?'var(--red)':'var(--green)'}">${isPay ? '払う：' : '貰う：'}${new Intl.NumberFormat("ja-JP").format(Math.round(absDiff))}円</td>`;
     tbody.appendChild(tr);
-    snapshot.push({ name: p.name, val: myProfit });
+    snapshot.push({ name: p.name, val: individualProfit });
   });
 
-  // LINEメッセージ作成
   let msg = `【ノリ打ち精算レポート】\n\n■ 今回の収支\n`;
   snapshot.forEach(p => msg += `・${p.name}：${money(p.val)}\n`);
   msg += `合計：${money(totalProfit)}\n\n■ 受け渡し指示\n`;
   let hasPay = false;
-  receive.forEach(r => {
-    const rAmt = { ...r }; // 元データを壊さないようコピー
-    pay.forEach(p => {
-      const pAmt = { ...p };
-      if(rAmt.amount <= 0 || pAmt.amount <= 0) return;
-      const move = Math.min(rAmt.amount, pAmt.amount);
-      payList.innerHTML += `<div class="pay-row"><span><b>${p.name}</b> → ${r.name}</span><span style="color:var(--green);font-weight:800;">${money(move)}</span></div>`;
-      msg += `・${p.name} → ${r.name}：${money(move)}\n`;
-      rAmt.amount -= move; pAmt.amount -= move; hasPay = true;
+
+  pay.forEach(p => {
+    receive.forEach(r => {
+      if(p.amount <= 0 || r.amount <= 0) return;
+      const move = Math.min(p.amount, r.amount);
+      payList.innerHTML += `<div class="pay-row"><span><b>${p.name}</b> → ${r.name}</span><span style="color:var(--green);font-weight:800;">${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円</span></div>`;
+      msg += `・${p.name} → ${r.name} : ${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円\n`;
+      p.amount -= move; r.amount -= move; hasPay = true;
     });
   });
-  if(!hasPay) msg += "移動なし\n";
+
+  if(!hasPay) {
+    payList.innerHTML = `<div style="padding:4px; color:var(--muted); font-size:13px;">受け渡しの必要はありません</div>`;
+    msg += "移動なし\n";
+  }
   lastShareMessage = msg;
 
-  // ★スプレッドシートへ保存を実行★
-  await saveToDB({
-    time: new Date().toLocaleString('ja-JP',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}), 
+  const dateInputVal = document.getElementById("recordDateInput").value;
+  let formattedDateStr = "";
+  if (dateInputVal) {
+    let parts = dateInputVal.split("-");
+    formattedDateStr = `${parts[0]}年${Number(parts[1])}月${Number(parts[2])}日`;
+  } else {
+    let now = new Date();
+    formattedDateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+  }
+
+  const newHist = {
+    time: formattedDateStr, 
     profit: totalProfit, 
     players: snapshot 
-  });
+  };
+
+  document.getElementById("loading").style.display = "block";
+  
+  try {
+    await fetch(GAS_URL, { 
+      method: "POST", 
+      mode: "no-cors", 
+      body: JSON.stringify(newHist) 
+    });
+  } catch (e) {
+    console.error(e);
+  }
+
+  await loadHistory();
+  document.getElementById("loading").style.display = "none";
 };
 
 document.getElementById("lineSendBtn").onclick = async () => {
-  liff.sendMessages([{ type: 'text', text: lastShareMessage }]).then(() => liff.closeWindow());
+  if (liff.isInClient()) {
+    liff.sendMessages([{ type: 'text', text: lastShareMessage }]).then(() => liff.closeWindow());
+  } else {
+    alert("LINEアプリ内から開いていないため送信できません。以下の内容をコピーしてください:\n\n" + lastShareMessage);
+  }
 };
 
 document.getElementById("addBtn").onclick = () => addPlayer();
-document.getElementById("saveMemberBtn").onclick = () => {
-  const names = [...document.querySelectorAll(".name")].map(i => i.value);
-  localStorage.setItem("nori_members", JSON.stringify(names));
-  alert("メンバー保存完了");
+
+const modal = document.getElementById("memberModal");
+document.getElementById("openMemberModal").onclick = () => {
+  renderMemberListEdit();
+  modal.style.display = "flex";
+};
+document.getElementById("closeModalBtn").onclick = () => {
+  modal.style.display = "none";
+  location.reload();
+};
+
+function renderMemberListEdit() {
+  const container = document.getElementById("memberListEdit");
+  container.innerHTML = "";
+  storedMembers.forEach((m, idx) => {
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; background:#f8fafc; padding:8px 12px; border-radius:8px; border:1px solid var(--line);";
+    row.innerHTML = `<span style="font-weight:600;">${m}</span><button class="delete-btn" onclick="removeStoredMember(${idx})">削除</button>`;
+    container.appendChild(row);
+  });
+}
+
+window.removeStoredMember = function(idx) {
+  storedMembers.splice(idx, 1);
+  localStorage.setItem("nori_stored_members", JSON.stringify(storedMembers));
+  renderMemberListEdit();
+};
+
+document.getElementById("addMemberStoreBtn").onclick = () => {
+  const nameInput = document.getElementById("newMemberName");
+  const name = nameInput.value.trim();
+  if(!name) return;
+  if(storedMembers.includes(name)) {
+    alert("すでに登録されています");
+    return;
+  }
+  storedMembers.push(name);
+  localStorage.setItem("nori_stored_members", JSON.stringify(storedMembers));
+  nameInput.value = "";
+  renderMemberListEdit();
 };
 
 liff.init({ liffId: LIFF_ID }).then(() => {
-  if (!liff.isLoggedIn()) { liff.login(); } else { loadHistory(); }
-});
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  document.getElementById("recordDateInput").value = `${yyyy}-${mm}-${dd}`;
 
-const savedMembers = JSON.parse(localStorage.getItem("nori_members") || '["Aさん","Bさん","Cさん"]');
-savedMembers.forEach(n => addPlayer(n));
+  if (!liff.isLoggedIn()) { 
+    liff.login(); 
+  } else { 
+    loadHistory();
+    if(storedMembers.length > 0) {
+      addPlayer(storedMembers[0], "", "");
+      if(storedMembers[1]) addPlayer(storedMembers[1], "", "");
+    } else {
+      addPlayer("", "", "");
+    }
+  }
+});
 </script>
 </body>
 </html>
