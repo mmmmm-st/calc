@@ -164,33 +164,48 @@ button:active { transform: scale(0.98); }
   box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 @media (min-width: 480px) {
   .grand-total-box {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
+    padding: 18px 24px;
   }
 }
-.grand-total-label { font-size: 11px; opacity: 0.85; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.grand-total-label { font-size: 11px; opacity: 0.85; margin-bottom: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
 .grand-total-value { font-size: 22px; font-weight: 900; letter-spacing: -0.03em; }
 
-.grand-metrics-row {
+.grand-right-col {
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: 8px;
   flex-wrap: wrap;
 }
-.grand-metric-item {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 8px 14px;
-  border-radius: 12px;
+.grand-per-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
   backdrop-filter: blur(4px);
-  min-width: 110px;
 }
-.grand-metric-label { font-size: 10px; opacity: 0.85; font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
-.grand-metric-value { font-size: 15px; font-weight: 800; }
+.grand-winrate-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-align: left;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+@media (min-width: 480px) {
+  .grand-winrate-badge { text-align: right; }
+}
+.grand-winrate-label { font-size: 9px; opacity: 0.85; font-weight: 600; text-transform: uppercase; }
+.grand-winrate-value { font-size: 13px; font-weight: 800; }
 
 .global-filter-card {
   background: #f1f5f9;
@@ -449,14 +464,11 @@ tr:last-child td { border-bottom: none; }
         <div class="grand-total-label" id="grandTotalLabel">グループ選択期間の累計収支</div>
         <div class="grand-total-value" id="grandTotalDisplay">0円</div>
       </div>
-      <div class="grand-metrics-row">
-        <div class="grand-metric-item">
-          <div class="grand-metric-label">1人あたり平均</div>
-          <div class="grand-metric-value" id="grandPerDisplay">0円</div>
-        </div>
-        <div class="grand-metric-item">
-          <div class="grand-metric-label">グループ勝率</div>
-          <div class="grand-metric-value" id="grandWinRateDisplay">0%</div>
+      <div class="grand-right-col">
+        <div class="grand-per-badge" id="grandPerDisplay">1人: 0円</div>
+        <div class="grand-winrate-badge">
+          <div class="grand-winrate-label">勝率</div>
+          <div class="grand-winrate-value" id="grandWinRateDisplay">0%</div>
         </div>
       </div>
     </div>
@@ -649,7 +661,7 @@ function renderAll() {
     document.getElementById("history").innerHTML = "履歴はありません。";
     document.getElementById("personalTotals").innerHTML = "";
     document.getElementById("grandTotalDisplay").textContent = "0円";
-    document.getElementById("grandPerDisplay").textContent = "0円";
+    document.getElementById("grandPerDisplay").textContent = "1人: 0円";
     document.getElementById("grandWinRateDisplay").textContent = "0%";
     return;
   }
@@ -883,7 +895,7 @@ function renderPersonalTotalsAndHistory() {
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:12px; font-weight:700;">
             <span>合計: <span style="color:${sProfit>=0?'var(--green)':'var(--red)'}">${money(sProfit)}</span></span>
-            <span class="hist-per-badge" style="background:var(--accent-light); color:var(--accent); padding:2px 6px; border-radius:4px; font-size:11px;">1人あたり: ${money(sPer)}</span>
+            <span class="hist-per-badge" style="background:var(--accent-light); color:var(--accent); padding:2px 6px; border-radius:4px; font-size:11px;">1人: ${money(sPer)}</span>
           </div>
           <div class="hist-players-grid">
             ${pDetails}
@@ -955,8 +967,7 @@ function renderGrandTotals() {
   const groupWinRate = totalSessions > 0 ? Math.round((winSessions / totalSessions) * 100) : 0;
 
   grandEl.textContent = money(gTotal);
-  grandPerEl.textContent = money(avgPerProfit);
-  grandPerEl.style.color = avgPerProfit >= 0 ? "#34d399" : "#f87171";
+  grandPerEl.textContent = `1人: ${money(avgPerProfit)}`;
   grandWinRateEl.textContent = `${groupWinRate}% (${winSessions}/${totalSessions}勝)`;
 }
 
