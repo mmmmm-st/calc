@@ -1060,27 +1060,20 @@ function renderPersonalTotalsAndHistory() {
         });
 
         let detailsHtml = "";
-        if (validMachines.length === 1) {
-          let m = validMachines[0];
-          detailsHtml = `
-            <div style="font-size:11px; font-weight:700; color:var(--text); margin-top:2px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🎰 ${m.machineName}</div>
-            <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px;">
-              <span>投資:${new Intl.NumberFormat("ja-JP").format(m.machineInvest)}</span>
-              <span>回収:${new Intl.NumberFormat("ja-JP").format(m.machineCash)}</span>
-            </div>
-          `;
-        } else if (validMachines.length > 1) {
+        if (validMachines.length > 0) {
           let listHtml = "";
           validMachines.forEach(m => {
-            listHtml += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; padding:2px 0; border-bottom:1px dashed #f1f5f9; gap:4px;"><span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:55%;">🎰 ${m.machineName}</span><span style="color:var(--muted); white-space:nowrap;">投${new Intl.NumberFormat("ja-JP").format(m.machineInvest)}/収${new Intl.NumberFormat("ja-JP").format(m.machineCash)}</span></div>`;
+            listHtml += `<div style="display:flex; justify-content:space-between; align-items:center; font-size:10px; padding:2px 0; border-bottom:1px dashed #f1f5f9; gap:4px;"><span style="color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:55%;">🎰 ${m.machineName}</span><span style="color:var(--muted); white-space:nowrap;">投${new Intl.NumberFormat("ja-JP").format(m.machineInvest)}/収${new Intl.NumberFormat("ja-JP").format(m.machineCash)}</span></div>`;
           });
-          detailsHtml = `
-            <div style="margin-top:2px; margin-bottom:2px;">${listHtml}</div>
-            <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px; font-weight:700; white-space:nowrap;">
-              <span>合計</span>
-              <span>投資:${new Intl.NumberFormat("ja-JP").format(pInv)} / 回収:${new Intl.NumberFormat("ja-JP").format(pCsh)}</span>
-            </div>
-          `;
+          detailsHtml = `<div style="margin-top:2px; margin-bottom:2px;">${listHtml}</div>`;
+          if (validMachines.length > 1) {
+            detailsHtml += `
+              <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px; font-weight:600; white-space:nowrap; border-top:1px solid var(--line); padding-top:2px;">
+                <span>合計</span>
+                <span>投資:${new Intl.NumberFormat("ja-JP").format(pInv)} / 回収:${new Intl.NumberFormat("ja-JP").format(pCsh)}</span>
+              </div>
+            `;
+          }
         } else {
           detailsHtml = `
             <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px; margin-top:4px; margin-bottom:2px; white-space:nowrap;">
