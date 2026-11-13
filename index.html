@@ -673,6 +673,7 @@ function renderPersonalTotalsAndHistory() {
     return;
   }
 
+  // 履歴一覧から正確にセッション単位の受け渡し（貢献・強盗）を計算してトータルに集計
   let pStats = {};
   filteredHistory.forEach((h) => {
     const totalProfit = h.players.reduce((sum, p) => sum + Number(p.val || 0), 0);
@@ -707,6 +708,8 @@ function renderPersonalTotalsAndHistory() {
     let netTransferMap = {};
     h.players.forEach(p => netTransferMap[p.name] = 0);
     sessionTransfers.forEach(t => {
+      // t.from は支払う側（強盗・受け取る側、マイナス＝強盗）
+      // t.to は受け取る側（貢献・支払う側、プラス＝貢献）
       netTransferMap[t.from] -= t.amount;
       netTransferMap[t.to] += t.amount;
     });
@@ -720,7 +723,7 @@ function renderPersonalTotalsAndHistory() {
       if(Number(p.val) >= 0) {
         pStats[p.name].wins += 1;
       }
-      pStats[p.name].netTransferSum += netTransferMap[p.name];
+      pStats[p.name].netTransferSum += (netTransferMap[p.name] || 0);
     });
   });
 
@@ -732,6 +735,7 @@ function renderPersonalTotalsAndHistory() {
 
     let settleSummaryHtml = "";
     const roundedNet = Math.round(s.netTransferSum);
+    // 正（プラス）なら貢献、負（マイナス）なら強盗に修正
     if (roundedNet > 1) {
       settleSummaryHtml = `<div style="font-size:11px; font-weight:700; color:var(--green); margin-bottom:4px;">貢献: ${new Intl.NumberFormat("ja-JP").format(roundedNet)}円</div>`;
     } else if (roundedNet < -1) {
@@ -801,7 +805,6 @@ function renderPersonalTotalsAndHistory() {
         
         let statusHtml = "";
         if (hasTransfers) {
-          const targetAmount = pInv + fairProfitPerPerson;
           let netDiff = 0;
           transfers.forEach(t => {
             if (t.from === p.name) netDiff -= t.amount;
