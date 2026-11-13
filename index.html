@@ -164,7 +164,7 @@ button:active { transform: scale(0.98); }
   box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 @media (min-width: 480px) {
   .grand-total-box {
@@ -175,19 +175,22 @@ button:active { transform: scale(0.98); }
   }
 }
 .grand-total-label { font-size: 11px; opacity: 0.85; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.grand-total-value { font-size: 24px; font-weight: 900; letter-spacing: -0.03em; }
-.grand-winrate-badge {
-  background: rgba(255, 255, 255, 0.2);
+.grand-total-value { font-size: 22px; font-weight: 900; letter-spacing: -0.03em; }
+
+.grand-metrics-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.grand-metric-item {
+  background: rgba(255, 255, 255, 0.15);
   padding: 8px 14px;
   border-radius: 12px;
-  text-align: left;
   backdrop-filter: blur(4px);
+  min-width: 110px;
 }
-@media (min-width: 480px) {
-  .grand-winrate-badge { text-align: right; }
-}
-.grand-winrate-label { font-size: 10px; opacity: 0.85; font-weight: 600; text-transform: uppercase; }
-.grand-winrate-value { font-size: 16px; font-weight: 800; }
+.grand-metric-label { font-size: 10px; opacity: 0.85; font-weight: 600; text-transform: uppercase; margin-bottom: 2px; }
+.grand-metric-value { font-size: 15px; font-weight: 800; }
 
 .global-filter-card {
   background: #f1f5f9;
@@ -446,9 +449,15 @@ tr:last-child td { border-bottom: none; }
         <div class="grand-total-label" id="grandTotalLabel">グループ選択期間の累計収支</div>
         <div class="grand-total-value" id="grandTotalDisplay">0円</div>
       </div>
-      <div class="grand-winrate-badge">
-        <div class="grand-winrate-label">グループ勝率</div>
-        <div class="grand-winrate-value" id="grandWinRateDisplay">0%</div>
+      <div class="grand-metrics-row">
+        <div class="grand-metric-item">
+          <div class="grand-metric-label">1人あたり平均</div>
+          <div class="grand-metric-value" id="grandPerDisplay">0円</div>
+        </div>
+        <div class="grand-metric-item">
+          <div class="grand-metric-label">グループ勝率</div>
+          <div class="grand-metric-value" id="grandWinRateDisplay">0%</div>
+        </div>
       </div>
     </div>
 
@@ -604,7 +613,6 @@ window.editHistory = function(rowIdx) {
 
   if (!confirm("この回のデータを入力欄に読み込んで修正しますか？\n（※修正後に「計算を実行して保存」を押すと、古いデータが上書きされます）")) return;
 
-  // 日付のセット
   let match = target.time.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
   if (match) {
     let y = match[1];
@@ -613,7 +621,6 @@ window.editHistory = function(rowIdx) {
     document.getElementById("recordDateInput").value = `${y}-${m}-${d}`;
   }
 
-  // 参加者入力欄をクリアして再構築
   document.getElementById("players").innerHTML = "";
   if (target.players && target.players.length > 0) {
     target.players.forEach(p => {
@@ -623,10 +630,7 @@ window.editHistory = function(rowIdx) {
     addPlayer("", "", "");
   }
 
-  // 古い履歴を一旦削除してから新規保存として上書きするため、自動削除を実行
   deleteHistorySilently(rowIdx);
-
-  // ページ上部にスクロール
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -645,6 +649,7 @@ function renderAll() {
     document.getElementById("history").innerHTML = "履歴はありません。";
     document.getElementById("personalTotals").innerHTML = "";
     document.getElementById("grandTotalDisplay").textContent = "0円";
+    document.getElementById("grandPerDisplay").textContent = "0円";
     document.getElementById("grandWinRateDisplay").textContent = "0%";
     return;
   }
@@ -907,6 +912,7 @@ function renderPersonalTotalsAndHistory() {
 
 function renderGrandTotals() {
   const grandEl = document.getElementById("grandTotalDisplay");
+  const grandPerEl = document.getElementById("grandPerDisplay");
   const grandWinRateEl = document.getElementById("grandWinRateDisplay");
   const grandLabelEl = document.getElementById("grandTotalLabel");
   const comboSelect = document.getElementById("combinationSelect");
@@ -926,6 +932,7 @@ function renderGrandTotals() {
   let gTotal = 0;
   let totalSessions = 0;
   let winSessions = 0;
+  let totalPerSum = 0;
 
   if(Array.isArray(historyData)) {
     historyData.forEach(h => {
@@ -938,12 +945,18 @@ function renderGrandTotals() {
         if(profit >= 0) {
           winSessions += 1;
         }
+        const sPer = h.players.length > 0 ? profit / h.players.length : 0;
+        totalPerSum += sPer;
       }
     });
   }
 
+  const avgPerProfit = totalSessions > 0 ? totalPerSum : 0;
   const groupWinRate = totalSessions > 0 ? Math.round((winSessions / totalSessions) * 100) : 0;
+
   grandEl.textContent = money(gTotal);
+  grandPerEl.textContent = money(avgPerProfit);
+  grandPerEl.style.color = avgPerProfit >= 0 ? "#34d399" : "#f87171";
   grandWinRateEl.textContent = `${groupWinRate}% (${winSessions}/${totalSessions}勝)`;
 }
 
