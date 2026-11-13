@@ -158,54 +158,41 @@ button:active { transform: scale(0.98); }
 .grand-total-box {
   background: var(--gradient);
   border-radius: 16px;
-  padding: 16px;
+  padding: 16px 18px;
   color: white;
   margin-bottom: 20px;
   box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 @media (min-width: 480px) {
   .grand-total-box {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 24px;
+    padding: 18px 22px;
   }
 }
-.grand-total-label { font-size: 11px; opacity: 0.85; margin-bottom: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.grand-total-value { font-size: 22px; font-weight: 900; letter-spacing: -0.03em; }
+.grand-total-label { font-size: 11px; opacity: 0.85; margin-bottom: 2px; font-weight: 600; letter-spacing: 0.03em; }
+.grand-total-value { font-size: 24px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.2; }
 
-.grand-right-col {
+.grand-badges {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
-.grand-per-badge {
-  font-size: 11px;
+.grand-pill {
+  font-size: 12px;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.2);
   color: #ffffff;
   padding: 6px 10px;
   border-radius: 8px;
   white-space: nowrap;
   backdrop-filter: blur(4px);
 }
-.grand-winrate-badge {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 6px 12px;
-  border-radius: 8px;
-  text-align: left;
-  backdrop-filter: blur(4px);
-  white-space: nowrap;
-}
-@media (min-width: 480px) {
-  .grand-winrate-badge { text-align: right; }
-}
-.grand-winrate-label { font-size: 9px; opacity: 0.85; font-weight: 600; text-transform: uppercase; }
-.grand-winrate-value { font-size: 13px; font-weight: 800; }
 
 .global-filter-card {
   background: #f1f5f9;
@@ -464,12 +451,9 @@ tr:last-child td { border-bottom: none; }
         <div class="grand-total-label" id="grandTotalLabel">グループ選択期間の累計収支</div>
         <div class="grand-total-value" id="grandTotalDisplay">0円</div>
       </div>
-      <div class="grand-right-col">
-        <div class="grand-per-badge" id="grandPerDisplay">1人: 0円</div>
-        <div class="grand-winrate-badge">
-          <div class="grand-winrate-label">勝率</div>
-          <div class="grand-winrate-value" id="grandWinRateDisplay">0%</div>
-        </div>
+      <div class="grand-badges">
+        <span class="grand-pill" id="grandPerDisplay">1人: 0円</span>
+        <span class="grand-pill" id="grandWinRateDisplay">勝率: 0%</span>
       </div>
     </div>
 
@@ -662,7 +646,7 @@ function renderAll() {
     document.getElementById("personalTotals").innerHTML = "";
     document.getElementById("grandTotalDisplay").textContent = "0円";
     document.getElementById("grandPerDisplay").textContent = "1人: 0円";
-    document.getElementById("grandWinRateDisplay").textContent = "0%";
+    document.getElementById("grandWinRateDisplay").textContent = "勝率: 0%";
     return;
   }
   graphsArea.style.display = "block";
@@ -968,7 +952,7 @@ function renderGrandTotals() {
 
   grandEl.textContent = money(gTotal);
   grandPerEl.textContent = `1人: ${money(avgPerProfit)}`;
-  grandWinRateEl.textContent = `${groupWinRate}% (${winSessions}/${totalSessions}勝)`;
+  grandWinRateEl.textContent = `勝率: ${groupWinRate}% (${winSessions}/${totalSessions})`;
 }
 
 function getAvailableYearsAndMonths() {
