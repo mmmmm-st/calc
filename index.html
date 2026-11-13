@@ -638,17 +638,8 @@ async function loadHistory() {
     historyData = (jsonRes.history || []).map(item => ({ ...item, time: cleanTimeStr(item.time) }));
     serverMestMap = jsonRes.mestMap || {};
     
-    if (jsonRes.members && Array.isArray(jsonRes.members)) {
-      storedMembers = jsonRes.members;
-    } else {
-      storedMembers = ["しゅうや", "まいと", "れお"];
-    }
-
-    if (jsonRes.machines && Array.isArray(jsonRes.machines)) {
-      storedMachines = jsonRes.machines;
-    } else {
-      storedMachines = ["スマスロ北斗の拳", "マイジャグラーV", "モンキーターンV"];
-    }
+    storedMembers = jsonRes.members || [];
+    storedMachines = jsonRes.machines || [];
     
     historyData.sort((a, b) => parseDateStrToObj(a.time) - parseDateStrToObj(b.time));
     
@@ -657,8 +648,8 @@ async function loadHistory() {
     historyEl.innerHTML = "履歴の読み込みに失敗しました。";
     historyData = [];
     serverMestMap = {};
-    storedMembers = ["しゅうや", "まいと", "れお"];
-    storedMachines = ["スマスロ北斗の拳", "マイジャグラーV"];
+    storedMembers = [];
+    storedMachines = [];
     renderAll();
   }
 }
