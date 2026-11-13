@@ -239,7 +239,7 @@ svg {
   height: 270px;
 }
 
-.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 16px; }
 .personal-card { background: #f8fafc; border-radius: 14px; padding: 12px; border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
 .personal-card .name-label { font-size: 13px; color: var(--text); font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .personal-card .amount-value { font-size: 15px; font-weight: 800; margin-bottom: 2px; }
@@ -675,15 +675,23 @@ function renderPersonalTotalsAndHistory() {
 
   let pStats = {};
   filteredHistory.forEach((h) => {
+    const totalProfit = h.players.reduce((sum, p) => sum + Number(p.val || 0), 0);
+    const fairProfitPerPerson = h.players.length > 0 ? totalProfit / h.players.length : 0;
+
     h.players.forEach(p => {
       if(!pStats[p.name]) {
-        pStats[p.name] = { total: 0, count: 0, wins: 0 };
+        pStats[p.name] = { total: 0, count: 0, wins: 0, diffSum: 0 };
       }
       pStats[p.name].total += Number(p.val);
       pStats[p.name].count += 1;
       if(Number(p.val) >= 0) {
         pStats[p.name].wins += 1;
       }
+      const pInv = p.invest !== undefined ? Number(p.invest) : 0;
+      const pCsh = p.cash !== undefined ? Number(p.cash) : 0;
+      const targetAmount = pInv + fairProfitPerPerson;
+      const diff = pCsh - targetAmount;
+      pStats[p.name].diffSum += diff;
     });
   });
 
@@ -692,6 +700,16 @@ function renderPersonalTotalsAndHistory() {
     const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
     let mestCount = serverMestMap[name] || 0;
     const canConsume = mestCount > 0;
+
+    let settleSummaryHtml = "";
+    const roundedDiff = Math.round(s.diffSum);
+    if (roundedDiff > 1) {
+      settleSummaryHtml = `<div style="font-size:11px; font-weight:700; color:var(--green); margin-bottom:4px;">貢献: ${new Intl.NumberFormat("ja-JP").format(roundedDiff)}円</div>`;
+    } else if (roundedDiff < -1) {
+      settleSummaryHtml = `<div style="font-size:11px; font-weight:700; color:var(--red); margin-bottom:4px;">強盗: ${new Intl.NumberFormat("ja-JP").format(Math.round(-roundedDiff))}円</div>`;
+    } else {
+      settleSummaryHtml = `<div style="font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">平和: 0円</div>`;
+    }
 
     const pCard = document.createElement("div");
     pCard.className = "personal-card";
@@ -703,6 +721,7 @@ function renderPersonalTotalsAndHistory() {
           <span>勝率: ${winRate}%</span>
           <span>(${s.wins}勝/${s.count}回)</span>
         </div>
+        ${settleSummaryHtml}
       </div>
       <div class="mest-row">
         <span class="mest-text">飯スト: <b style="color:var(--accent);">${mestCount}</b></span>
@@ -788,11 +807,8 @@ function renderPersonalTotalsAndHistory() {
           </div>
         `;
       } else {
-        transferHtml = `
-          <div style="margin-top:6px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:4px 8px; font-size:10px; color:#166534; font-weight:600;">
-            💸 お金の受け渡し：平和 (必要なし)
-          </div>
-        `;
+        // 平和の場合は余計な表示を完全に省く
+        transferHtml = "";
       }
 
       sessionsHtml += `
