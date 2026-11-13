@@ -387,7 +387,7 @@ tr:last-child td { border-bottom: none; }
 }
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
-.modal-content { background: #fff; padding: 20px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+.modal-content { background: #fff; padding: 20px; border-radius: 20px; width: 90%; max-width: 420px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
 </style>
 </head>
 <body>
@@ -483,6 +483,7 @@ tr:last-child td { border-bottom: none; }
   </div>
 </div>
 
+<!-- メンバー管理モーダル -->
 <div class="modal" id="memberModal">
   <div class="modal-content">
     <h2>メンバー管理</h2>
@@ -493,6 +494,22 @@ tr:last-child td { border-bottom: none; }
       <div class="half"><button class="sub-btn" id="addMemberStoreBtn" style="background: var(--accent); color: #fff; border:none; height: 100%;">追加</button></div>
     </div>
     <button class="sub-btn" id="closeModalBtn" style="background: #f1f5f9;">閉じる</button>
+  </div>
+</div>
+
+<!-- 履歴修正モーダル -->
+<div class="modal" id="editModal">
+  <div class="modal-content">
+    <h2>履歴の修正</h2>
+    <div style="margin-bottom: 12px;">
+      <label>実践日</label>
+      <input type="date" id="editDateInput">
+    </div>
+    <div id="editPlayersContainer" style="margin-bottom: 16px;"></div>
+    <div style="display: flex; gap: 8px;">
+      <button class="sub-btn" id="closeEditModalBtn" style="background: #f1f5f9; flex: 1;">キャンセル</button>
+      <button class="main-btn" id="saveEditBtn" style="flex: 1; margin: 0;">上書き保存</button>
+    </div>
   </div>
 </div>
 
@@ -509,6 +526,7 @@ let serverMestMap = {};
 let lastShareMessage = "";
 let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
 let isInitialFilterSet = false;
+let editingRowIdx = null; // 現在編集中の履歴インデックス
 
 function cleanTimeStr(rawTime) {
   if (!rawTime) return "";
@@ -600,6 +618,7 @@ async function deleteHistory(rowIdx) {
   document.getElementById("loading").style.display = "none";
 }
 
+// 修正モーダルを開く処理
 window.editHistory = function(rowIdx) {
   const target = historyData.find(h => h.rowIdx === rowIdx);
   if (!target) {
@@ -607,36 +626,126 @@ window.editHistory = function(rowIdx) {
     return;
   }
 
-  if (!confirm("この回のデータを入力欄に読み込んで修正しますか？\n（※修正後に「計算を実行して保存」を押すと、古いデータが上書きされます）")) return;
+  editingRowIdx = rowIdx;
 
+  // 日付のセット
   let match = target.time.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
   if (match) {
     let y = match[1];
     let m = String(match[2]).padStart(2, '0');
     let d = String(match[3]).padStart(2, '0');
-    document.getElementById("recordDateInput").value = `${y}-${m}-${d}`;
+    document.getElementById("editDateInput").value = `${y}-${m}-${d}`;
+  } else {
+    document.getElementById("editDateInput").value = "";
   }
 
-  document.getElementById("players").innerHTML = "";
+  // プレイヤーの読み込み
+  const container = document.getElementById("editPlayersContainer");
+  container.innerHTML = "";
+  
   if (target.players && target.players.length > 0) {
     target.players.forEach(p => {
-      addPlayer(p.name, p.invest !== undefined ? p.invest : "", p.cash !== undefined ? p.cash : "");
+      addEditPlayerRow(container, p.name, p.invest !== undefined ? p.invest : "", p.cash !== undefined ? p.cash : "");
     });
-  } else {
-    addPlayer("", "", "");
   }
 
-  deleteHistorySilently(rowIdx);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById("editModal").style.display = "flex";
 };
 
-async function deleteHistorySilently(rowIdx) {
+function addEditPlayerRow(container, selectedName = "", investVal = "", cashVal = "") {
+  const div = document.createElement("div");
+  div.className = "player";
+  let options = '<option value="">選択してください</option>';
+  storedMembers.forEach(m => {
+    const selected = (m === selectedName) ? 'selected' : '';
+    options += `<option value="${m}" ${selected}>${m}</option>`;
+  });
+
+  div.innerHTML = `
+    <div style="margin-bottom: 8px;">
+      <label>名前</label>
+      <select class="edit-name-select" style="background:#fff;">${options}</select>
+    </div>
+    <div class="grid">
+      <div class="half">
+        <label>投資額</label>
+        <input class="edit-invest" type="number" inputmode="numeric" pattern="[0-9]*" value="${investVal}" placeholder="0">
+      </div>
+      <div class="half">
+        <label>回収額</label>
+        <input class="edit-cash" type="number" inputmode="numeric" pattern="[0-9]*" value="${cashVal}" placeholder="0">
+      </div>
+    </div>
+    <div style="margin-top:8px; display:flex; justify-content:flex-end;">
+      <button class="delete-btn" onclick="this.closest('.player').remove()">このメンバーを外す</button>
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+// 修正内容を保存（古いデータを削除して上書き）
+document.getElementById("saveEditBtn").onclick = async function() {
+  const pNodes = document.querySelectorAll("#editPlayersContainer .player");
+  if(pNodes.length === 0) {
+    alert("参加者を1人以上設定してください");
+    return;
+  }
+
+  let players = [];
+  let hasError = false;
+
+  pNodes.forEach(node => {
+    const name = node.querySelector(".edit-name-select").value;
+    const investStr = node.querySelector(".edit-invest").value;
+    const cashStr = node.querySelector(".edit-cash").value;
+    const invest = investStr === "" ? 0 : +investStr;
+    const cash = cashStr === "" ? 0 : +cashStr;
+
+    if(!name) hasError = true;
+    const individualProfit = cash - invest;
+    players.push({ name, val: individualProfit, invest, cash });
+  });
+
+  if(hasError) {
+    alert("名前が未選択の参加者がいます。");
+    return;
+  }
+
+  const totalProfit = players.reduce((s, p) => s + p.val, 0);
+  const dateInputVal = document.getElementById("editDateInput").value;
+  let formattedDateStr = "";
+  if (dateInputVal) {
+    let parts = dateInputVal.split("-");
+    formattedDateStr = `${parts[0]}年${Number(parts[1])}月${Number(parts[2])}日`;
+  } else {
+    formattedDateStr = "日付不明";
+  }
+
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("editModal").style.display = "none";
+
   try {
-    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: rowIdx }) });
-  } catch(e) {
+    // 1. 古い行を削除
+    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: editingRowIdx }) });
+    
+    // 2. 新しいデータとして保存
+    const updatedHist = {
+      time: formattedDateStr, 
+      profit: totalProfit, 
+      players: players 
+    };
+    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(updatedHist) });
+  } catch (e) {
     console.error(e);
   }
-}
+
+  await loadHistory();
+  document.getElementById("loading").style.display = "none";
+};
+
+document.getElementById("closeEditModalBtn").onclick = () => {
+  document.getElementById("editModal").style.display = "none";
+};
 
 function renderAll() {
   const graphsArea = document.getElementById("graphsArea");
@@ -1287,7 +1396,7 @@ function addPlayer(selectedName = "", investVal = "", cashVal = ""){
 }
 
 document.getElementById("calcBtn").onclick = async function() {
-  const pNodes = document.querySelectorAll(".player");
+  const pNodes = document.querySelectorAll("#players .player");
   if(pNodes.length === 0) {
     alert("参加者を1人以上追加してください");
     return;
