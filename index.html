@@ -129,6 +129,7 @@ button:active { transform: scale(0.98); }
 .sub-btn:hover { background: #e2e8f0; }
 
 .delete-btn { background: #fee2e2; color: var(--red); width: auto; padding: 4px 8px; font-size: 10px; border-radius: 6px; }
+.edit-btn { background: #e0e7ff; color: var(--accent); width: auto; padding: 4px 8px; font-size: 10px; border-radius: 6px; }
 
 /* フローティング更新ボタン */
 .float-reload-btn {
@@ -594,6 +595,49 @@ async function deleteHistory(rowIdx) {
   document.getElementById("loading").style.display = "none";
 }
 
+window.editHistory = function(rowIdx) {
+  const target = historyData.find(h => h.rowIdx === rowIdx);
+  if (!target) {
+    alert("該当する履歴が見つかりませんでした。");
+    return;
+  }
+
+  if (!confirm("この回のデータを入力欄に読み込んで修正しますか？\n（※修正後に「計算を実行して保存」を押すと、古いデータが上書きされます）")) return;
+
+  // 日付のセット
+  let match = target.time.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+  if (match) {
+    let y = match[1];
+    let m = String(match[2]).padStart(2, '0');
+    let d = String(match[3]).padStart(2, '0');
+    document.getElementById("recordDateInput").value = `${y}-${m}-${d}`;
+  }
+
+  // 参加者入力欄をクリアして再構築
+  document.getElementById("players").innerHTML = "";
+  if (target.players && target.players.length > 0) {
+    target.players.forEach(p => {
+      addPlayer(p.name, p.invest !== undefined ? p.invest : "", p.cash !== undefined ? p.cash : "");
+    });
+  } else {
+    addPlayer("", "", "");
+  }
+
+  // 古い履歴を一旦削除してから新規保存として上書きするため、自動削除を実行
+  deleteHistorySilently(rowIdx);
+
+  // ページ上部にスクロール
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+async function deleteHistorySilently(rowIdx) {
+  try {
+    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: rowIdx }) });
+  } catch(e) {
+    console.error(e);
+  }
+}
+
 function renderAll() {
   const graphsArea = document.getElementById("graphsArea");
   if(!Array.isArray(historyData) || historyData.length === 0){
@@ -673,7 +717,6 @@ function renderPersonalTotalsAndHistory() {
     return;
   }
 
-  // 履歴一覧のセッションごとの計算ロジックと完全に同期させてトータル集計を行う
   let pStats = {};
   filteredHistory.forEach((h) => {
     const totalProfit = h.players.reduce((sum, p) => sum + Number(p.val || 0), 0);
@@ -688,7 +731,7 @@ function renderPersonalTotalsAndHistory() {
         let pInv = p.invest !== undefined ? Number(p.invest) : 0;
         let pCsh = p.cash !== undefined ? Number(p.cash) : 0;
         const targetAmount = pInv + fairProfitPerPerson;
-        let netDiff = pCsh - targetAmount; // プラス＝貢献、マイナス＝強盗
+        let netDiff = pCsh - targetAmount;
         sessionNetMap[p.name] = netDiff;
       });
     }
@@ -828,7 +871,10 @@ function renderPersonalTotalsAndHistory() {
         <div class="session-block">
           <div class="session-title">
             <span>第 ${idx + 1} 回セッション</span>
-            <button class="delete-btn" onclick="deleteHistory(${s.rowIdx})">この回を削除</button>
+            <div style="display:flex; gap:4px;">
+              <button class="edit-btn" onclick="editHistory(${s.rowIdx})">修正</button>
+              <button class="delete-btn" onclick="deleteHistory(${s.rowIdx})">削除</button>
+            </div>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:12px; font-weight:700;">
             <span>合計: <span style="color:${sProfit>=0?'var(--green)':'var(--red)'}">${money(sProfit)}</span></span>
