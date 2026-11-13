@@ -31,6 +31,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* モーダル表示時に背景を固定するクラス */
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
 .wrap { max-width: 680px; margin: auto; width: 100%; overflow-x: hidden; }
 
 .card {
@@ -530,8 +537,25 @@ let historyData = [];
 let serverMestMap = {};
 let lastShareMessage = "";
 let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
+let sTop = 0;
 let isInitialFilterSet = false;
 let editingRowIdx = null;
+
+// モーダルを開くときの共通処理（背景スクロールをピタッとロック）
+function openModal(modalEl) {
+  sTop = window.scrollY;
+  document.body.classList.add("modal-open");
+  document.body.style.top = `-${sTop}px`;
+  modalEl.style.display = "flex";
+}
+
+// モーダルを閉じるときの共通処理（背景ロックを解除して元の位置に戻す）
+function closeModal(modalEl) {
+  modalEl.style.display = "none";
+  document.body.classList.remove("modal-open");
+  document.body.style.top = "";
+  window.scrollTo(0, sTop);
+}
 
 function cleanTimeStr(rawTime) {
   if (!rawTime) return "";
@@ -651,7 +675,7 @@ window.editHistory = function(rowIdx) {
     });
   }
 
-  document.getElementById("editModal").style.display = "flex";
+  openModal(document.getElementById("editModal"));
 };
 
 function addEditPlayerRow(container, selectedName = "", investVal = "", cashVal = "") {
@@ -722,8 +746,8 @@ document.getElementById("saveEditBtn").onclick = async function() {
     formattedDateStr = "日付不明";
   }
 
+  closeModal(document.getElementById("editModal"));
   document.getElementById("loading").style.display = "block";
-  document.getElementById("editModal").style.display = "none";
 
   try {
     await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: editingRowIdx }) });
@@ -743,7 +767,7 @@ document.getElementById("saveEditBtn").onclick = async function() {
 };
 
 document.getElementById("closeEditModalBtn").onclick = () => {
-  document.getElementById("editModal").style.display = "none";
+  closeModal(document.getElementById("editModal"));
 };
 
 function renderAll() {
@@ -1539,11 +1563,10 @@ document.getElementById("addBtn").onclick = () => addPlayer();
 const modal = document.getElementById("memberModal");
 document.getElementById("openMemberModal").onclick = () => {
   renderMemberListEdit();
-  modal.style.display = "flex";
+  openModal(modal);
 };
 document.getElementById("closeModalBtn").onclick = () => {
-  modal.style.display = "none";
-  location.reload();
+  closeModal(modal);
 };
 
 function renderMemberListEdit() {
