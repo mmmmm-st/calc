@@ -673,46 +673,25 @@ function renderPersonalTotalsAndHistory() {
     return;
   }
 
-  // 履歴一覧から正確にセッション単位の受け渡し（貢献・強盗）を計算してトータルに集計
+  // 履歴一覧のセッションごとの計算ロジックと完全に同期させてトータル集計を行う
   let pStats = {};
   filteredHistory.forEach((h) => {
     const totalProfit = h.players.reduce((sum, p) => sum + Number(p.val || 0), 0);
     const fairProfitPerPerson = h.players.length > 0 ? totalProfit / h.players.length : 0;
 
-    let sessionPay = [];
-    let sessionReceive = [];
-    
-    h.players.forEach(p => {
-      const pInv = p.invest !== undefined ? Number(p.invest) : 0;
-      const pCsh = p.cash !== undefined ? Number(p.cash) : 0;
-      const targetAmount = pInv + fairProfitPerPerson;
-      const diff = pCsh - targetAmount;
-      if (diff > 1) {
-        sessionPay.push({ name: p.name, amount: diff });
-      } else if (diff < -1) {
-        sessionReceive.push({ name: p.name, amount: -diff });
-      }
-    });
+    let transfers = calculateTransfers(h.players);
+    let sessionNetMap = {};
+    h.players.forEach(p => sessionNetMap[p.name] = 0);
 
-    let sessionTransfers = [];
-    sessionPay.forEach(p => {
-      sessionReceive.forEach(r => {
-        if(p.amount <= 0 || r.amount <= 0) return;
-        const move = Math.min(p.amount, r.amount);
-        sessionTransfers.push({ from: p.name, to: r.name, amount: move });
-        p.amount -= move;
-        r.amount -= move;
+    if (transfers.length > 0) {
+      h.players.forEach(p => {
+        let pInv = p.invest !== undefined ? Number(p.invest) : 0;
+        let pCsh = p.cash !== undefined ? Number(p.cash) : 0;
+        const targetAmount = pInv + fairProfitPerPerson;
+        let netDiff = pCsh - targetAmount; // プラス＝貢献、マイナス＝強盗
+        sessionNetMap[p.name] = netDiff;
       });
-    });
-
-    let netTransferMap = {};
-    h.players.forEach(p => netTransferMap[p.name] = 0);
-    sessionTransfers.forEach(t => {
-      // t.from は支払う側（強盗・受け取る側、マイナス＝強盗）
-      // t.to は受け取る側（貢献・支払う側、プラス＝貢献）
-      netTransferMap[t.from] -= t.amount;
-      netTransferMap[t.to] += t.amount;
-    });
+    }
 
     h.players.forEach(p => {
       if(!pStats[p.name]) {
@@ -723,7 +702,7 @@ function renderPersonalTotalsAndHistory() {
       if(Number(p.val) >= 0) {
         pStats[p.name].wins += 1;
       }
-      pStats[p.name].netTransferSum += (netTransferMap[p.name] || 0);
+      pStats[p.name].netTransferSum += (sessionNetMap[p.name] || 0);
     });
   });
 
@@ -735,7 +714,6 @@ function renderPersonalTotalsAndHistory() {
 
     let settleSummaryHtml = "";
     const roundedNet = Math.round(s.netTransferSum);
-    // 正（プラス）なら貢献、負（マイナス）なら強盗に修正
     if (roundedNet > 1) {
       settleSummaryHtml = `<div style="font-size:11px; font-weight:700; color:var(--green); margin-bottom:4px;">貢献: ${new Intl.NumberFormat("ja-JP").format(roundedNet)}円</div>`;
     } else if (roundedNet < -1) {
@@ -805,15 +783,12 @@ function renderPersonalTotalsAndHistory() {
         
         let statusHtml = "";
         if (hasTransfers) {
-          let netDiff = 0;
-          transfers.forEach(t => {
-            if (t.from === p.name) netDiff -= t.amount;
-            if (t.to === p.name) netDiff += t.amount;
-          });
+          const targetAmount = pInv + fairProfitPerPerson;
+          let netDiff = pCsh - targetAmount;
 
-          if (netDiff > 0) {
+          if (netDiff > 1) {
             statusHtml = `<span style="color:var(--green); font-weight:700;">貢献: ${new Intl.NumberFormat("ja-JP").format(Math.round(netDiff))}円</span>`;
-          } else if (netDiff < 0) {
+          } else if (netDiff < -1) {
             statusHtml = `<span style="color:var(--red); font-weight:700;">強盗: ${new Intl.NumberFormat("ja-JP").format(Math.round(-netDiff))}円</span>`;
           } else {
             statusHtml = `<span style="color:var(--muted); font-weight:700;">平和: 0円</span>`;
