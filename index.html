@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ノリ打ち精算</title>
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 :root {
   --bg: #f8fafc;
@@ -16,7 +15,6 @@
   --red: #dc2626;
   --accent: #6366f1;
   --accent-light: #e0e7ff;
-  --line-green: #06c755;
   --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   --shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.08), 0 8px 10px -6px rgba(99, 102, 241, 0.08);
   --radius: 20px;
@@ -126,8 +124,7 @@ button {
 }
 button:active { transform: scale(0.98); }
 
-.main-btn { background: var(--gradient); color: white; margin: 8px 0; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
-.line-btn { background: var(--line-green); color: white; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(6, 199, 85, 0.35); }
+.main-btn { background: var(--gradient); color: white; margin: 8px 0 16px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
 .sub-btn { background: #f1f5f9; color: var(--text); border: 1px solid var(--line); }
 .sub-btn:hover { background: #e2e8f0; }
 
@@ -382,10 +379,12 @@ tr:last-child td { border-bottom: none; }
 
   <button class="main-btn" id="calcBtn">計算を実行して保存</button>
   <div id="loading" style="display:none; text-align:center; padding:10px; color:var(--accent); font-weight:bold;">処理中...</div>
-  <button class="line-btn" id="lineSendBtn" style="display:none;">LINEに結果を送る</button>
 
   <div class="card" id="resultCard" style="display:none;">
-    <h2>精算結果</h2>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h2 style="margin:0;">精算結果</h2>
+      <button class="sub-btn" id="copyResultBtn" style="width:auto; padding:6px 10px; font-size:11px;">📋 結果をコピー</button>
+    </div>
     <div class="summary">
       <div class="box"><div class="box-title">グループ総損益</div><div class="box-value" id="profitTotal" style="color:var(--accent)">-</div></div>
       <div class="box"><div class="box-title">1人あたり純利益</div><div id="perProfit" class="box-value">-</div></div>
@@ -466,7 +465,6 @@ tr:last-child td { border-bottom: none; }
 </div>
 
 <script>
-const LIFF_ID = "2010062599-fM2vPvTM"; 
 const GAS_URL = "https://script.google.com/macros/s/AKfycby7oUyS6AHE-B5b_v1xtSuIFEIOsS0s_1kN6JeskN7tm1wp3cxkBHBrNvTs-6TQMrxG8g/exec"; 
   
 function money(v){
@@ -688,7 +686,6 @@ function renderPersonalTotalsAndHistory() {
     personalEl.appendChild(pCard);
   });
 
-  // 同じ日付ごとに履歴をグループ化する
   let dateGroupMap = {};
   filteredHistory.forEach(h => {
     let dKey = h.time || "日付不明";
@@ -698,13 +695,11 @@ function renderPersonalTotalsAndHistory() {
     dateGroupMap[dKey].push(h);
   });
 
-  // 日付の降順で並び替え
   let sortedDates = Object.keys(dateGroupMap).sort((a, b) => parseDateStrToObj(b) - parseDateStrToObj(a));
 
   sortedDates.forEach(dateStr => {
     let sessions = dateGroupMap[dateStr];
     
-    // その日のトータルおよび1人あたりトータルの計算（重複を除いた実際の参加人数で割る）
     let dayTotalProfit = 0;
     let uniqueMembers = new Set();
     sessions.forEach(s => {
@@ -784,7 +779,7 @@ function renderPersonalTotalsAndHistory() {
       <div class="hist-date-header">📅 ${dateStr}</div>
       <div class="hist-day-summary">
         <div class="hist-day-summary-left">
-          <span style="font-size:11px; opacity:0.9;">トータル:</span>
+          <span style="font-size:11px; opacity:0.9;">その日のトータル:</span>
           <span style="font-size:15px; font-weight:900; white-space:nowrap;">${money(dayTotalProfit)}</span>
         </div>
         <span class="hist-day-per">1人: ${money(dayPerProfit)}</span>
@@ -1200,7 +1195,6 @@ document.getElementById("calcBtn").onclick = async function() {
   const fairProfitPerPerson = totalProfit / players.length;
 
   document.getElementById("resultCard").style.display = "block";
-  document.getElementById("lineSendBtn").style.display = "block";
   document.getElementById("profitTotal").textContent = money(totalProfit);
   document.getElementById("perProfit").textContent = money(fairProfitPerPerson);
   document.getElementById("investTotal").textContent = new Intl.NumberFormat("ja-JP").format(totalInvest) + "円";
@@ -1287,11 +1281,12 @@ document.getElementById("calcBtn").onclick = async function() {
   document.getElementById("loading").style.display = "none";
 };
 
-document.getElementById("lineSendBtn").onclick = async () => {
-  if (liff.isInClient()) {
-    liff.sendMessages([{ type: 'text', text: lastShareMessage }]).then(() => liff.closeWindow());
-  } else {
-    alert("LINEアプリ内から開いていないため送信できません。以下の内容をコピーしてください:\n\n" + lastShareMessage);
+document.getElementById("copyResultBtn").onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(lastShareMessage);
+    alert("精算結果をコピーしました！");
+  } catch (e) {
+    alert("以下の内容をコピーしてください:\n\n" + lastShareMessage);
   }
 };
 
@@ -1338,23 +1333,20 @@ document.getElementById("addMemberStoreBtn").onclick = () => {
   renderMemberListEdit();
 };
 
-liff.init({ liffId: LIFF_ID }).then(() => {
+// ページ読み込み時に即座に初期化・データ取得を実行
+window.addEventListener("DOMContentLoaded", () => {
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
   const dd = String(today.getDate()).padStart(2, '0');
   document.getElementById("recordDateInput").value = `${yyyy}-${mm}-${dd}`;
 
-  if (!liff.isLoggedIn()) { 
-    liff.login(); 
-  } else { 
-    loadHistory();
-    if(storedMembers.length > 0) {
-      addPlayer(storedMembers[0], "", "");
-      if(storedMembers[1]) addPlayer(storedMembers[1], "", "");
-    } else {
-      addPlayer("", "", "");
-    }
+  loadHistory();
+  if(storedMembers.length > 0) {
+    addPlayer(storedMembers[0], "", "");
+    if(storedMembers[1]) addPlayer(storedMembers[1], "", "");
+  } else {
+    addPlayer("", "", "");
   }
 });
 </script>
