@@ -383,15 +383,15 @@ tr:last-child td { border-bottom: none; }
 .hist-players-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 4px;
+  gap: 6px;
   margin-bottom: 4px;
 }
 .hist-player-mini {
   background: #fff;
   border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 5px 6px;
-  font-size: 10px;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 11px;
 }
 
 .accordion-header {
@@ -606,6 +606,7 @@ function toggleHistoryAccordion() {
   }
 }
 
+// 機種未入力や空欄を除外して候補に登録する
 function updateMachineSuggestions() {
   const datalist = document.getElementById("machineSuggestions");
   if (!datalist) return;
@@ -615,8 +616,9 @@ function updateMachineSuggestions() {
       h.players.forEach(p => {
         if (p.machines && Array.isArray(p.machines)) {
           p.machines.forEach(m => {
-            if (m.machineName && m.machineName.trim()) {
-              machineSet.add(m.machineName.trim());
+            let name = (m.machineName || "").trim();
+            if (name && name !== "機種未入力") {
+              machineSet.add(name);
             }
           });
         }
@@ -715,7 +717,7 @@ window.editHistory = function(rowIdx) {
       let csh = p.cash !== undefined ? p.cash : 0;
       let machines = p.machines || [];
       if (machines.length === 0 && (inv > 0 || csh > 0)) {
-        machines = [{ machineName: "機種未入力", machineInvest: inv, machineCash: csh }];
+        machines = [{ machineName: "", machineInvest: inv, machineCash: csh }];
       }
       addEditPlayerRow(container, p.name, machines);
     });
@@ -752,7 +754,8 @@ function addEditPlayerRow(container, selectedName = "", machines = []) {
   const mContainer = div.querySelector('.edit-machine-container');
   if(machines && machines.length > 0) {
     machines.forEach(mObj => {
-      addEditMachineRow(mContainer, mObj.machineName || "", mObj.machineInvest !== undefined ? mObj.machineInvest : "", mObj.machineCash !== undefined ? mObj.machineCash : "");
+      let mNameVal = (mObj.machineName === "機種未入力") ? "" : (mObj.machineName || "");
+      addEditMachineRow(mContainer, mNameVal, mObj.machineInvest !== undefined ? mObj.machineInvest : "", mObj.machineCash !== undefined ? mObj.machineCash : "");
     });
   } else {
     addEditMachineRow(mContainer, "", "", "");
@@ -797,7 +800,7 @@ document.getElementById("saveEditBtn").onclick = async function() {
 
       if(mName || mInvStr !== "" || mCshStr !== "") {
         machines.push({ 
-          machineName: mName || "機種未入力", 
+          machineName: mName, 
           machineInvest: mInv, 
           machineCash: mCsh 
         });
@@ -1053,25 +1056,30 @@ function renderPersonalTotalsAndHistory() {
 
         let machinesHtml = "";
         let machinesList = p.machines || [];
-        if (machinesList.length === 0 && (pInv > 0 || pCsh > 0)) {
-          machinesList = [{ machineName: "機種未入力", machineInvest: pInv, machineCash: pCsh }];
-        }
+        
+        // 機種名が入力されているもの、または金額があるものだけを整理して表示
         machinesList.forEach(m => {
-          machinesHtml += `<div style="font-size:9px; color:var(--muted); margin-top:1px;">🎰 ${m.machineName} (投:${new Intl.NumberFormat("ja-JP").format(m.machineInvest)}/収:${new Intl.NumberFormat("ja-JP").format(m.machineCash)})</div>`;
+          let mName = (m.machineName || "").trim();
+          let mInv = Number(m.machineInvest || 0);
+          let mCsh = Number(m.machineCash || 0);
+          
+          if (mName && mName !== "機種未入力") {
+            machinesHtml += `<div style="font-size:10px; color:var(--text); margin-top:2px; font-weight:600;">🎰 ${mName} <span style="color:var(--muted); font-weight:normal;">(投:${new Intl.NumberFormat("ja-JP").format(mInv)}/収:${new Intl.NumberFormat("ja-JP").format(mCsh)})</span></div>`;
+          }
         });
 
         pDetails += `
           <div class="hist-player-mini">
-            <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:1px;">
+            <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:2px; font-size:12px;">
               <span>${p.name}</span>
               <span style="color:${p.val>=0?'var(--green)':'var(--red)'};">${money(p.val)}</span>
             </div>
-            <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:9px; margin-bottom:1px;">
+            <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px; margin-bottom:2px;">
               <span>投資:${new Intl.NumberFormat("ja-JP").format(pInv)}</span>
               <span>回収:${new Intl.NumberFormat("ja-JP").format(pCsh)}</span>
             </div>
             ${machinesHtml}
-            ${hasTransfers ? `<div style="font-size:9px; text-align:right; margin-top:2px;">${statusHtml}</div>` : ''}
+            ${hasTransfers ? `<div style="font-size:10px; text-align:right; margin-top:3px; border-top:1px dashed var(--line); padding-top:2px;">${statusHtml}</div>` : ''}
           </div>
         `;
       });
@@ -1550,7 +1558,7 @@ document.getElementById("calcBtn").onclick = async function() {
 
       if(mName || mInvStr !== "" || mCshStr !== "") {
         machines.push({ 
-          machineName: mName || "機種未入力", 
+          machineName: mName, 
           machineInvest: mInv, 
           machineCash: mCsh 
         });
@@ -1613,7 +1621,10 @@ document.getElementById("calcBtn").onclick = async function() {
     
     let machineSummaryText = "";
     if (p.machines && p.machines.length > 0) {
-      machineSummaryText = p.machines.map(m => `${m.machineName}(投:${m.machineInvest}/収:${m.machineCash})`).join(", ");
+      machineSummaryText = p.machines.map(m => {
+        let namePart = m.machineName ? `${m.machineName}:` : "";
+        return `${namePart}投${m.machineInvest}/収${m.machineCash}`;
+      }).join(", ");
     }
 
     const tr = document.createElement("tr");
@@ -1626,7 +1637,10 @@ document.getElementById("calcBtn").onclick = async function() {
   snapshot.forEach(p => {
     let lineStr = `・${p.name}：${money(p.val)}`;
     if(p.machines && p.machines.length > 0) {
-      let mStrs = p.machines.map(m => `${m.machineName}(投${m.machineInvest}/収${m.machineCash})`).join(" ");
+      let mStrs = p.machines.map(m => {
+        let namePart = m.machineName ? `${m.machineName}` : "";
+        return `${namePart ? namePart + ' ' : ''}(投${m.machineInvest}/収${m.machineCash})`;
+      }).join(" ");
       lineStr += ` [${mStrs}]`;
     }
     lines.push(lineStr);
