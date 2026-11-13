@@ -11,9 +11,9 @@
   --line: #e2e8f0;
   --text: #0f172a;
   --muted: #64748b;
-  --green: #0d9488; /* 洗練されたターコイズグリーン */
-  --red: #e11d48;   /* シックなローズレッド */
-  --accent: #2563eb; /* 鮮やかで視認性の高いインディゴブルー */
+  --green: #0d9488;
+  --red: #e11d48;
+  --accent: #2563eb;
   --accent-light: #eff6ff;
   --gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   --shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.06), 0 2px 6px -2px rgba(15, 23, 42, 0.03);
@@ -106,7 +106,7 @@ input::placeholder, select::placeholder {
   background: #f8fafc;
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 8px 10px;
+  padding: 10px;
   margin-bottom: 8px;
   width: 100%;
 }
@@ -117,6 +117,23 @@ input::placeholder, select::placeholder {
   align-items: center;
   margin-bottom: 6px;
   gap: 6px;
+}
+
+.machine-list-box {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  margin-top: 6px;
+}
+.machine-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.machine-row:last-child {
+  margin-bottom: 0;
 }
 
 .result-label { font-size: 10px; font-weight: 600; color: var(--muted); text-align: right; }
@@ -395,7 +412,11 @@ tr:last-child td { border-bottom: none; }
 }
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
-.modal-content { background: #fff; padding: 16px; border-radius: 16px; width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+.modal-content { background: #fff; padding: 16px; border-radius: 16px; width: 92%; max-width: 440px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+
+.tab-buttons { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.tab-btn { flex: 1; padding: 6px; font-size: 12px; background: #f1f5f9; color: var(--muted); border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
+.tab-btn.active { background: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
@@ -404,7 +425,9 @@ tr:last-child td { border-bottom: none; }
 <div class="wrap">
   <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
     <h1>🎰 ノリ打ち精算</h1>
-    <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 6px 10px; font-size: 11px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
+    <div style="display: flex; gap: 6px;">
+      <button class="sub-btn" id="openMasterModal" style="width: auto; padding: 6px 10px; font-size: 11px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">管理画面</button>
+    </div>
   </div>
 
   <div class="card" style="padding: 12px;">
@@ -418,7 +441,7 @@ tr:last-child td { border-bottom: none; }
     <button class="sub-btn" id="addBtn" style="border-style: dashed; border-color: #cbd5e1; color: var(--accent); font-weight: 600; padding: 6px; font-size: 12px;">＋ 参加者を追加</button>
   </div>
 
-  <button class="main-btn" id="calcBtn">計算を実行して保存</button>
+  <button class="main-btn" id="calcBtn">清算</button>
   <div id="loading" style="display:none; text-align:center; padding:8px; color:var(--accent); font-weight:bold; font-size:13px;">処理中...</div>
 
   <div class="card" id="resultCard" style="display:none;">
@@ -492,17 +515,36 @@ tr:last-child td { border-bottom: none; }
   </div>
 </div>
 
-<!-- メンバー管理モーダル -->
-<div class="modal" id="memberModal">
+<!-- 統合管理画面モーダル -->
+<div class="modal" id="masterModal">
   <div class="modal-content">
-    <h2>メンバー管理</h2>
-    <p style="font-size: 11px; color: var(--muted); margin-bottom: 12px;">よく参加するメンバーの名前を登録できます。</p>
-    <div id="memberListEdit" style="margin-bottom: 12px; max-height: 180px; overflow-y: auto;"></div>
-    <div class="grid" style="margin-bottom: 10px;">
-      <div class="half"><input type="text" id="newMemberName" placeholder="新しい名前"></div>
-      <div class="half"><button class="sub-btn" id="addMemberStoreBtn" style="background: var(--accent); color: #fff; border:none; height: 100%; padding: 8px;">追加</button></div>
+    <h2>管理画面</h2>
+    <div class="tab-buttons">
+      <button class="tab-btn active" id="tabMemberBtn" onclick="switchTab('member')">👥 メンバー管理</button>
+      <button class="tab-btn" id="tabMachineBtn" onclick="switchTab('machine')">🎰 機種管理</button>
     </div>
-    <button class="sub-btn" id="closeModalBtn" style="background: #f1f5f9; padding: 10px;">閉じる</button>
+
+    <!-- メンバータブ -->
+    <div id="tabMemberContent">
+      <p style="font-size: 11px; color: var(--muted); margin-bottom: 10px;">スプレッドシートと同期するメンバーの追加・削除ができます。</p>
+      <div id="memberListEdit" style="margin-bottom: 10px; max-height: 160px; overflow-y: auto;"></div>
+      <div class="grid" style="margin-bottom: 10px;">
+        <div class="half"><input type="text" id="newMemberName" placeholder="新しいメンバー名"></div>
+        <div class="half"><button class="sub-btn" id="addMemberStoreBtn" style="background: var(--accent); color: #fff; border:none; height: 100%; padding: 8px;">追加</button></div>
+      </div>
+    </div>
+
+    <!-- 機種タブ -->
+    <div id="tabMachineContent" style="display:none;">
+      <p style="font-size: 11px; color: var(--muted); margin-bottom: 10px;">よく打つ機種を登録しておくとプルダウンから簡単に選べます。</p>
+      <div id="machineListEdit" style="margin-bottom: 10px; max-height: 160px; overflow-y: auto;"></div>
+      <div class="grid" style="margin-bottom: 10px;">
+        <div class="half"><input type="text" id="newMachineName" placeholder="新しい機種名"></div>
+        <div class="half"><button class="sub-btn" id="addMachineStoreBtn" style="background: var(--accent); color: #fff; border:none; height: 100%; padding: 8px;">追加</button></div>
+      </div>
+    </div>
+
+    <button class="sub-btn" id="closeMasterModalBtn" style="background: #f1f5f9; padding: 10px; margin-top: 4px;">閉じる</button>
   </div>
 </div>
 
@@ -514,7 +556,7 @@ tr:last-child td { border-bottom: none; }
       <label>実践日</label>
       <input type="date" id="editDateInput">
     </div>
-    <div id="editPlayersContainer" style="margin-bottom: 12px;"></div>
+    <div id="editPlayersContainer" style="margin-bottom: 12px; max-height: 240px; overflow-y: auto;"></div>
     <div style="display: flex; gap: 8px;">
       <button class="sub-btn" id="closeEditModalBtn" style="background: #f1f5f9; flex: 1; padding: 10px;">キャンセル</button>
       <button class="main-btn" id="saveEditBtn" style="flex: 1; margin: 0; padding: 10px;">上書き保存</button>
@@ -533,7 +575,8 @@ function money(v){
 let historyData = [];
 let serverMestMap = {};
 let lastShareMessage = "";
-let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
+let storedMembers = [];
+let storedMachines = [];
 let sTop = 0;
 let isInitialFilterSet = false;
 let editingRowIdx = null;
@@ -595,6 +638,19 @@ async function loadHistory() {
     historyData = (jsonRes.history || []).map(item => ({ ...item, time: cleanTimeStr(item.time) }));
     serverMestMap = jsonRes.mestMap || {};
     
+    // スプシ側から取得したメンバー・機種リストを反映
+    if (jsonRes.members && Array.isArray(jsonRes.members)) {
+      storedMembers = jsonRes.members;
+    } else {
+      storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
+    }
+
+    if (jsonRes.machines && Array.isArray(jsonRes.machines)) {
+      storedMachines = jsonRes.machines;
+    } else {
+      storedMachines = JSON.parse(localStorage.getItem("nori_stored_machines") || '["スマスロ北斗の拳", "マイジャグラーV", "モンキーターンV"]');
+    }
+    
     historyData.sort((a, b) => parseDateStrToObj(a.time) - parseDateStrToObj(b.time));
     
     renderAll();
@@ -602,7 +658,22 @@ async function loadHistory() {
     historyEl.innerHTML = "履歴の読み込みに失敗しました。";
     historyData = [];
     serverMestMap = {};
+    storedMembers = ["Aさん", "Bさん", "Cさん"];
+    storedMachines = ["スマスロ北斗の拳", "マイジャグラーV"];
     renderAll();
+  }
+}
+
+// サーバーへメンバー・機種の同期保存
+async function syncMasterData() {
+  try {
+    await fetch(GAS_URL, { 
+      method: "POST", 
+      mode: "no-cors", 
+      body: JSON.stringify({ method: "UPDATE_MASTER", members: storedMembers, machines: storedMachines }) 
+    });
+  } catch(e) {
+    console.error(e);
   }
 }
 
@@ -666,14 +737,14 @@ window.editHistory = function(rowIdx) {
   
   if (target.players && target.players.length > 0) {
     target.players.forEach(p => {
-      addEditPlayerRow(container, p.name, p.invest !== undefined ? p.invest : "", p.cash !== undefined ? p.cash : "");
+      addEditPlayerRow(container, p.name, p.invest !== undefined ? p.invest : "", p.cash !== undefined ? p.cash : "", p.machines || []);
     });
   }
 
   openModal(document.getElementById("editModal"));
 };
 
-function addEditPlayerRow(container, selectedName = "", investVal = "", cashVal = "") {
+function addEditPlayerRow(container, selectedName = "", investVal = "", cashVal = "", machines = []) {
   const div = document.createElement("div");
   div.className = "player";
   let options = '<option value="">選択してください</option>';
@@ -697,12 +768,43 @@ function addEditPlayerRow(container, selectedName = "", investVal = "", cashVal 
         <input class="edit-cash" type="number" inputmode="numeric" pattern="[0-9]*" value="${cashVal}" placeholder="0" style="padding: 6px 8px; font-size: 13px;">
       </div>
     </div>
-    <div style="margin-top:4px; display:flex; justify-content:flex-end;">
+    <div style="margin-top:6px;">
+      <label>打った機種</label>
+      <div class="machine-list-box edit-machine-container"></div>
+      <button class="sub-btn" type="button" onclick="addEditMachineRow(this.closest('.player').querySelector('.edit-machine-container'))" style="margin-top:4px; padding:3px; font-size:11px; background:#fff; color:var(--accent);">＋ 機種を追加</button>
+    </div>
+    <div style="margin-top:6px; display:flex; justify-content:flex-end;">
       <button class="delete-btn" onclick="this.closest('.player').remove()">このメンバーを外す</button>
     </div>
   `;
   container.appendChild(div);
+
+  const mContainer = div.querySelector('.edit-machine-container');
+  if(machines && machines.length > 0) {
+    machines.forEach(mObj => {
+      addEditMachineRow(mContainer, mObj.machineName || "", mObj.machineInvest || "", mObj.machineCash || "");
+    });
+  } else {
+    addEditMachineRow(mContainer, "", "", "");
+  }
 }
+
+window.addEditMachineRow = function(container, mName = "", mInv = "", mCsh = "") {
+  let mOptions = '<option value="">機種を選択</option>';
+  storedMachines.forEach(mc => {
+    const sel = (mc === mName) ? 'selected' : '';
+    mOptions += `<option value="${mc}" ${sel}>${mc}</option>`;
+  });
+  const row = document.createElement("div");
+  row.className = "machine-row";
+  row.innerHTML = `
+    <select class="edit-machine-name" style="flex: 2; padding: 4px 6px; font-size: 12px; background:#fff;">${mOptions}</select>
+    <input class="edit-machine-invest" type="number" inputmode="numeric" placeholder="投資" value="${mInv}" style="flex: 1; padding: 4px 6px; font-size: 12px;">
+    <input class="edit-machine-cash" type="number" inputmode="numeric" placeholder="回収" value="${mCsh}" style="flex: 1; padding: 4px 6px; font-size: 12px;">
+    <button class="delete-btn" type="button" onclick="this.closest('.machine-row').remove()" style="padding:2px 4px; font-size:10px;">×</button>
+  `;
+  container.appendChild(row);
+};
 
 document.getElementById("saveEditBtn").onclick = async function() {
   const pNodes = document.querySelectorAll("#editPlayersContainer .player");
@@ -721,9 +823,19 @@ document.getElementById("saveEditBtn").onclick = async function() {
     const invest = investStr === "" ? 0 : +investStr;
     const cash = cashStr === "" ? 0 : +cashStr;
 
+    let machines = [];
+    node.querySelectorAll(".machine-row").forEach(mRow => {
+      const mName = mRow.querySelector(".edit-machine-name").value;
+      const mInv = +(mRow.querySelector(".edit-machine-invest").value || 0);
+      const mCsh = +(mRow.querySelector(".edit-machine-cash").value || 0);
+      if(mName) {
+        machines.push({ machineName: mName, machineInvest: mInv, machineCash: mCsh });
+      }
+    });
+
     if(!name) hasError = true;
     const individualProfit = cash - invest;
-    players.push({ name, val: individualProfit, invest, cash });
+    players.push({ name, val: individualProfit, invest, cash, machines });
   });
 
   if(hasError) {
@@ -966,6 +1078,13 @@ function renderPersonalTotalsAndHistory() {
           }
         }
 
+        let machinesHtml = "";
+        if (p.machines && p.machines.length > 0) {
+          p.machines.forEach(m => {
+            machinesHtml += `<div style="font-size:9px; color:var(--muted);">・${m.machineName} (投:${m.machineInvest}/収:${m.machineCash})</div>`;
+          });
+        }
+
         pDetails += `
           <div class="hist-player-mini">
             <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:1px;">
@@ -976,6 +1095,7 @@ function renderPersonalTotalsAndHistory() {
               <span>投資:${new Intl.NumberFormat("ja-JP").format(pInv)}</span>
               <span>回収:${new Intl.NumberFormat("ja-JP").format(pCsh)}</span>
             </div>
+            ${machinesHtml}
             ${hasTransfers ? `<div style="font-size:9px; text-align:right;">${statusHtml}</div>` : ''}
           </div>
         `;
@@ -1377,7 +1497,7 @@ function renderExcelChart() {
   });
 }
 
-function addPlayer(selectedName = "", investVal = "", cashVal = ""){
+function addPlayer(selectedName = "", investVal = "", cashVal = "", machines = []){
   const div = document.createElement("div");
   div.className = "player";
   let options = '<option value="">選択してください</option>';
@@ -1407,11 +1527,42 @@ function addPlayer(selectedName = "", investVal = "", cashVal = ""){
         <input class="cash" type="number" inputmode="numeric" pattern="[0-9]*" value="${cashVal}" placeholder="0" style="padding: 6px 8px; font-size: 13px;">
       </div>
     </div>
+    <div style="margin-top:6px;">
+      <label>打った機種</label>
+      <div class="machine-list-box machine-container"></div>
+      <button class="sub-btn" type="button" onclick="addMachineRow(this.closest('.player').querySelector('.machine-container'))" style="margin-top:4px; padding:3px; font-size:11px; background:#fff; color:var(--accent);">＋ 機種を追加</button>
+    </div>
     <div style="margin-top:6px; display:flex; justify-content:flex-end;">
       <button class="delete-btn" onclick="this.closest('.player').remove()">削除</button>
     </div>`;
   document.getElementById("players").appendChild(div);
+
+  const mContainer = div.querySelector('.machine-container');
+  if(machines && machines.length > 0) {
+    machines.forEach(mObj => {
+      addMachineRow(mContainer, mObj.machineName || "", mObj.machineInvest || "", mObj.machineCash || "");
+    });
+  } else {
+    addMachineRow(mContainer, "", "", "");
+  }
 }
+
+window.addMachineRow = function(container, mName = "", mInv = "", mCsh = "") {
+  let mOptions = '<option value="">機種を選択</option>';
+  storedMachines.forEach(mc => {
+    const sel = (mc === mName) ? 'selected' : '';
+    mOptions += `<option value="${mc}" ${sel}>${mc}</option>`;
+  });
+  const row = document.createElement("div");
+  row.className = "machine-row";
+  row.innerHTML = `
+    <select class="machine-name" style="flex: 2; padding: 4px 6px; font-size: 12px; background:#fff;">${mOptions}</select>
+    <input class="machine-invest" type="number" inputmode="numeric" placeholder="投資" value="${mInv}" style="flex: 1; padding: 4px 6px; font-size: 12px;">
+    <input class="machine-cash" type="number" inputmode="numeric" placeholder="回収" value="${mCsh}" style="flex: 1; padding: 4px 6px; font-size: 12px;">
+    <button class="delete-btn" type="button" onclick="this.closest('.machine-row').remove()" style="padding:2px 4px; font-size:10px;">×</button>
+  `;
+  container.appendChild(row);
+};
 
 document.getElementById("calcBtn").onclick = async function() {
   const pNodes = document.querySelectorAll("#players .player");
@@ -1430,8 +1581,18 @@ document.getElementById("calcBtn").onclick = async function() {
     const invest = investStr === "" ? 0 : +investStr;
     const cash = cashStr === "" ? 0 : +cashStr;
 
+    let machines = [];
+    node.querySelectorAll(".machine-row").forEach(mRow => {
+      const mName = mRow.querySelector(".machine-name").value;
+      const mInv = +(mRow.querySelector(".machine-invest").value || 0);
+      const mCsh = +(mRow.querySelector(".machine-cash").value || 0);
+      if(mName) {
+        machines.push({ machineName: mName, machineInvest: mInv, machineCash: mCsh });
+      }
+    });
+
     if(!name) hasError = true;
-    players.push({ name, invest, cash, node });
+    players.push({ name, invest, cash, machines, node });
   });
 
   if(hasError) {
@@ -1482,14 +1643,26 @@ document.getElementById("calcBtn").onclick = async function() {
       settleColor = "var(--muted)";
     }
     
+    let machineSummaryText = "";
+    if (p.machines && p.machines.length > 0) {
+      machineSummaryText = p.machines.map(m => `${m.machineName}(投:${m.machineInvest}/収:${m.machineCash})`).join(", ");
+    }
+
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td><b>${p.name}</b></td><td>${new Intl.NumberFormat("ja-JP").format(p.invest)}円</td><td>${new Intl.NumberFormat("ja-JP").format(p.cash)}円</td><td style="color:${individualProfit>=0?'var(--green)':'var(--red)'}; font-weight:600;">${money(individualProfit)}</td><td style="font-weight:800; color:${settleColor}">${settleStatusText}</td>`;
+    tr.innerHTML = `<td><b>${p.name}</b>${machineSummaryText ? `<br><span style="font-size:10px; color:var(--muted);">${machineSummaryText}</span>` : ''}</td><td>${new Intl.NumberFormat("ja-JP").format(p.invest)}円</td><td>${new Intl.NumberFormat("ja-JP").format(p.cash)}円</td><td style="color:${individualProfit>=0?'var(--green)':'var(--red)'}; font-weight:600;">${money(individualProfit)}</td><td style="font-weight:800; color:${settleColor}">${settleStatusText}</td>`;
     tbody.appendChild(tr);
-    snapshot.push({ name: p.name, val: individualProfit, invest: p.invest, cash: p.cash });
+    snapshot.push({ name: p.name, val: individualProfit, invest: p.invest, cash: p.cash, machines: p.machines });
   });
 
   let lines = [`【ノリ打ち精算レポート】`, ``, `■ 今回の収支`];
-  snapshot.forEach(p => lines.push(`・${p.name}：${money(p.val)}`));
+  snapshot.forEach(p => {
+    let lineStr = `・${p.name}：${money(p.val)}`;
+    if(p.machines && p.machines.length > 0) {
+      let mStrs = p.machines.map(m => `${m.machineName}(投${m.machineInvest}/収${m.machineCash})`).join(" ");
+      lineStr += ` [${mStrs}]`;
+    }
+    lines.push(lineStr);
+  });
   lines.push(`合計：${money(totalProfit)}（1人あたり：${money(fairProfitPerPerson)}）`);
   lines.push(``);
   lines.push(`■ お金の受け渡し（貢献・強盗）`);
@@ -1555,30 +1728,67 @@ document.getElementById("copyResultBtn").onclick = async () => {
 
 document.getElementById("addBtn").onclick = () => addPlayer();
 
-const modal = document.getElementById("memberModal");
-document.getElementById("openMemberModal").onclick = () => {
-  renderMemberListEdit();
-  openModal(modal);
+// 管理画面モーダル・タブ制御
+const masterModal = document.getElementById("masterModal");
+document.getElementById("openMasterModal").onclick = () => {
+  renderMasterEdit();
+  openModal(masterModal);
 };
-document.getElementById("closeModalBtn").onclick = () => {
-  closeModal(modal);
+document.getElementById("closeMasterModalBtn").onclick = () => {
+  closeModal(masterModal);
 };
 
-function renderMemberListEdit() {
-  const container = document.getElementById("memberListEdit");
-  container.innerHTML = "";
+window.switchTab = function(tabName) {
+  const memberBtn = document.getElementById("tabMemberBtn");
+  const machineBtn = document.getElementById("tabMachineBtn");
+  const memberContent = document.getElementById("tabMemberContent");
+  const machineContent = document.getElementById("tabMachineContent");
+
+  if(tabName === 'member') {
+    memberBtn.classList.add("active");
+    machineBtn.classList.remove("active");
+    memberContent.style.display = "block";
+    machineContent.style.display = "none";
+  } else {
+    machineBtn.classList.add("active");
+    memberBtn.classList.remove("active");
+    machineContent.style.display = "block";
+    memberContent.style.display = "none";
+  }
+};
+
+function renderMasterEdit() {
+  // メンバー一覧
+  const mContainer = document.getElementById("memberListEdit");
+  mContainer.innerHTML = "";
   storedMembers.forEach((m, idx) => {
     const row = document.createElement("div");
     row.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:#f8fafc; padding:6px 10px; border-radius:6px; border:1px solid var(--line);";
     row.innerHTML = `<span style="font-weight:600; font-size:13px;">${m}</span><button class="delete-btn" onclick="removeStoredMember(${idx})">削除</button>`;
-    container.appendChild(row);
+    mContainer.appendChild(row);
+  });
+
+  // 機種一覧
+  const mcContainer = document.getElementById("machineListEdit");
+  mcContainer.innerHTML = "";
+  storedMachines.forEach((mc, idx) => {
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:#f8fafc; padding:6px 10px; border-radius:6px; border:1px solid var(--line);";
+    row.innerHTML = `<span style="font-weight:600; font-size:13px;">${mc}</span><button class="delete-btn" onclick="removeStoredMachine(${idx})">削除</button>`;
+    mcContainer.appendChild(row);
   });
 }
 
 window.removeStoredMember = function(idx) {
   storedMembers.splice(idx, 1);
-  localStorage.setItem("nori_stored_members", JSON.stringify(storedMembers));
-  renderMemberListEdit();
+  syncMasterData();
+  renderMasterEdit();
+};
+
+window.removeStoredMachine = function(idx) {
+  storedMachines.splice(idx, 1);
+  syncMasterData();
+  renderMasterEdit();
 };
 
 document.getElementById("addMemberStoreBtn").onclick = () => {
@@ -1590,9 +1800,23 @@ document.getElementById("addMemberStoreBtn").onclick = () => {
     return;
   }
   storedMembers.push(name);
-  localStorage.setItem("nori_stored_members", JSON.stringify(storedMembers));
+  syncMasterData();
   nameInput.value = "";
-  renderMemberListEdit();
+  renderMasterEdit();
+};
+
+document.getElementById("addMachineStoreBtn").onclick = () => {
+  const machineInput = document.getElementById("newMachineName");
+  const name = machineInput.value.trim();
+  if(!name) return;
+  if(storedMachines.includes(name)) {
+    alert("すでに登録されています");
+    return;
+  }
+  storedMachines.push(name);
+  syncMasterData();
+  machineInput.value = "";
+  renderMasterEdit();
 };
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -1603,12 +1827,14 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("recordDateInput").value = `${yyyy}-${mm}-${dd}`;
 
   loadHistory();
-  if(storedMembers.length > 0) {
-    addPlayer(storedMembers[0], "", "");
-    if(storedMembers[1]) addPlayer(storedMembers[1], "", "");
-  } else {
-    addPlayer("", "", "");
-  }
+  setTimeout(() => {
+    if(storedMembers.length > 0) {
+      addPlayer(storedMembers[0], "", "");
+      if(storedMembers[1]) addPlayer(storedMembers[1], "", "");
+    } else {
+      addPlayer("", "", "");
+    }
+  }, 300);
 });
 </script>
 </body>
