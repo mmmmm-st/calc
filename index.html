@@ -6,59 +6,52 @@
 <title>ノリ打ち精算</title>
 <style>
 :root {
-  --bg: #0f172a;
-  --bg-gradient: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
-  --card: rgba(30, 41, 59, 0.7);
-  --card-solid: #1e293b;
-  --line: rgba(255, 255, 255, 0.08);
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --green: #34d399;
-  --red: #f87171;
-  --accent: #818cf8;
-  --accent-light: rgba(129, 140, 248, 0.15);
-  --gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-  --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-  --radius: 22px;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --line: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+  --green: #059669;
+  --red: #dc2626;
+  --accent: #6366f1;
+  --accent-light: #e0e7ff;
+  --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.08), 0 8px 10px -6px rgba(99, 102, 241, 0.08);
+  --radius: 20px;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
   margin: 0;
-  padding: 20px 10px 40px;
+  padding: 16px 8px 32px;
   background: var(--bg);
-  background-image: var(--bg-gradient);
-  background-attachment: fixed;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
 }
 
 .wrap { max-width: 680px; margin: auto; width: 100%; overflow-x: hidden; }
 
 .card {
   background: var(--card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 16px;
   margin-bottom: 16px;
   box-shadow: var(--shadow);
-  border: 1px solid var(--line);
+  border: 1px solid rgba(226, 232, 240, 0.8);
   width: 100%;
 }
 
 @media (min-width: 480px) {
-  .card { padding: 28px; }
-  body { padding: 32px 16px; }
+  .card { padding: 24px; }
+  body { padding: 24px 12px; }
 }
 
-h1 { font-size: 19px; margin: 0; font-weight: 800; letter-spacing: -0.025em; color: var(--text); display: flex; align-items: center; gap: 8px; }
-h2 { font-size: 15px; margin: 0 0 16px; font-weight: 700; letter-spacing: -0.025em; display: flex; align-items: center; gap: 8px; color: #e2e8f0; }
+h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.025em; color: var(--text); }
+h2 { font-size: 16px; margin: 0 0 16px; font-weight: 700; letter-spacing: -0.025em; display: flex; align-items: center; gap: 8px; }
 
-.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; width: 100%; }
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; width: 100%; }
 .half { grid-column: span 6; }
 
 label {
@@ -76,11 +69,11 @@ input, select {
   max-width: 100%;
   box-sizing: border-box;
   padding: 12px 14px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1.5px solid var(--line);
   font-size: 16px;
   color: var(--text);
-  background: rgba(15, 23, 42, 0.6);
+  background: #f8fafc;
   transition: all 0.2s ease;
   outline: none;
   font-weight: 500;
@@ -89,20 +82,21 @@ input, select {
 input[type="date"] {
   appearance: none;
   -webkit-appearance: none;
+  background-color: #f8fafc;
   text-align: center;
 }
 
 input:focus, select:focus {
-  background: rgba(15, 23, 42, 0.9);
+  background: #fff;
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.15);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
 .player {
-  background: rgba(15, 23, 42, 0.4);
+  background: #f8fafc;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 14px;
+  border-radius: 14px;
+  padding: 12px;
   margin-bottom: 12px;
   width: 100%;
 }
@@ -116,44 +110,44 @@ input:focus, select:focus {
 }
 
 .result-label { font-size: 11px; font-weight: 600; margin-bottom: 2px; text-align: right; color: var(--muted); }
-.result-value { font-size: 17px; font-weight: 800; text-align: right; }
+.result-value { font-size: 16px; font-weight: 800; text-align: right; }
 
 button {
   border: none;
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 14px;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.1s ease, opacity 0.2s;
+  transition: transform 0.1s ease, background 0.2s;
   width: 100%;
 }
-button:active { transform: scale(0.98); opacity: 0.9; }
+button:active { transform: scale(0.98); }
 
-.main-btn { background: var(--gradient); color: white; margin: 8px 0 16px; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35); }
-.sub-btn { background: rgba(255, 255, 255, 0.05); color: var(--text); border: 1px solid var(--line); }
-.sub-btn:hover { background: rgba(255, 255, 255, 0.1); }
+.main-btn { background: var(--gradient); color: white; margin: 8px 0 16px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35); }
+.sub-btn { background: #f1f5f9; color: var(--text); border: 1px solid var(--line); }
+.sub-btn:hover { background: #e2e8f0; }
 
-.delete-btn { background: rgba(248, 113, 113, 0.15); color: var(--red); width: auto; padding: 4px 10px; font-size: 10px; border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.3); }
+.delete-btn { background: #fee2e2; color: var(--red); width: auto; padding: 4px 8px; font-size: 10px; border-radius: 6px; }
 
 /* フローティング更新ボタン */
 .float-reload-btn {
   position: fixed;
   bottom: 24px;
   right: 20px;
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
   background: var(--gradient);
   color: #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
   cursor: pointer;
   z-index: 999;
   font-size: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: none;
   transition: transform 0.2s ease;
 }
 .float-reload-btn:active {
@@ -162,11 +156,11 @@ button:active { transform: scale(0.98); opacity: 0.9; }
 
 .grand-total-box {
   background: var(--gradient);
-  border-radius: 18px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 16px;
   color: white;
   margin-bottom: 20px;
-  box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.4);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -176,15 +170,15 @@ button:active { transform: scale(0.98); opacity: 0.9; }
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 24px;
+    padding: 20px 24px;
   }
 }
 .grand-total-label { font-size: 11px; opacity: 0.85; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-.grand-total-value { font-size: 26px; font-weight: 900; letter-spacing: -0.03em; }
+.grand-total-value { font-size: 24px; font-weight: 900; letter-spacing: -0.03em; }
 .grand-winrate-badge {
-  background: rgba(255, 255, 255, 0.18);
-  padding: 10px 16px;
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 14px;
+  border-radius: 12px;
   text-align: left;
   backdrop-filter: blur(4px);
 }
@@ -195,9 +189,9 @@ button:active { transform: scale(0.98); opacity: 0.9; }
 .grand-winrate-value { font-size: 16px; font-weight: 800; }
 
 .global-filter-card {
-  background: rgba(15, 23, 42, 0.5);
+  background: #f1f5f9;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 16px;
   padding: 16px;
   margin-bottom: 20px;
 }
@@ -212,29 +206,29 @@ button:active { transform: scale(0.98); opacity: 0.9; }
   }
 }
 .filter-grid select {
-  background: rgba(30, 41, 59, 0.8);
+  background: #fff;
   font-size: 13px;
   padding: 10px 12px;
   font-weight: 600;
 }
 
 .chart-card {
-  background: rgba(15, 23, 42, 0.4);
+  background: #f8fafc;
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 14px;
+  border-radius: 14px;
+  padding: 12px;
   overflow: hidden;
 }
 .chart-title { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
 
 .chart-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
-.legend-item { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
 .chart-fit-wrap {
   width: 100%;
-  background: rgba(15, 23, 42, 0.6);
-  border-radius: 14px;
+  background: #fff;
+  border-radius: 12px;
   border: 1px solid var(--line);
   padding: 8px 0;
   overflow-x: auto;
@@ -245,11 +239,11 @@ svg {
   height: 270px;
 }
 
-.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
-.personal-card { background: rgba(15, 23, 42, 0.4); border-radius: 16px; padding: 14px; border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
+.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.personal-card { background: #f8fafc; border-radius: 14px; padding: 12px; border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
 .personal-card .name-label { font-size: 13px; color: var(--text); font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.personal-card .amount-value { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
-.personal-card .sub-info { font-size: 11px; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 8px; }
+.personal-card .amount-value { font-size: 15px; font-weight: 800; margin-bottom: 2px; }
+.personal-card .sub-info { font-size: 11px; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 6px; }
 
 .mest-row { 
   display: flex; 
@@ -262,51 +256,50 @@ svg {
   font-weight: 700; 
   gap: 4px;
 }
-.mest-text { white-space: nowrap; color: var(--muted); }
+.mest-text { white-space: nowrap; }
 .mest-btn { 
   padding: 4px 8px; 
   font-size: 11px; 
-  background: rgba(248, 113, 113, 0.15); 
+  background: #fee2e2; 
   color: var(--red); 
-  border-radius: 8px; 
+  border-radius: 6px; 
   font-weight: 700; 
   width: auto !important; 
-  border: 1px solid rgba(248, 113, 113, 0.3);
 }
 .mest-btn:disabled {
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.2);
-  border-color: transparent;
+  background: #f1f5f9;
+  color: #cbd5e1;
   cursor: not-allowed;
 }
 
-.summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-.box { padding: 14px; border-radius: 14px; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--line); }
+.summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+.box { padding: 12px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--line); }
 .box-title { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
-.box-value { font-size: 16px; font-weight: 800; }
+.box-value { font-size: 15px; font-weight: 800; }
 
-.table-wrapper { overflow-x: auto; margin-top: 15px; border-radius: 14px; border: 1px solid var(--line); }
-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 380px; background: rgba(15, 23, 42, 0.4); }
-th { background: rgba(15, 23, 42, 0.8); color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
-th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+.table-wrapper { overflow-x: auto; margin-top: 15px; border-radius: 12px; border: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 380px; background: #fff; }
+th { background: #f8fafc; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; }
 tr:last-child td { border-bottom: none; }
 
-.pay-box { margin-top: 16px; border-radius: 14px; background: rgba(6, 95, 70, 0.2); border: 1px solid rgba(52, 211, 153, 0.3); padding: 14px; }
-.pay-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: rgba(15, 23, 42, 0.5); margin-bottom: 6px; border-radius: 10px; border: 1px solid rgba(52, 211, 153, 0.2); font-size: 13px; }
+.pay-box { margin-top: 16px; border-radius: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; }
+.pay-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #fff; margin-bottom: 6px; border-radius: 8px; border: 1px solid #dcfce7; font-size: 13px; }
 
-/* 履歴カードデザイン */
+/* 日付ごとにまとめた履歴カードデザイン */
 .hist-item { 
-  background: rgba(15, 23, 42, 0.4); 
+  background: #ffffff; 
   border: 1px solid var(--line); 
-  border-radius: 16px; 
-  padding: 16px; 
-  margin-bottom: 14px; 
+  border-radius: 14px; 
+  padding: 14px; 
+  margin-bottom: 12px; 
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 .hist-date-header {
   font-size: 13px;
   font-weight: 800;
   color: var(--text);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -317,11 +310,11 @@ tr:last-child td { border-bottom: none; }
   justify-content: space-between;
   background: var(--gradient);
   color: #ffffff;
-  border-radius: 12px;
-  padding: 10px 14px;
-  margin-bottom: 12px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
   gap: 8px;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 10px -2px rgba(99, 102, 241, 0.3);
 }
 .hist-day-summary-left {
   display: flex;
@@ -335,22 +328,22 @@ tr:last-child td { border-bottom: none; }
   background: rgba(255, 255, 255, 0.22);
   color: #ffffff;
   padding: 4px 8px;
-  border-radius: 8px;
+  border-radius: 6px;
   white-space: nowrap;
 }
 .session-block {
-  background: rgba(30, 41, 59, 0.5);
+  background: #f8fafc;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 10px;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 8px;
   position: relative;
 }
 .session-title {
   font-size: 11px;
   font-weight: 700;
   color: var(--muted);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -358,14 +351,14 @@ tr:last-child td { border-bottom: none; }
 .hist-players-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 .hist-player-mini {
-  background: rgba(15, 23, 42, 0.6);
+  background: #fff;
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 8px;
+  border-radius: 8px;
+  padding: 6px 8px;
   font-size: 11px;
 }
 
@@ -387,8 +380,8 @@ tr:last-child td { border-bottom: none; }
   margin-top: 16px;
 }
 
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); align-items: center; justify-content: center; z-index: 1000; }
-.modal-content { background: var(--card-solid); border: 1px solid var(--line); padding: 24px; border-radius: var(--radius); width: 90%; max-width: 400px; box-shadow: var(--shadow); }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
+.modal-content { background: #fff; padding: 20px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
 </style>
 </head>
 <body>
@@ -397,7 +390,7 @@ tr:last-child td { border-bottom: none; }
 <div class="wrap">
   <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px;">
     <h1>🎰 ノリ打ち精算</h1>
-    <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 8px 14px; font-size: 12px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
+    <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 8px 12px; font-size: 12px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
   </div>
 
   <div class="card">
@@ -407,7 +400,7 @@ tr:last-child td { border-bottom: none; }
       <input type="date" id="recordDateInput">
     </div>
     <div id="players"></div>
-    <button class="sub-btn" id="addBtn" style="border-style: dashed; border-color: rgba(255,255,255,0.2); color: var(--accent); font-weight: 600;">＋ 参加者を追加</button>
+    <button class="sub-btn" id="addBtn" style="border-style: dashed; border-color: #cbd5e1; color: var(--accent); font-weight: 600;">＋ 参加者を追加</button>
   </div>
 
   <button class="main-btn" id="calcBtn">計算を実行して保存</button>
@@ -416,7 +409,7 @@ tr:last-child td { border-bottom: none; }
   <div class="card" id="resultCard" style="display:none;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h2 style="margin:0;">精算結果</h2>
-      <button class="sub-btn" id="copyResultBtn" style="width:auto; padding:6px 12px; font-size:11px;">📋 結果をコピー</button>
+      <button class="sub-btn" id="copyResultBtn" style="width:auto; padding:6px 10px; font-size:11px;">📋 結果をコピー</button>
     </div>
     <div class="summary">
       <div class="box"><div class="box-title">グループ総損益</div><div class="box-value" id="profitTotal" style="color:var(--accent)">-</div></div>
@@ -431,7 +424,7 @@ tr:last-child td { border-bottom: none; }
       </table>
     </div>
     <div class="pay-box" id="payBox">
-      <div style="font-weight: 700; color: #34d399; font-size: 13px; margin-bottom: 8px;">💸 お金の受け渡し指示</div>
+      <div style="font-weight: 700; color: #166534; font-size: 13px; margin-bottom: 8px;">💸 お金の受け渡し指示</div>
       <div id="payList"></div>
     </div>
   </div>
@@ -493,7 +486,7 @@ tr:last-child td { border-bottom: none; }
       <div class="half"><input type="text" id="newMemberName" placeholder="新しい名前"></div>
       <div class="half"><button class="sub-btn" id="addMemberStoreBtn" style="background: var(--accent); color: #fff; border:none; height: 100%;">追加</button></div>
     </div>
-    <button class="sub-btn" id="closeModalBtn" style="background: rgba(255,255,255,0.05);">閉じる</button>
+    <button class="sub-btn" id="closeModalBtn" style="background: #f1f5f9;">閉じる</button>
   </div>
 </div>
 
@@ -713,7 +706,7 @@ function renderPersonalTotalsAndHistory() {
       </div>
       <div class="mest-row">
         <span class="mest-text">飯スト: <b style="color:var(--accent);">${mestCount}</b></span>
-        <button class="mest-btn" ${!canConsume ? 'disabled style="background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.2);cursor:not-allowed;"' : ''} onclick="updateMemberMest('${name}', -1)">消費</button>
+        <button class="mest-btn" ${!canConsume ? 'disabled style="background:#f1f5f9;color:#cbd5e1;cursor:not-allowed;"' : ''} onclick="updateMemberMest('${name}', -1)">消費</button>
       </div>
     `;
     personalEl.appendChild(pCard);
@@ -748,7 +741,6 @@ function renderPersonalTotalsAndHistory() {
     sessions.forEach((s, idx) => {
       let sProfit = Number(s.profit || 0);
       let sPer = s.players.length > 0 ? sProfit / s.players.length : 0;
-      const totalProfit = sProfit;
       const fairProfitPerPerson = sPer;
 
       let pDetails = "";
@@ -756,7 +748,6 @@ function renderPersonalTotalsAndHistory() {
         let pInv = p.invest !== undefined ? Number(p.invest) : 0;
         let pCsh = p.cash !== undefined ? Number(p.cash) : 0;
         
-        // 各プレイヤーの受け渡し状態（貢献・強盗・平和）を計算
         const targetAmount = pInv + fairProfitPerPerson;
         const diff = pCsh - targetAmount;
         let statusHtml = "";
@@ -788,17 +779,17 @@ function renderPersonalTotalsAndHistory() {
       if (transfers.length > 0) {
         let rows = "";
         transfers.forEach(t => {
-          rows += `<div style="display:flex; justify-content:space-between; font-size:11px; padding:2px 0; border-bottom:1px solid rgba(52, 211, 153, 0.2);"><span><b>${t.from}</b> → ${t.to}</span><span style="color:var(--green); font-weight:800;">${new Intl.NumberFormat("ja-JP").format(t.amount)}円</span></div>`;
+          rows += `<div style="display:flex; justify-content:space-between; font-size:11px; padding:2px 0; border-bottom:1px solid #dcfce7;"><span><b>${t.from}</b> → ${t.to}</span><span style="color:var(--green); font-weight:800;">${new Intl.NumberFormat("ja-JP").format(t.amount)}円</span></div>`;
         });
         transferHtml = `
-          <div style="margin-top:6px; background:rgba(6, 95, 70, 0.2); border:1px solid rgba(52, 211, 153, 0.3); border-radius:10px; padding:8px;">
-            <div style="font-weight:700; color:#34d399; font-size:10px; margin-bottom:2px;">💸 お金の受け渡し</div>
+          <div style="margin-top:6px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:6px 8px;">
+            <div style="font-weight:700; color:#166534; font-size:10px; margin-bottom:2px;">💸 お金の受け渡し</div>
             ${rows}
           </div>
         `;
       } else {
         transferHtml = `
-          <div style="margin-top:6px; background:rgba(6, 95, 70, 0.2); border:1px solid rgba(52, 211, 153, 0.3); border-radius:10px; padding:6px 8px; font-size:10px; color:#34d399; font-weight:600;">
+          <div style="margin-top:6px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:4px 8px; font-size:10px; color:#166534; font-weight:600;">
             💸 お金の受け渡し：平和 (必要なし)
           </div>
         `;
@@ -1108,7 +1099,7 @@ function renderExcelChart() {
   for(let val = minVal; val <= maxVal + 1; val += stepUnit) {
     const y = getY(val);
     const isZero = (val === 0);
-    svg.innerHTML += `<line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="${isZero ? '#94a3b8' : 'rgba(255,255,255,0.06)'}" stroke-width="${isZero ? '1.8' : '1'}" ${isZero ? '' : 'stroke-dasharray="3,3"'}/>`;
+    svg.innerHTML += `<line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="${isZero ? '#64748b' : '#e2e8f0'}" stroke-width="${isZero ? '1.8' : '1'}" ${isZero ? '' : 'stroke-dasharray="3,3"'}/>`;
     
     let labelText = "";
     if (isZero) {
@@ -1119,7 +1110,7 @@ function renderExcelChart() {
       labelText = (val / 1000) + "千";
     }
 
-    svg.innerHTML += `<text x="${paddingLeft - 10}" y="${y + 4}" fill="${isZero ? '#f8fafc' : '#94a3b8'}" font-weight="${isZero ? '800' : '500'}" font-size="11" text-anchor="end">${labelText}</text>`;
+    svg.innerHTML += `<text x="${paddingLeft - 10}" y="${y + 4}" fill="${isZero ? '#0f172a' : '#64748b'}" font-weight="${isZero ? '800' : '500'}" font-size="11" text-anchor="end">${labelText}</text>`;
   }
 
   let xStep = 1;
@@ -1128,7 +1119,7 @@ function renderExcelChart() {
 
   groupData.forEach((val, i) => {
     const x = getX(i);
-    svg.innerHTML += `<line x1="${x}" y1="${paddingTop}" x2="${x}" y2="${height - paddingBottom}" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>`;
+    svg.innerHTML += `<line x1="${x}" y1="${paddingTop}" x2="${x}" y2="${height - paddingBottom}" stroke="#f1f5f9" stroke-width="1"/>`;
     
     if (i > 0 && (i === totalPoints - 1 || i % xStep === 0)) {
       let h = targetHistory[i - 1];
@@ -1143,11 +1134,11 @@ function renderExcelChart() {
       } else {
         dateStr = `#${i}`;
       }
-      svg.innerHTML += `<text x="${x}" y="${height - 10}" fill="#94a3b8" font-size="11" font-weight="600" text-anchor="middle">${dateStr}</text>`;
+      svg.innerHTML += `<text x="${x}" y="${height - 10}" fill="#64748b" font-size="11" font-weight="600" text-anchor="middle">${dateStr}</text>`;
     }
   });
 
-  const colors = ["#818cf8", "#38bdf8", "#34d399", "#fbbf24", "#f472b6", "#a78bfa"];
+  const colors = ["#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6"];
 
   const drawLineAndDots = (data, color, label) => {
     if(data.length === 0) return;
@@ -1158,7 +1149,7 @@ function renderExcelChart() {
       svg.innerHTML += `<polyline fill="none" stroke="${color}" stroke-width="3" points="${points.join(" ")}" stroke-linecap="round" stroke-linejoin="round"/>`;
     }
     data.forEach((val, i) => {
-      svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="4.5" fill="#1e293b" stroke="${color}" stroke-width="2.5"/>`;
+      svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="4.5" fill="#fff" stroke="${color}" stroke-width="2.5"/>`;
     });
 
     legendContainer.innerHTML += `
@@ -1169,7 +1160,7 @@ function renderExcelChart() {
     `;
   };
 
-  drawLineAndDots(groupData, "#818cf8", "ノリ打ち全体");
+  drawLineAndDots(groupData, "var(--accent)", "ノリ打ち全体");
   allNames.forEach((name, idx) => {
     const color = colors[(idx + 1) % colors.length];
     drawLineAndDots(memberSeries[name], color, name);
@@ -1369,7 +1360,7 @@ function renderMemberListEdit() {
   container.innerHTML = "";
   storedMembers.forEach((m, idx) => {
     const row = document.createElement("div");
-    row.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; background:rgba(15, 23, 42, 0.5); padding:8px 12px; border-radius:10px; border:1px solid var(--line);";
+    row.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; background:#f8fafc; padding:8px 12px; border-radius:8px; border:1px solid var(--line);";
     row.innerHTML = `<span style="font-weight:600;">${m}</span><button class="delete-btn" onclick="removeStoredMember(${idx})">削除</button>`;
     container.appendChild(row);
   });
