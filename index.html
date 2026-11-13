@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>ノリ打ち精算</title>
 <style>
 :root {
@@ -11,9 +11,9 @@
   --line: #e2e8f0;
   --text: #0f172a;
   --muted: #64748b;
-  --green: #0d9488; /* 洗練されたターコイズグリーン */
-  --red: #e11d48;   /* シックなローズレッド */
-  --accent: #2563eb; /* 鮮やかで視認性の高いインディゴブルー */
+  --green: #0d9488;
+  --red: #e11d48;
+  --accent: #2563eb;
   --accent-light: #eff6ff;
   --gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   --shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.06), 0 2px 6px -2px rgba(15, 23, 42, 0.03);
@@ -70,6 +70,7 @@ label {
   letter-spacing: 0.05em;
 }
 
+/* スマホでのタップ時ズームを防ぐため font-size を 16px に設定 */
 input, select {
   width: 100%;
   max-width: 100%;
@@ -77,7 +78,7 @@ input, select {
   padding: 8px 10px;
   border-radius: 10px;
   border: 1.5px solid var(--line);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--text);
   background: #f8fafc;
   transition: all 0.2s ease;
@@ -90,6 +91,7 @@ input[type="date"] {
   -webkit-appearance: none;
   background-color: #f8fafc;
   text-align: center;
+  font-size: 14px;
 }
 
 input:focus, select:focus {
@@ -106,7 +108,7 @@ input::placeholder, select::placeholder {
   background: #f8fafc;
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 8px 10px;
+  padding: 10px;
   margin-bottom: 8px;
   width: 100%;
 }
@@ -119,8 +121,25 @@ input::placeholder, select::placeholder {
   gap: 6px;
 }
 
+.machine-list-box {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  margin-top: 4px;
+}
+.machine-row {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.machine-row:last-child {
+  margin-bottom: 0;
+}
+
 .result-label { font-size: 10px; font-weight: 600; color: var(--muted); text-align: right; }
-.result-value { font-size: 13px; font-weight: 800; text-align: right; }
+.result-value { font-size: 14px; font-weight: 800; text-align: right; }
 
 button {
   border: none;
@@ -138,7 +157,7 @@ button:active { transform: scale(0.98); }
 .sub-btn { background: #f1f5f9; color: var(--text); border: 1px solid var(--line); }
 .sub-btn:hover { background: #e2e8f0; }
 
-.delete-btn { background: #fff1f2; color: var(--red); width: auto; padding: 2px 6px; font-size: 10px; border-radius: 6px; }
+.delete-btn { background: #fff1f2; color: var(--red); width: auto; padding: 4px 8px; font-size: 11px; border-radius: 6px; }
 .edit-btn { background: var(--accent-light); color: var(--accent); width: auto; padding: 3px 6px; font-size: 10px; border-radius: 6px; }
 
 .float-reload-btn {
@@ -222,8 +241,8 @@ button:active { transform: scale(0.98); }
 }
 .filter-grid select {
   background: #fff;
-  font-size: 12px;
-  padding: 8px 10px;
+  font-size: 16px;
+  padding: 6px 10px;
   font-weight: 600;
 }
 
@@ -364,7 +383,7 @@ tr:last-child td { border-bottom: none; }
 }
 .hist-players-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 4px;
   margin-bottom: 4px;
 }
@@ -395,11 +414,14 @@ tr:last-child td { border-bottom: none; }
 }
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
-.modal-content { background: #fff; padding: 16px; border-radius: 16px; width: 90%; max-width: 400px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+.modal-content { background: #fff; padding: 16px; border-radius: 16px; width: 92%; max-width: 420px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
 </style>
 </head>
 <body>
 <button class="float-reload-btn" onclick="location.reload()" title="ページを更新">🔄</button>
+
+<!-- 過去の履歴から抽出した機種名の候補リスト（自由入力と併用） -->
+<datalist id="machineSuggestions"></datalist>
 
 <div class="wrap">
   <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
@@ -410,15 +432,15 @@ tr:last-child td { border-bottom: none; }
   <div class="card" style="padding: 12px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--line);">
       <h2 style="margin: 0; font-size: 13px;">参加者 & 日付</h2>
-      <div style="width: 135px;">
-        <input type="date" id="recordDateInput" style="padding: 5px 6px; font-size: 12px;">
+      <div style="width: 140px;">
+        <input type="date" id="recordDateInput" style="padding: 5px 6px;">
       </div>
     </div>
     <div id="players"></div>
-    <button class="sub-btn" id="addBtn" style="border-style: dashed; border-color: #cbd5e1; color: var(--accent); font-weight: 600; padding: 6px; font-size: 12px;">＋ 参加者を追加</button>
+    <button class="sub-btn" id="addBtn" style="border-style: dashed; border-color: #cbd5e1; color: var(--accent); font-weight: 600; padding: 8px; font-size: 13px;">＋ 参加者を追加</button>
   </div>
 
-  <button class="main-btn" id="calcBtn">計算を実行して保存</button>
+  <button class="main-btn" id="calcBtn">清算</button>
   <div id="loading" style="display:none; text-align:center; padding:8px; color:var(--accent); font-weight:bold; font-size:13px;">処理中...</div>
 
   <div class="card" id="resultCard" style="display:none;">
@@ -514,7 +536,7 @@ tr:last-child td { border-bottom: none; }
       <label>実践日</label>
       <input type="date" id="editDateInput">
     </div>
-    <div id="editPlayersContainer" style="margin-bottom: 12px;"></div>
+    <div id="editPlayersContainer" style="margin-bottom: 12px; max-height: 280px; overflow-y: auto;"></div>
     <div style="display: flex; gap: 8px;">
       <button class="sub-btn" id="closeEditModalBtn" style="background: #f1f5f9; flex: 1; padding: 10px;">キャンセル</button>
       <button class="main-btn" id="saveEditBtn" style="flex: 1; margin: 0; padding: 10px;">上書き保存</button>
@@ -586,6 +608,32 @@ function toggleHistoryAccordion() {
   }
 }
 
+// 履歴データから過去に入力された機種名を自動抽出して入力候補にセット
+function updateMachineSuggestions() {
+  const datalist = document.getElementById("machineSuggestions");
+  if (!datalist) return;
+  let machineSet = new Set();
+  historyData.forEach(h => {
+    if (h.players) {
+      h.players.forEach(p => {
+        if (p.machines && Array.isArray(p.machines)) {
+          p.machines.forEach(m => {
+            if (m.machineName && m.machineName.trim()) {
+              machineSet.add(m.machineName.trim());
+            }
+          });
+        }
+      });
+    }
+  });
+  datalist.innerHTML = "";
+  Array.from(machineSet).sort().forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = name;
+    datalist.appendChild(opt);
+  });
+}
+
 async function loadHistory() {
   const historyEl = document.getElementById("history");
   try {
@@ -596,7 +644,7 @@ async function loadHistory() {
     serverMestMap = jsonRes.mestMap || {};
     
     historyData.sort((a, b) => parseDateStrToObj(a.time) - parseDateStrToObj(b.time));
-    
+    updateMachineSuggestions();
     renderAll();
   } catch (e) { 
     historyEl.innerHTML = "履歴の読み込みに失敗しました。";
@@ -666,14 +714,14 @@ window.editHistory = function(rowIdx) {
   
   if (target.players && target.players.length > 0) {
     target.players.forEach(p => {
-      addEditPlayerRow(container, p.name, p.invest !== undefined ? p.invest : "", p.cash !== undefined ? p.cash : "");
+      addEditPlayerRow(container, p.name, p.invest !== undefined ? p.invest : "", p.cash !== undefined ? p.cash : "", p.machines || []);
     });
   }
 
   openModal(document.getElementById("editModal"));
 };
 
-function addEditPlayerRow(container, selectedName = "", investVal = "", cashVal = "") {
+function addEditPlayerRow(container, selectedName = "", investVal = "", cashVal = "", machines = []) {
   const div = document.createElement("div");
   div.className = "player";
   let options = '<option value="">選択してください</option>';
@@ -683,26 +731,52 @@ function addEditPlayerRow(container, selectedName = "", investVal = "", cashVal 
   });
 
   div.innerHTML = `
-    <div style="margin-bottom: 4px;">
+    <div style="margin-bottom: 6px;">
       <label>名前</label>
-      <select class="edit-name-select" style="background:#fff; padding: 6px 8px; font-size: 13px;">${options}</select>
+      <select class="edit-name-select" style="background:#fff; padding: 6px 8px;">${options}</select>
     </div>
     <div class="grid">
       <div class="half">
         <label>投資額</label>
-        <input class="edit-invest" type="number" inputmode="numeric" pattern="[0-9]*" value="${investVal}" placeholder="0" style="padding: 6px 8px; font-size: 13px;">
+        <input class="edit-invest" type="number" inputmode="numeric" pattern="[0-9]*" value="${investVal}" placeholder="0" style="padding: 6px 8px;">
       </div>
       <div class="half">
         <label>回収額</label>
-        <input class="edit-cash" type="number" inputmode="numeric" pattern="[0-9]*" value="${cashVal}" placeholder="0" style="padding: 6px 8px; font-size: 13px;">
+        <input class="edit-cash" type="number" inputmode="numeric" pattern="[0-9]*" value="${cashVal}" placeholder="0" style="padding: 6px 8px;">
       </div>
     </div>
-    <div style="margin-top:4px; display:flex; justify-content:flex-end;">
+    <div style="margin-top:6px;">
+      <label>打った機種（自由入力・候補選択）</label>
+      <div class="machine-list-box edit-machine-container"></div>
+      <button class="sub-btn" type="button" onclick="addEditMachineRow(this.closest('.player').querySelector('.edit-machine-container'))" style="margin-top:4px; padding:4px; font-size:11px; background:#fff; color:var(--accent);">＋ 機種を追加</button>
+    </div>
+    <div style="margin-top:6px; display:flex; justify-content:flex-end;">
       <button class="delete-btn" onclick="this.closest('.player').remove()">このメンバーを外す</button>
     </div>
   `;
   container.appendChild(div);
+
+  const mContainer = div.querySelector('.edit-machine-container');
+  if(machines && machines.length > 0) {
+    machines.forEach(mObj => {
+      addEditMachineRow(mContainer, mObj.machineName || "", mObj.machineInvest !== undefined ? mObj.machineInvest : "", mObj.machineCash !== undefined ? mObj.machineCash : "");
+    });
+  } else {
+    addEditMachineRow(mContainer, "", "", "");
+  }
 }
+
+window.addEditMachineRow = function(container, mName = "", mInv = "", mCsh = "") {
+  const row = document.createElement("div");
+  row.className = "machine-row";
+  row.innerHTML = `
+    <input class="edit-machine-name" type="text" list="machineSuggestions" placeholder="機種名を入力" value="${mName}" style="flex: 2.2; padding: 6px 8px; background:#fff;">
+    <input class="edit-machine-invest" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="投資" value="${mInv}" style="flex: 1; padding: 6px 6px;">
+    <input class="edit-machine-cash" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="回収" value="${mCsh}" style="flex: 1; padding: 6px 6px;">
+    <button class="delete-btn" type="button" onclick="this.closest('.machine-row').remove()" style="padding:4px 6px;">×</button>
+  `;
+  container.appendChild(row);
+};
 
 document.getElementById("saveEditBtn").onclick = async function() {
   const pNodes = document.querySelectorAll("#editPlayersContainer .player");
@@ -721,9 +795,23 @@ document.getElementById("saveEditBtn").onclick = async function() {
     const invest = investStr === "" ? 0 : +investStr;
     const cash = cashStr === "" ? 0 : +cashStr;
 
+    let machines = [];
+    node.querySelectorAll(".machine-row").forEach(mRow => {
+      const mName = mRow.querySelector(".edit-machine-name").value.trim();
+      const mInvStr = mRow.querySelector(".edit-machine-invest").value;
+      const mCshStr = mRow.querySelector(".edit-machine-cash").value;
+      if(mName || mInvStr !== "" || mCshStr !== "") {
+        machines.push({ 
+          machineName: mName || "機種未入力", 
+          machineInvest: mInvStr === "" ? 0 : +mInvStr, 
+          machineCash: mCshStr === "" ? 0 : +mCshStr 
+        });
+      }
+    });
+
     if(!name) hasError = true;
     const individualProfit = cash - invest;
-    players.push({ name, val: individualProfit, invest, cash });
+    players.push({ name, val: individualProfit, invest, cash, machines });
   });
 
   if(hasError) {
@@ -966,6 +1054,13 @@ function renderPersonalTotalsAndHistory() {
           }
         }
 
+        let machinesHtml = "";
+        if (p.machines && p.machines.length > 0) {
+          p.machines.forEach(m => {
+            machinesHtml += `<div style="font-size:9px; color:var(--muted); margin-top:1px;">🎰 ${m.machineName} (投:${new Intl.NumberFormat("ja-JP").format(m.machineInvest)}/収:${new Intl.NumberFormat("ja-JP").format(m.machineCash)})</div>`;
+          });
+        }
+
         pDetails += `
           <div class="hist-player-mini">
             <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:1px;">
@@ -976,7 +1071,8 @@ function renderPersonalTotalsAndHistory() {
               <span>投資:${new Intl.NumberFormat("ja-JP").format(pInv)}</span>
               <span>回収:${new Intl.NumberFormat("ja-JP").format(pCsh)}</span>
             </div>
-            ${hasTransfers ? `<div style="font-size:9px; text-align:right;">${statusHtml}</div>` : ''}
+            ${machinesHtml}
+            ${hasTransfers ? `<div style="font-size:9px; text-align:right; margin-top:2px;">${statusHtml}</div>` : ''}
           </div>
         `;
       });
@@ -1377,7 +1473,28 @@ function renderExcelChart() {
   });
 }
 
-function addPlayer(selectedName = "", investVal = "", cashVal = ""){
+// 機種ごとの投資・回収を入力した際に、全体の投資・回収欄へ自動合計反映する補助関数
+window.syncPlayerTotalsFromMachines = function(playerNode) {
+  const mRows = playerNode.querySelectorAll(".machine-row");
+  let sumInv = 0;
+  let sumCsh = 0;
+  let hasAnyMachineVal = false;
+  mRows.forEach(row => {
+    const invVal = row.querySelector(".machine-invest").value;
+    const cshVal = row.querySelector(".machine-cash").value;
+    if (invVal !== "" || cshVal !== "") {
+      hasAnyMachineVal = true;
+      sumInv += Number(invVal || 0);
+      sumCsh += Number(cshVal || 0);
+    }
+  });
+  if (hasAnyMachineVal) {
+    playerNode.querySelector(".invest").value = sumInv;
+    playerNode.querySelector(".cash").value = sumCsh;
+  }
+};
+
+function addPlayer(selectedName = "", investVal = "", cashVal = "", machines = []){
   const div = document.createElement("div");
   div.className = "player";
   let options = '<option value="">選択してください</option>';
@@ -1390,7 +1507,7 @@ function addPlayer(selectedName = "", investVal = "", cashVal = ""){
     <div class="player-top">
       <div style="width:55%;">
         <label>名前</label>
-        <select class="name-select" style="padding: 6px 8px; font-size: 13px;">${options}</select>
+        <select class="name-select" style="padding: 6px 8px;">${options}</select>
       </div>
       <div style="width:40%;">
         <div class="result-label">個人の収支</div>
@@ -1399,19 +1516,45 @@ function addPlayer(selectedName = "", investVal = "", cashVal = ""){
     </div>
     <div class="grid">
       <div class="half">
-        <label>投資額</label>
-        <input class="invest" type="number" inputmode="numeric" pattern="[0-9]*" value="${investVal}" placeholder="0" style="padding: 6px 8px; font-size: 13px;">
+        <label>投資額（合計）</label>
+        <input class="invest" type="number" inputmode="numeric" pattern="[0-9]*" value="${investVal}" placeholder="0" style="padding: 6px 8px;">
       </div>
       <div class="half">
-        <label>回収額</label>
-        <input class="cash" type="number" inputmode="numeric" pattern="[0-9]*" value="${cashVal}" placeholder="0" style="padding: 6px 8px; font-size: 13px;">
+        <label>回収額（合計）</label>
+        <input class="cash" type="number" inputmode="numeric" pattern="[0-9]*" value="${cashVal}" placeholder="0" style="padding: 6px 8px;">
       </div>
+    </div>
+    <div style="margin-top:8px;">
+      <label>打った機種（自由入力・履歴から候補選択）</label>
+      <div class="machine-list-box machine-container"></div>
+      <button class="sub-btn" type="button" onclick="addMachineRow(this.closest('.player').querySelector('.machine-container'))" style="margin-top:4px; padding:5px; font-size:12px; background:#fff; color:var(--accent);">＋ 機種を追加</button>
     </div>
     <div style="margin-top:6px; display:flex; justify-content:flex-end;">
       <button class="delete-btn" onclick="this.closest('.player').remove()">削除</button>
     </div>`;
   document.getElementById("players").appendChild(div);
+
+  const mContainer = div.querySelector('.machine-container');
+  if(machines && machines.length > 0) {
+    machines.forEach(mObj => {
+      addMachineRow(mContainer, mObj.machineName || "", mObj.machineInvest !== undefined ? mObj.machineInvest : "", mObj.machineCash !== undefined ? mObj.machineCash : "");
+    });
+  } else {
+    addMachineRow(mContainer, "", "", "");
+  }
 }
+
+window.addMachineRow = function(container, mName = "", mInv = "", mCsh = "") {
+  const row = document.createElement("div");
+  row.className = "machine-row";
+  row.innerHTML = `
+    <input class="machine-name" type="text" list="machineSuggestions" placeholder="機種名を入力" value="${mName}" style="flex: 2.2; padding: 6px 8px; background:#fff;">
+    <input class="machine-invest" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="投資" value="${mInv}" oninput="syncPlayerTotalsFromMachines(this.closest('.player'))" style="flex: 1; padding: 6px 6px;">
+    <input class="machine-cash" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="回収" value="${mCsh}" oninput="syncPlayerTotalsFromMachines(this.closest('.player'))" style="flex: 1; padding: 6px 6px;">
+    <button class="delete-btn" type="button" onclick="const p=this.closest('.player'); this.closest('.machine-row').remove(); syncPlayerTotalsFromMachines(p);" style="padding:4px 6px;">×</button>
+  `;
+  container.appendChild(row);
+};
 
 document.getElementById("calcBtn").onclick = async function() {
   const pNodes = document.querySelectorAll("#players .player");
@@ -1430,8 +1573,22 @@ document.getElementById("calcBtn").onclick = async function() {
     const invest = investStr === "" ? 0 : +investStr;
     const cash = cashStr === "" ? 0 : +cashStr;
 
+    let machines = [];
+    node.querySelectorAll(".machine-row").forEach(mRow => {
+      const mName = mRow.querySelector(".machine-name").value.trim();
+      const mInvStr = mRow.querySelector(".machine-invest").value;
+      const mCshStr = mRow.querySelector(".machine-cash").value;
+      if(mName || mInvStr !== "" || mCshStr !== "") {
+        machines.push({ 
+          machineName: mName || "機種未入力", 
+          machineInvest: mInvStr === "" ? 0 : +mInvStr, 
+          machineCash: mCshStr === "" ? 0 : +mCshStr 
+        });
+      }
+    });
+
     if(!name) hasError = true;
-    players.push({ name, invest, cash, node });
+    players.push({ name, invest, cash, machines, node });
   });
 
   if(hasError) {
@@ -1482,14 +1639,26 @@ document.getElementById("calcBtn").onclick = async function() {
       settleColor = "var(--muted)";
     }
     
+    let machineSummaryText = "";
+    if (p.machines && p.machines.length > 0) {
+      machineSummaryText = p.machines.map(m => `${m.machineName}(投:${m.machineInvest}/収:${m.machineCash})`).join(", ");
+    }
+
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td><b>${p.name}</b></td><td>${new Intl.NumberFormat("ja-JP").format(p.invest)}円</td><td>${new Intl.NumberFormat("ja-JP").format(p.cash)}円</td><td style="color:${individualProfit>=0?'var(--green)':'var(--red)'}; font-weight:600;">${money(individualProfit)}</td><td style="font-weight:800; color:${settleColor}">${settleStatusText}</td>`;
+    tr.innerHTML = `<td><b>${p.name}</b>${machineSummaryText ? `<br><span style="font-size:10px; color:var(--muted);">${machineSummaryText}</span>` : ''}</td><td>${new Intl.NumberFormat("ja-JP").format(p.invest)}円</td><td>${new Intl.NumberFormat("ja-JP").format(p.cash)}円</td><td style="color:${individualProfit>=0?'var(--green)':'var(--red)'}; font-weight:600;">${money(individualProfit)}</td><td style="font-weight:800; color:${settleColor}">${settleStatusText}</td>`;
     tbody.appendChild(tr);
-    snapshot.push({ name: p.name, val: individualProfit, invest: p.invest, cash: p.cash });
+    snapshot.push({ name: p.name, val: individualProfit, invest: p.invest, cash: p.cash, machines: p.machines });
   });
 
   let lines = [`【ノリ打ち精算レポート】`, ``, `■ 今回の収支`];
-  snapshot.forEach(p => lines.push(`・${p.name}：${money(p.val)}`));
+  snapshot.forEach(p => {
+    let lineStr = `・${p.name}：${money(p.val)}`;
+    if(p.machines && p.machines.length > 0) {
+      let mStrs = p.machines.map(m => `${m.machineName}(投${m.machineInvest}/収${m.machineCash})`).join(" ");
+      lineStr += ` [${mStrs}]`;
+    }
+    lines.push(lineStr);
+  });
   lines.push(`合計：${money(totalProfit)}（1人あたり：${money(fairProfitPerPerson)}）`);
   lines.push(``);
   lines.push(`■ お金の受け渡し（貢献・強盗）`);
