@@ -70,7 +70,6 @@ label {
   letter-spacing: 0.05em;
 }
 
-/* スマホでのタップ時ズームを防ぐため font-size を 16px に設定 */
 input, select {
   width: 100%;
   max-width: 100%;
@@ -420,7 +419,6 @@ tr:last-child td { border-bottom: none; }
 <body>
 <button class="float-reload-btn" onclick="location.reload()" title="ページを更新">🔄</button>
 
-<!-- 過去の履歴から抽出した機種名の候補リスト（自由入力と併用） -->
 <datalist id="machineSuggestions"></datalist>
 
 <div class="wrap">
@@ -608,7 +606,6 @@ function toggleHistoryAccordion() {
   }
 }
 
-// 履歴データから過去に入力された機種名を自動抽出して入力候補にセット
 function updateMachineSuggestions() {
   const datalist = document.getElementById("machineSuggestions");
   if (!datalist) return;
@@ -714,14 +711,20 @@ window.editHistory = function(rowIdx) {
   
   if (target.players && target.players.length > 0) {
     target.players.forEach(p => {
-      addEditPlayerRow(container, p.name, p.invest !== undefined ? p.invest : "", p.cash !== undefined ? p.cash : "", p.machines || []);
+      let inv = p.invest !== undefined ? p.invest : 0;
+      let csh = p.cash !== undefined ? p.cash : 0;
+      let machines = p.machines || [];
+      if (machines.length === 0 && (inv > 0 || csh > 0)) {
+        machines = [{ machineName: "機種未入力", machineInvest: inv, machineCash: csh }];
+      }
+      addEditPlayerRow(container, p.name, machines);
     });
   }
 
   openModal(document.getElementById("editModal"));
 };
 
-function addEditPlayerRow(container, selectedName = "", investVal = "", cashVal = "", machines = []) {
+function addEditPlayerRow(container, selectedName = "", machines = []) {
   const div = document.createElement("div");
   div.className = "player";
   let options = '<option value="">選択してください</option>';
@@ -735,18 +738,8 @@ function addEditPlayerRow(container, selectedName = "", investVal = "", cashVal 
       <label>名前</label>
       <select class="edit-name-select" style="background:#fff; padding: 6px 8px;">${options}</select>
     </div>
-    <div class="grid">
-      <div class="half">
-        <label>投資額</label>
-        <input class="edit-invest" type="number" inputmode="numeric" pattern="[0-9]*" value="${investVal}" placeholder="0" style="padding: 6px 8px;">
-      </div>
-      <div class="half">
-        <label>回収額</label>
-        <input class="edit-cash" type="number" inputmode="numeric" pattern="[0-9]*" value="${cashVal}" placeholder="0" style="padding: 6px 8px;">
-      </div>
-    </div>
-    <div style="margin-top:6px;">
-      <label>打った機種（自由入力・候補選択）</label>
+    <div style="margin-top:4px;">
+      <label>打った機種・投資・回収</label>
       <div class="machine-list-box edit-machine-container"></div>
       <button class="sub-btn" type="button" onclick="addEditMachineRow(this.closest('.player').querySelector('.edit-machine-container'))" style="margin-top:4px; padding:4px; font-size:11px; background:#fff; color:var(--accent);">＋ 機種を追加</button>
     </div>
@@ -790,22 +783,26 @@ document.getElementById("saveEditBtn").onclick = async function() {
 
   pNodes.forEach(node => {
     const name = node.querySelector(".edit-name-select").value;
-    const investStr = node.querySelector(".edit-invest").value;
-    const cashStr = node.querySelector(".edit-cash").value;
-    const invest = investStr === "" ? 0 : +investStr;
-    const cash = cashStr === "" ? 0 : +cashStr;
 
     let machines = [];
+    let invest = 0;
+    let cash = 0;
+
     node.querySelectorAll(".machine-row").forEach(mRow => {
       const mName = mRow.querySelector(".edit-machine-name").value.trim();
       const mInvStr = mRow.querySelector(".edit-machine-invest").value;
       const mCshStr = mRow.querySelector(".edit-machine-cash").value;
+      const mInv = mInvStr === "" ? 0 : +mInvStr;
+      const mCsh = mCshStr === "" ? 0 : +mCshStr;
+
       if(mName || mInvStr !== "" || mCshStr !== "") {
         machines.push({ 
           machineName: mName || "機種未入力", 
-          machineInvest: mInvStr === "" ? 0 : +mInvStr, 
-          machineCash: mCshStr === "" ? 0 : +mCshStr 
+          machineInvest: mInv, 
+          machineCash: mCsh 
         });
+        invest += mInv;
+        cash += mCsh;
       }
     });
 
@@ -1055,11 +1052,13 @@ function renderPersonalTotalsAndHistory() {
         }
 
         let machinesHtml = "";
-        if (p.machines && p.machines.length > 0) {
-          p.machines.forEach(m => {
-            machinesHtml += `<div style="font-size:9px; color:var(--muted); margin-top:1px;">🎰 ${m.machineName} (投:${new Intl.NumberFormat("ja-JP").format(m.machineInvest)}/収:${new Intl.NumberFormat("ja-JP").format(m.machineCash)})</div>`;
-          });
+        let machinesList = p.machines || [];
+        if (machinesList.length === 0 && (pInv > 0 || pCsh > 0)) {
+          machinesList = [{ machineName: "機種未入力", machineInvest: pInv, machineCash: pCsh }];
         }
+        machinesList.forEach(m => {
+          machinesHtml += `<div style="font-size:9px; color:var(--muted); margin-top:1px;">🎰 ${m.machineName} (投:${new Intl.NumberFormat("ja-JP").format(m.machineInvest)}/収:${new Intl.NumberFormat("ja-JP").format(m.machineCash)})</div>`;
+        });
 
         pDetails += `
           <div class="hist-player-mini">
@@ -1473,28 +1472,7 @@ function renderExcelChart() {
   });
 }
 
-// 機種ごとの投資・回収を入力した際に、全体の投資・回収欄へ自動合計反映する補助関数
-window.syncPlayerTotalsFromMachines = function(playerNode) {
-  const mRows = playerNode.querySelectorAll(".machine-row");
-  let sumInv = 0;
-  let sumCsh = 0;
-  let hasAnyMachineVal = false;
-  mRows.forEach(row => {
-    const invVal = row.querySelector(".machine-invest").value;
-    const cshVal = row.querySelector(".machine-cash").value;
-    if (invVal !== "" || cshVal !== "") {
-      hasAnyMachineVal = true;
-      sumInv += Number(invVal || 0);
-      sumCsh += Number(cshVal || 0);
-    }
-  });
-  if (hasAnyMachineVal) {
-    playerNode.querySelector(".invest").value = sumInv;
-    playerNode.querySelector(".cash").value = sumCsh;
-  }
-};
-
-function addPlayer(selectedName = "", investVal = "", cashVal = "", machines = []){
+function addPlayer(selectedName = "", machines = []){
   const div = document.createElement("div");
   div.className = "player";
   let options = '<option value="">選択してください</option>';
@@ -1514,18 +1492,8 @@ function addPlayer(selectedName = "", investVal = "", cashVal = "", machines = [
         <div class="result-value">-</div>
       </div>
     </div>
-    <div class="grid">
-      <div class="half">
-        <label>投資額（合計）</label>
-        <input class="invest" type="number" inputmode="numeric" pattern="[0-9]*" value="${investVal}" placeholder="0" style="padding: 6px 8px;">
-      </div>
-      <div class="half">
-        <label>回収額（合計）</label>
-        <input class="cash" type="number" inputmode="numeric" pattern="[0-9]*" value="${cashVal}" placeholder="0" style="padding: 6px 8px;">
-      </div>
-    </div>
-    <div style="margin-top:8px;">
-      <label>打った機種（自由入力・履歴から候補選択）</label>
+    <div style="margin-top:4px;">
+      <label>打った機種・投資・回収</label>
       <div class="machine-list-box machine-container"></div>
       <button class="sub-btn" type="button" onclick="addMachineRow(this.closest('.player').querySelector('.machine-container'))" style="margin-top:4px; padding:5px; font-size:12px; background:#fff; color:var(--accent);">＋ 機種を追加</button>
     </div>
@@ -1549,9 +1517,9 @@ window.addMachineRow = function(container, mName = "", mInv = "", mCsh = "") {
   row.className = "machine-row";
   row.innerHTML = `
     <input class="machine-name" type="text" list="machineSuggestions" placeholder="機種名を入力" value="${mName}" style="flex: 2.2; padding: 6px 8px; background:#fff;">
-    <input class="machine-invest" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="投資" value="${mInv}" oninput="syncPlayerTotalsFromMachines(this.closest('.player'))" style="flex: 1; padding: 6px 6px;">
-    <input class="machine-cash" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="回収" value="${mCsh}" oninput="syncPlayerTotalsFromMachines(this.closest('.player'))" style="flex: 1; padding: 6px 6px;">
-    <button class="delete-btn" type="button" onclick="const p=this.closest('.player'); this.closest('.machine-row').remove(); syncPlayerTotalsFromMachines(p);" style="padding:4px 6px;">×</button>
+    <input class="machine-invest" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="投資" value="${mInv}" style="flex: 1; padding: 6px 6px;">
+    <input class="machine-cash" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="回収" value="${mCsh}" style="flex: 1; padding: 6px 6px;">
+    <button class="delete-btn" type="button" onclick="this.closest('.machine-row').remove()" style="padding:4px 6px;">×</button>
   `;
   container.appendChild(row);
 };
@@ -1568,22 +1536,26 @@ document.getElementById("calcBtn").onclick = async function() {
 
   pNodes.forEach(node => {
     const name = node.querySelector(".name-select").value;
-    const investStr = node.querySelector(".invest").value;
-    const cashStr = node.querySelector(".cash").value;
-    const invest = investStr === "" ? 0 : +investStr;
-    const cash = cashStr === "" ? 0 : +cashStr;
 
     let machines = [];
+    let invest = 0;
+    let cash = 0;
+
     node.querySelectorAll(".machine-row").forEach(mRow => {
       const mName = mRow.querySelector(".machine-name").value.trim();
       const mInvStr = mRow.querySelector(".machine-invest").value;
       const mCshStr = mRow.querySelector(".machine-cash").value;
+      const mInv = mInvStr === "" ? 0 : +mInvStr;
+      const mCsh = mCshStr === "" ? 0 : +mCshStr;
+
       if(mName || mInvStr !== "" || mCshStr !== "") {
         machines.push({ 
           machineName: mName || "機種未入力", 
-          machineInvest: mInvStr === "" ? 0 : +mInvStr, 
-          machineCash: mCshStr === "" ? 0 : +mCshStr 
+          machineInvest: mInv, 
+          machineCash: mCsh 
         });
+        invest += mInv;
+        cash += mCsh;
       }
     });
 
@@ -1773,10 +1745,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
   loadHistory();
   if(storedMembers.length > 0) {
-    addPlayer(storedMembers[0], "", "");
-    if(storedMembers[1]) addPlayer(storedMembers[1], "", "");
+    addPlayer(storedMembers[0]);
+    if(storedMembers[1]) addPlayer(storedMembers[1]);
   } else {
-    addPlayer("", "", "");
+    addPlayer();
   }
 });
 </script>
