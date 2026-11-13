@@ -606,7 +606,6 @@ function toggleHistoryAccordion() {
   }
 }
 
-// 機種未入力や空欄を除外して候補に登録する
 function updateMachineSuggestions() {
   const datalist = document.getElementById("machineSuggestions");
   if (!datalist) return;
@@ -1054,19 +1053,45 @@ function renderPersonalTotalsAndHistory() {
           }
         }
 
-        let machinesHtml = "";
         let machinesList = p.machines || [];
-        
-        // 機種名が入力されているもの、または金額があるものだけを整理して表示
-        machinesList.forEach(m => {
+        let validMachines = machinesList.filter(m => {
           let mName = (m.machineName || "").trim();
-          let mInv = Number(m.machineInvest || 0);
-          let mCsh = Number(m.machineCash || 0);
-          
-          if (mName && mName !== "機種未入力") {
-            machinesHtml += `<div style="font-size:10px; color:var(--text); margin-top:2px; font-weight:600;">🎰 ${mName} <span style="color:var(--muted); font-weight:normal;">(投:${new Intl.NumberFormat("ja-JP").format(mInv)}/収:${new Intl.NumberFormat("ja-JP").format(mCsh)})</span></div>`;
-          }
+          return mName && mName !== "機種未入力";
         });
+
+        let detailsHtml = "";
+        if (validMachines.length === 1) {
+          // 機種が1つの場合はすっきりと1行にまとめる
+          let m = validMachines[0];
+          detailsHtml = `
+            <div style="font-size:11px; font-weight:700; color:var(--text); margin-top:2px; margin-bottom:2px;">🎰 ${m.machineName}</div>
+            <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px;">
+              <span>投資:${new Intl.NumberFormat("ja-JP").format(m.machineInvest)}</span>
+              <span>回収:${new Intl.NumberFormat("ja-JP").format(m.machineCash)}</span>
+            </div>
+          `;
+        } else if (validMachines.length > 1) {
+          // 機種が複数の場合はそれぞれの内訳をスマートにリスト化
+          let listHtml = "";
+          validMachines.forEach(m => {
+            listHtml += `<div style="display:flex; justify-content:space-between; font-size:10px; padding:2px 0; border-bottom:1px dashed #f1f5f9;"><span>🎰 ${m.machineName}</span><span style="color:var(--muted);">投${new Intl.NumberFormat("ja-JP").format(m.machineInvest)}/収${new Intl.NumberFormat("ja-JP").format(m.machineCash)}</span></div>`;
+          });
+          detailsHtml = `
+            <div style="margin-top:2px; margin-bottom:2px;">${listHtml}</div>
+            <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px; font-weight:700;">
+              <span>合算</span>
+              <span>投資:${new Intl.NumberFormat("ja-JP").format(pInv)} / 回収:${new Intl.NumberFormat("ja-JP").format(pCsh)}</span>
+            </div>
+          `;
+        } else {
+          // 機種名未入力の場合はシンプルに投資・回収のみ
+          detailsHtml = `
+            <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px; margin-top:4px; margin-bottom:2px;">
+              <span>投資:${new Intl.NumberFormat("ja-JP").format(pInv)}</span>
+              <span>回収:${new Intl.NumberFormat("ja-JP").format(pCsh)}</span>
+            </div>
+          `;
+        }
 
         pDetails += `
           <div class="hist-player-mini">
@@ -1074,12 +1099,8 @@ function renderPersonalTotalsAndHistory() {
               <span>${p.name}</span>
               <span style="color:${p.val>=0?'var(--green)':'var(--red)'};">${money(p.val)}</span>
             </div>
-            <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px; margin-bottom:2px;">
-              <span>投資:${new Intl.NumberFormat("ja-JP").format(pInv)}</span>
-              <span>回収:${new Intl.NumberFormat("ja-JP").format(pCsh)}</span>
-            </div>
-            ${machinesHtml}
-            ${hasTransfers ? `<div style="font-size:10px; text-align:right; margin-top:3px; border-top:1px dashed var(--line); padding-top:2px;">${statusHtml}</div>` : ''}
+            ${detailsHtml}
+            ${hasTransfers ? `<div style="font-size:10px; text-align:right; margin-top:4px; border-top:1px dashed var(--line); padding-top:2px;">${statusHtml}</div>` : ''}
           </div>
         `;
       });
