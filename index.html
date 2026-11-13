@@ -638,17 +638,16 @@ async function loadHistory() {
     historyData = (jsonRes.history || []).map(item => ({ ...item, time: cleanTimeStr(item.time) }));
     serverMestMap = jsonRes.mestMap || {};
     
-    // スプシ側から取得したメンバー・機種リストを反映
     if (jsonRes.members && Array.isArray(jsonRes.members)) {
       storedMembers = jsonRes.members;
     } else {
-      storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
+      storedMembers = ["しゅうや", "まいと", "れお"];
     }
 
     if (jsonRes.machines && Array.isArray(jsonRes.machines)) {
       storedMachines = jsonRes.machines;
     } else {
-      storedMachines = JSON.parse(localStorage.getItem("nori_stored_machines") || '["スマスロ北斗の拳", "マイジャグラーV", "モンキーターンV"]');
+      storedMachines = ["スマスロ北斗の拳", "マイジャグラーV", "モンキーターンV"];
     }
     
     historyData.sort((a, b) => parseDateStrToObj(a.time) - parseDateStrToObj(b.time));
@@ -658,13 +657,12 @@ async function loadHistory() {
     historyEl.innerHTML = "履歴の読み込みに失敗しました。";
     historyData = [];
     serverMestMap = {};
-    storedMembers = ["Aさん", "Bさん", "Cさん"];
+    storedMembers = ["しゅうや", "まいと", "れお"];
     storedMachines = ["スマスロ北斗の拳", "マイジャグラーV"];
     renderAll();
   }
 }
 
-// サーバーへメンバー・機種の同期保存
 async function syncMasterData() {
   try {
     await fetch(GAS_URL, { 
@@ -1728,7 +1726,6 @@ document.getElementById("copyResultBtn").onclick = async () => {
 
 document.getElementById("addBtn").onclick = () => addPlayer();
 
-// 管理画面モーダル・タブ制御
 const masterModal = document.getElementById("masterModal");
 document.getElementById("openMasterModal").onclick = () => {
   renderMasterEdit();
@@ -1758,7 +1755,6 @@ window.switchTab = function(tabName) {
 };
 
 function renderMasterEdit() {
-  // メンバー一覧
   const mContainer = document.getElementById("memberListEdit");
   mContainer.innerHTML = "";
   storedMembers.forEach((m, idx) => {
@@ -1768,7 +1764,6 @@ function renderMasterEdit() {
     mContainer.appendChild(row);
   });
 
-  // 機種一覧
   const mcContainer = document.getElementById("machineListEdit");
   mcContainer.innerHTML = "";
   storedMachines.forEach((mc, idx) => {
