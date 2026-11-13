@@ -762,20 +762,25 @@ function renderPersonalTotalsAndHistory() {
       let sPer = s.players.length > 0 ? sProfit / s.players.length : 0;
       const fairProfitPerPerson = sPer;
 
+      let transfers = calculateTransfers(s.players);
+      let hasTransfers = transfers.length > 0;
+
       let pDetails = "";
       s.players.forEach(p => {
         let pInv = p.invest !== undefined ? Number(p.invest) : 0;
         let pCsh = p.cash !== undefined ? Number(p.cash) : 0;
         
-        const targetAmount = pInv + fairProfitPerPerson;
-        const diff = pCsh - targetAmount;
         let statusHtml = "";
-        if (diff > 1) {
-          statusHtml = `<span style="color:var(--green); font-weight:700;">貢献: ${new Intl.NumberFormat("ja-JP").format(Math.round(diff))}円</span>`;
-        } else if (diff < -1) {
-          statusHtml = `<span style="color:var(--red); font-weight:700;">強盗: ${new Intl.NumberFormat("ja-JP").format(Math.round(-diff))}円</span>`;
-        } else {
-          statusHtml = `<span style="color:var(--muted); font-weight:700;">平和: 0円</span>`;
+        if (hasTransfers) {
+          const targetAmount = pInv + fairProfitPerPerson;
+          const diff = pCsh - targetAmount;
+          if (diff > 1) {
+            statusHtml = `<span style="color:var(--green); font-weight:700;">貢献: ${new Intl.NumberFormat("ja-JP").format(Math.round(diff))}円</span>`;
+          } else if (diff < -1) {
+            statusHtml = `<span style="color:var(--red); font-weight:700;">強盗: ${new Intl.NumberFormat("ja-JP").format(Math.round(-diff))}円</span>`;
+          } else {
+            statusHtml = `<span style="color:var(--muted); font-weight:700;">平和: 0円</span>`;
+          }
         }
 
         pDetails += `
@@ -788,14 +793,13 @@ function renderPersonalTotalsAndHistory() {
               <span>投資:${new Intl.NumberFormat("ja-JP").format(pInv)}</span>
               <span>回収:${new Intl.NumberFormat("ja-JP").format(pCsh)}</span>
             </div>
-            <div style="font-size:10px; text-align:right;">${statusHtml}</div>
+            ${hasTransfers ? `<div style="font-size:10px; text-align:right;">${statusHtml}</div>` : ''}
           </div>
         `;
       });
 
-      let transfers = calculateTransfers(s.players);
       let transferHtml = "";
-      if (transfers.length > 0) {
+      if (hasTransfers) {
         let rows = "";
         transfers.forEach(t => {
           rows += `<div style="display:flex; justify-content:space-between; font-size:11px; padding:2px 0; border-bottom:1px solid #dcfce7;"><span><b>${t.from}</b> → ${t.to}</span><span style="color:var(--green); font-weight:800;">${new Intl.NumberFormat("ja-JP").format(t.amount)}円</span></div>`;
@@ -806,9 +810,6 @@ function renderPersonalTotalsAndHistory() {
             ${rows}
           </div>
         `;
-      } else {
-        // 平和の場合は余計な表示を完全に省く
-        transferHtml = "";
       }
 
       sessionsHtml += `
