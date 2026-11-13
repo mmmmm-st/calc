@@ -678,20 +678,49 @@ function renderPersonalTotalsAndHistory() {
     const totalProfit = h.players.reduce((sum, p) => sum + Number(p.val || 0), 0);
     const fairProfitPerPerson = h.players.length > 0 ? totalProfit / h.players.length : 0;
 
+    let sessionPay = [];
+    let sessionReceive = [];
+    
+    h.players.forEach(p => {
+      const pInv = p.invest !== undefined ? Number(p.invest) : 0;
+      const pCsh = p.cash !== undefined ? Number(p.cash) : 0;
+      const targetAmount = pInv + fairProfitPerPerson;
+      const diff = pCsh - targetAmount;
+      if (diff > 1) {
+        sessionPay.push({ name: p.name, amount: diff });
+      } else if (diff < -1) {
+        sessionReceive.push({ name: p.name, amount: -diff });
+      }
+    });
+
+    let sessionTransfers = [];
+    sessionPay.forEach(p => {
+      sessionReceive.forEach(r => {
+        if(p.amount <= 0 || r.amount <= 0) return;
+        const move = Math.min(p.amount, r.amount);
+        sessionTransfers.push({ from: p.name, to: r.name, amount: move });
+        p.amount -= move;
+        r.amount -= move;
+      });
+    });
+
+    let netTransferMap = {};
+    h.players.forEach(p => netTransferMap[p.name] = 0);
+    sessionTransfers.forEach(t => {
+      netTransferMap[t.from] -= t.amount;
+      netTransferMap[t.to] += t.amount;
+    });
+
     h.players.forEach(p => {
       if(!pStats[p.name]) {
-        pStats[p.name] = { total: 0, count: 0, wins: 0, diffSum: 0 };
+        pStats[p.name] = { total: 0, count: 0, wins: 0, netTransferSum: 0 };
       }
       pStats[p.name].total += Number(p.val);
       pStats[p.name].count += 1;
       if(Number(p.val) >= 0) {
         pStats[p.name].wins += 1;
       }
-      const pInv = p.invest !== undefined ? Number(p.invest) : 0;
-      const pCsh = p.cash !== undefined ? Number(p.cash) : 0;
-      const targetAmount = pInv + fairProfitPerPerson;
-      const diff = pCsh - targetAmount;
-      pStats[p.name].diffSum += diff;
+      pStats[p.name].netTransferSum += netTransferMap[p.name];
     });
   });
 
@@ -702,11 +731,11 @@ function renderPersonalTotalsAndHistory() {
     const canConsume = mestCount > 0;
 
     let settleSummaryHtml = "";
-    const roundedDiff = Math.round(s.diffSum);
-    if (roundedDiff > 1) {
-      settleSummaryHtml = `<div style="font-size:11px; font-weight:700; color:var(--green); margin-bottom:4px;">貢献: ${new Intl.NumberFormat("ja-JP").format(roundedDiff)}円</div>`;
-    } else if (roundedDiff < -1) {
-      settleSummaryHtml = `<div style="font-size:11px; font-weight:700; color:var(--red); margin-bottom:4px;">強盗: ${new Intl.NumberFormat("ja-JP").format(Math.round(-roundedDiff))}円</div>`;
+    const roundedNet = Math.round(s.netTransferSum);
+    if (roundedNet > 1) {
+      settleSummaryHtml = `<div style="font-size:11px; font-weight:700; color:var(--green); margin-bottom:4px;">貢献: ${new Intl.NumberFormat("ja-JP").format(roundedNet)}円</div>`;
+    } else if (roundedNet < -1) {
+      settleSummaryHtml = `<div style="font-size:11px; font-weight:700; color:var(--red); margin-bottom:4px;">強盗: ${new Intl.NumberFormat("ja-JP").format(Math.round(-roundedNet))}円</div>`;
     } else {
       settleSummaryHtml = `<div style="font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px;">平和: 0円</div>`;
     }
@@ -773,11 +802,16 @@ function renderPersonalTotalsAndHistory() {
         let statusHtml = "";
         if (hasTransfers) {
           const targetAmount = pInv + fairProfitPerPerson;
-          const diff = pCsh - targetAmount;
-          if (diff > 1) {
-            statusHtml = `<span style="color:var(--green); font-weight:700;">貢献: ${new Intl.NumberFormat("ja-JP").format(Math.round(diff))}円</span>`;
-          } else if (diff < -1) {
-            statusHtml = `<span style="color:var(--red); font-weight:700;">強盗: ${new Intl.NumberFormat("ja-JP").format(Math.round(-diff))}円</span>`;
+          let netDiff = 0;
+          transfers.forEach(t => {
+            if (t.from === p.name) netDiff -= t.amount;
+            if (t.to === p.name) netDiff += t.amount;
+          });
+
+          if (netDiff > 0) {
+            statusHtml = `<span style="color:var(--green); font-weight:700;">貢献: ${new Intl.NumberFormat("ja-JP").format(Math.round(netDiff))}円</span>`;
+          } else if (netDiff < 0) {
+            statusHtml = `<span style="color:var(--red); font-weight:700;">強盗: ${new Intl.NumberFormat("ja-JP").format(Math.round(-netDiff))}円</span>`;
           } else {
             statusHtml = `<span style="color:var(--muted); font-weight:700;">平和: 0円</span>`;
           }
@@ -836,7 +870,7 @@ function renderPersonalTotalsAndHistory() {
       <div class="hist-date-header">📅 ${dateStr}</div>
       <div class="hist-day-summary">
         <div class="hist-day-summary-left">
-          <span style="font-size:11px; opacity:0.9;">その日のトータル:</span>
+          <span style="font-size:11px; opacity:0.9;">トータル:</span>
           <span style="font-size:15px; font-weight:900; white-space:nowrap;">${money(dayTotalProfit)}</span>
         </div>
         <span class="hist-day-per">1人: ${money(dayPerProfit)}</span>
