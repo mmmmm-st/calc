@@ -151,6 +151,7 @@ button {
   width: 100%;
 }
 button:active { transform: scale(0.98); }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .main-btn { background: var(--gradient); color: white; margin: 4px 0 12px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
 .sub-btn { background: #f1f5f9; color: var(--text); border: 1px solid var(--line); }
@@ -272,7 +273,7 @@ svg {
   height: 240px;
 }
 
-.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-bottom: 12px; }
+.personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-bottom: 12px; }
 .personal-card { background: #f8fafc; border-radius: 12px; padding: 10px; border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
 .personal-card .name-label { font-size: 12px; color: var(--text); font-weight: 700; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .personal-card .amount-value { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
@@ -284,7 +285,7 @@ svg {
   align-items: center; 
   border-top: 1px solid var(--line); 
   padding-top: 6px; 
-  margin-top: 2px; 
+  margin-top: 4px; 
   font-size: 11px; 
   font-weight: 700; 
   gap: 4px;
@@ -300,9 +301,10 @@ svg {
   width: auto !important; 
 }
 .mest-btn:disabled {
-  background: #f1f5f9;
+  background: transparent;
   color: #cbd5e1;
-  cursor: not-allowed;
+  border: none;
+  cursor: default;
 }
 
 .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px; }
@@ -317,7 +319,19 @@ th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: lef
 tr:last-child td { border-bottom: none; }
 
 .pay-box { margin-top: 12px; border-radius: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; }
-.pay-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #fff; margin-bottom: 4px; border-radius: 6px; border: 1px solid #dcfce7; font-size: 12px; }
+.pay-row { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 6px 8px; 
+  background: #fff; 
+  margin-bottom: 4px; 
+  border-radius: 6px; 
+  border: 1px solid #dcfce7; 
+  font-size: 12px; 
+  white-space: nowrap; /* 👈 ここを追加して絶対に1行に収まるように修正しました */
+  gap: 8px;
+}
 
 .hist-item { 
   background: #ffffff; 
@@ -414,6 +428,84 @@ tr:last-child td { border-bottom: none; }
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
 .modal-content { background: #fff; padding: 16px; border-radius: 16px; width: 92%; max-width: 420px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+
+/* ルーレットスタイル */
+.wheel-wrapper {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  margin: 8px auto 14px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wheel-pointer {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 22px solid #ef4444;
+  z-index: 10;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+}
+#rouletteCanvas {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.15);
+}
+.roulette-result-banner {
+  background: var(--accent-light);
+  border: 1.5px solid var(--accent);
+  border-radius: 10px;
+  padding: 8px 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 12px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stock-editor-box {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 12px;
+}
+.stock-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.stock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 3px 8px 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+.stock-chip button {
+  background: none;
+  color: var(--red);
+  padding: 0 2px;
+  font-size: 13px;
+  width: auto;
+  line-height: 1;
+}
 </style>
 </head>
 <body>
@@ -424,7 +516,10 @@ tr:last-child td { border-bottom: none; }
 <div class="wrap">
   <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
     <h1>🎰 ノリ打ち精算</h1>
-    <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 6px 10px; font-size: 11px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
+    <div style="display:flex; gap:6px;">
+      <button class="sub-btn" id="openRouletteModal" style="width: auto; padding: 6px 10px; font-size: 11px; background: var(--gradient); color: #fff; border: none; font-weight: 700;">🎯 飯ストルーレット</button>
+      <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 6px 10px; font-size: 11px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
+    </div>
   </div>
 
   <div class="card" style="padding: 12px;">
@@ -496,7 +591,10 @@ tr:last-child td { border-bottom: none; }
   </div>
 
   <div class="card">
-    <h2>個人別実績・飯スト</h2>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 style="margin:0;">個人別実績・ストック</h2>
+      <button class="sub-btn" id="settleAllKinstBtn" onclick="settleAllKinst()" style="width:auto; padding:4px 10px; font-size:10px; background:#fff1f2; color:var(--red); border:1px solid #fecdd3; font-weight:700; display:none;">🧹 金スト一括精算</button>
+    </div>
     <div id="personalTotals" class="personal-total-grid"></div>
     <div style="font-size: 10px; color: var(--muted); margin-bottom: 0px;">※選択中の組み合わせ・期間に参加しているメンバーのみ表示されます。</div>
   </div>
@@ -526,6 +624,38 @@ tr:last-child td { border-bottom: none; }
   </div>
 </div>
 
+<!-- 飯ストルーレットモーダル -->
+<div class="modal" id="rouletteModal">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <h2 style="margin:0;">🎯 飯ストルーレット</h2>
+      <button class="sub-btn" id="resetRouletteBtn" style="width:auto; padding:4px 8px; font-size:10px;">最初から</button>
+    </div>
+
+    <div class="roulette-result-banner" id="rouletteBanner">① まずは当選メンバーを抽選！</div>
+    
+    <div class="wheel-wrapper">
+      <div class="wheel-pointer"></div>
+      <canvas id="rouletteCanvas" width="500" height="500"></canvas>
+    </div>
+
+    <button class="main-btn" id="startRouletteBtn" style="margin-bottom: 10px;">🚀 ルーレットを回す！</button>
+
+    <div class="stock-editor-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span style="font-size:11px; font-weight:700; color:var(--muted);">⚙️ ストック数のマス設定（自由に追加・削除）</span>
+      </div>
+      <div class="stock-chips" id="stockChipsContainer"></div>
+      <div style="display:flex; gap:6px;">
+        <input type="number" id="newStockValInput" placeholder="個数 (例: 1)" style="padding:6px 8px; font-size:14px; background:#fff;">
+        <button class="sub-btn" id="addStockValBtn" style="width:auto; padding:6px 12px; font-size:12px; background:var(--accent); color:#fff; border:none; white-space:nowrap;">＋ 追加</button>
+      </div>
+    </div>
+
+    <button class="sub-btn" id="closeRouletteModalBtn" style="background: #f1f5f9; padding: 10px;">閉じる</button>
+  </div>
+</div>
+
 <!-- 履歴修正モーダル -->
 <div class="modal" id="editModal">
   <div class="modal-content">
@@ -552,11 +682,60 @@ function money(v){
 
 let historyData = [];
 let serverMestMap = {};
+let serverKinstMap = {}; 
 let lastShareMessage = "";
 let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
+let stockOptions = JSON.parse(localStorage.getItem("nori_stock_options") || '[1, 2, 3, 4, 5, 6]');
 let sTop = 0;
 let isInitialFilterSet = false;
 let editingRowIdx = null;
+
+// --- Web Audio API による効果音生成 ---
+let audioCtx = null;
+function getAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+function playTickSound() {
+  try {
+    const ctx = getAudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(650, ctx.currentTime);
+    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.06);
+  } catch(e) {}
+}
+
+function playWinSound() {
+  try {
+    const ctx = getAudioContext();
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.11);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime + idx * 0.11);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.11 + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + idx * 0.11);
+      osc.stop(ctx.currentTime + idx * 0.11 + 0.35);
+    });
+  } catch(e) {}
+}
 
 function openModal(modalEl) {
   sTop = window.scrollY;
@@ -640,6 +819,7 @@ async function loadHistory() {
     
     historyData = (jsonRes.history || []).map(item => ({ ...item, time: cleanTimeStr(item.time) }));
     serverMestMap = jsonRes.mestMap || {};
+    serverKinstMap = jsonRes.kinstMap || {};
     
     historyData.sort((a, b) => parseDateStrToObj(a.time) - parseDateStrToObj(b.time));
     updateMachineSuggestions();
@@ -648,32 +828,106 @@ async function loadHistory() {
     historyEl.innerHTML = "履歴の読み込みに失敗しました。";
     historyData = [];
     serverMestMap = {};
+    serverKinstMap = {};
     renderAll();
   }
 }
 
+// 飯スト消費（高速化：描画を即時反映して裏で同期）
 window.updateMemberMest = async function(name, delta) {
   let currentCount = serverMestMap[name] || 0;
-  if(delta < 0 && currentCount <= 0) {
-    alert("消費できる飯ストがありません。");
-    return;
-  }
+  if(delta < 0 && currentCount <= 0) return;
   
   if(!confirm(`「${name}」の飯ストを1つ消費しますか？`)) return;
 
-  document.getElementById("loading").style.display = "block";
+  serverMestMap[name] = Math.max(0, currentCount + delta);
+  renderPersonalTotalsAndHistory();
+
   try {
-    await fetch(GAS_URL, { 
+    fetch(GAS_URL, { 
       method: "POST", 
       mode: "no-cors", 
       body: JSON.stringify({ method: "UPDATE_MEST", name: name, delta: delta }) 
     });
-    await loadHistory();
+  } catch(e) {
+    console.error(e);
+  }
+};
+
+// ★金スト一括精算（高速化）
+window.settleAllKinst = async function() {
+  if(!confirm("未清算の金スト（全員分）をすべて精算（リセット）して 0円 にしますか？")) return;
+
+  document.getElementById("loading").style.display = "block";
+
+  let updates = [];
+  for (let name in serverKinstMap) {
+    let amt = serverKinstMap[name];
+    if (amt !== 0) {
+      updates.push({ name: name, delta: -amt });
+      serverKinstMap[name] = 0;
+    }
+  }
+
+  renderPersonalTotalsAndHistory();
+
+  try {
+    await Promise.all(updates.map(u => 
+      fetch(GAS_URL, { 
+        method: "POST", 
+        mode: "no-cors", 
+        body: JSON.stringify({ method: "UPDATE_KINST", name: u.name, delta: u.delta }) 
+      })
+    ));
   } catch(e) {
     console.error(e);
   }
   document.getElementById("loading").style.display = "none";
 };
+
+window.stockKinstFromSession = async function(sessionTransfersStr) {
+  try {
+    let transfers = JSON.parse(decodeURIComponent(sessionTransfersStr));
+    if(!transfers || transfers.length === 0) return;
+
+    let summaryText = transfers.map(t => `${t.from} → ${t.to}: ${t.amount}円`).join("\n");
+    if(!confirm(`以下の受け渡し内容をそれぞれの金ストとして未清算ストックに登録しますか？\n\n${summaryText}`)) return;
+
+    document.getElementById("loading").style.display = "block";
+
+    let requests = [];
+    for (let t of transfers) {
+      serverKinstMap[t.from] = (serverKinstMap[t.from] || 0) - t.amount;
+      serverKinstMap[t.to] = (serverKinstMap[t.to] || 0) + t.amount;
+
+      requests.push(fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "UPDATE_KINST", name: t.from, delta: -t.amount }) }));
+      requests.push(fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "UPDATE_KINST", name: t.to, delta: t.amount }) }));
+    }
+
+    await Promise.all(requests);
+    renderPersonalTotalsAndHistory();
+    alert("金ストに登録しました！");
+  } catch(e) {
+    console.error(e);
+    alert("金ストへの登録に失敗しました。");
+  }
+  document.getElementById("loading").style.display = "none";
+};
+
+async function addMemberMestDirect(name, count) {
+  if (count === 0) return;
+  serverMestMap[name] = (serverMestMap[name] || 0) + count;
+  renderPersonalTotalsAndHistory();
+  try {
+    fetch(GAS_URL, { 
+      method: "POST", 
+      mode: "no-cors", 
+      body: JSON.stringify({ method: "UPDATE_MEST", name: name, delta: count }) 
+    });
+  } catch(e) {
+    console.error(e);
+  }
+}
 
 async function deleteHistory(rowIdx) {
   if(!confirm("この回の履歴を削除しますか？")) return;
@@ -681,10 +935,10 @@ async function deleteHistory(rowIdx) {
   document.getElementById("loading").style.display = "block";
   try {
     await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: rowIdx }) });
+    await loadHistory();
   } catch(e) {
     console.error(e);
   }
-  await loadHistory();
   document.getElementById("loading").style.display = "none";
 }
 
@@ -840,11 +1094,11 @@ document.getElementById("saveEditBtn").onclick = async function() {
       players: players 
     };
     await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(updatedHist) });
+    await loadHistory();
   } catch (e) {
     console.error(e);
   }
 
-  await loadHistory();
   document.getElementById("loading").style.display = "none";
 };
 
@@ -964,11 +1218,18 @@ function renderPersonalTotalsAndHistory() {
     });
   });
 
+  let hasAnyKinst = Object.values(serverKinstMap).some(v => v !== 0);
+  const settleAllBtn = document.getElementById("settleAllKinstBtn");
+  if(settleAllBtn) {
+    settleAllBtn.style.display = hasAnyKinst ? "block" : "none";
+  }
+
   Object.keys(pStats).sort().forEach(name => {
     const s = pStats[name];
     const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
     let mestCount = serverMestMap[name] || 0;
-    const canConsume = mestCount > 0;
+    let kinstAmount = serverKinstMap[name] || 0;
+    const canConsumeMest = mestCount > 0;
 
     let settleSummaryHtml = "";
     const roundedNet = Math.round(s.netTransferSum);
@@ -979,6 +1240,12 @@ function renderPersonalTotalsAndHistory() {
     } else {
       settleSummaryHtml = `<div style="font-size:10px; font-weight:700; color:var(--muted); margin-bottom:2px;">平和: 0円</div>`;
     }
+
+    let kinstColor = kinstAmount > 0 ? "var(--green)" : (kinstAmount < 0 ? "var(--red)" : "var(--muted)");
+
+    let mestBtnHtml = canConsumeMest 
+      ? `<button class="mest-btn" onclick="updateMemberMest('${name}', -1)">消費</button>` 
+      : `<button class="mest-btn" disabled>-</button>`;
 
     const pCard = document.createElement("div");
     pCard.className = "personal-card";
@@ -992,9 +1259,15 @@ function renderPersonalTotalsAndHistory() {
         </div>
         ${settleSummaryHtml}
       </div>
-      <div class="mest-row">
-        <span class="mest-text">飯スト: <b style="color:var(--accent);">${mestCount}</b></span>
-        <button class="mest-btn" ${!canConsume ? 'disabled style="background:#f1f5f9;color:#cbd5e1;cursor:not-allowed;"' : ''} onclick="updateMemberMest('${name}', -1)">消費</button>
+      <div>
+        <div class="mest-row">
+          <span class="mest-text">飯スト: <b style="color:var(--accent);">${mestCount}</b></span>
+          ${mestBtnHtml}
+        </div>
+        <div class="mest-row" style="border-top:none; margin-top:2px; padding-top:2px;">
+          <span class="mest-text">金スト: <b style="color:${kinstColor};">${new Intl.NumberFormat("ja-JP").format(kinstAmount)}円</b></span>
+          <span style="font-size:10px; color:var(--muted);">-</span>
+        </div>
       </div>
     `;
     personalEl.appendChild(pCard);
@@ -1097,15 +1370,23 @@ function renderPersonalTotalsAndHistory() {
       });
 
       let transferHtml = "";
+      let kinstBtnHtml = "";
       if (hasTransfers) {
         let rows = "";
         transfers.forEach(t => {
-          rows += `<div style="display:flex; justify-content:space-between; font-size:10px; padding:1px 0; border-bottom:1px solid #dcfce7;"><span><b>${t.from}</b> → ${t.to}</span><span style="color:var(--green); font-weight:800;">${new Intl.NumberFormat("ja-JP").format(t.amount)}円</span></div>`;
+          rows += `<div class="pay-row"><span><b>${t.from}</b> → ${t.to}</span><span style="color:var(--green); font-weight:800;">${new Intl.NumberFormat("ja-JP").format(t.amount)}円</span></div>`;
         });
+        
+        let encodedTransfers = encodeURIComponent(JSON.stringify(transfers));
+        kinstBtnHtml = `
+          <button class="sub-btn" onclick="stockKinstFromSession('${encodedTransfers}')" style="margin-top:6px; padding:6px 8px; font-size:11px; background:#fff; color:var(--accent); font-weight:700; border:1px solid var(--accent);">💰 この回の受け渡しを金ストに登録する</button>
+        `;
+
         transferHtml = `
-          <div style="margin-top:4px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:4px 6px;">
-            <div style="font-weight:700; color:#166534; font-size:9px; margin-bottom:1px;">💸 お金の受け渡し</div>
+          <div style="margin-top:4px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:6px 8px;">
+            <div style="font-weight:700; color:#166534; font-size:10px; margin-bottom:2px;">💸 お金の受け渡し指示</div>
             ${rows}
+            ${kinstBtnHtml}
           </div>
         `;
       }
@@ -1703,11 +1984,11 @@ document.getElementById("calcBtn").onclick = async function() {
       mode: "no-cors", 
       body: JSON.stringify(newHist) 
     });
+    await loadHistory();
   } catch (e) {
     console.error(e);
   }
 
-  await loadHistory();
   document.getElementById("loading").style.display = "none";
 };
 
@@ -1722,6 +2003,7 @@ document.getElementById("copyResultBtn").onclick = async () => {
 
 document.getElementById("addBtn").onclick = () => addPlayer();
 
+// メンバー管理モーダル
 const modal = document.getElementById("memberModal");
 document.getElementById("openMemberModal").onclick = () => {
   renderMemberListEdit();
@@ -1729,6 +2011,223 @@ document.getElementById("openMemberModal").onclick = () => {
 };
 document.getElementById("closeModalBtn").onclick = () => {
   closeModal(modal);
+};
+
+// ==========================================
+// 🎯 飯ストルーレットエンジン
+// ==========================================
+const rouletteModal = document.getElementById("rouletteModal");
+const wheelCanvas = document.getElementById("rouletteCanvas");
+const wheelCtx = wheelCanvas.getContext("2d");
+
+const wheelColors = [
+  "#ff6b6b", "#4ecdc4", "#45b7d1", "#ffa07a", 
+  "#98d8c8", "#f7dc6f", "#bb8fce", "#f1948a"
+];
+
+let rouletteState = "member"; 
+let selectedWinner = "";
+let wheelRotation = 0; 
+let isSpinning = false;
+let currentWheelItems = [];
+
+function getFilteredMembers() {
+  const comboSelect = document.getElementById("combinationSelect");
+  const selectedCombo = comboSelect ? comboSelect.value : "";
+  if (!selectedCombo) return storedMembers;
+  const list = selectedCombo.split(", ").map(s => s.trim()).filter(Boolean);
+  return list.length > 0 ? list : storedMembers;
+}
+
+function drawWheel(items, rotationAngle) {
+  const cx = wheelCanvas.width / 2;
+  const cy = wheelCanvas.height / 2;
+  const radius = cx - 8;
+
+  wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+  if (!items || items.length === 0) return;
+
+  const sliceAngle = (2 * Math.PI) / items.length;
+
+  items.forEach((item, i) => {
+    const startAngle = rotationAngle + i * sliceAngle;
+    const endAngle = startAngle + sliceAngle;
+
+    wheelCtx.beginPath();
+    wheelCtx.moveTo(cx, cy);
+    wheelCtx.arc(cx, cy, radius, startAngle, endAngle);
+    wheelCtx.closePath();
+    wheelCtx.fillStyle = wheelColors[i % wheelColors.length];
+    wheelCtx.fill();
+
+    wheelCtx.lineWidth = 4;
+    wheelCtx.strokeStyle = "#ffffff";
+    wheelCtx.stroke();
+
+    wheelCtx.save();
+    wheelCtx.translate(cx, cy);
+    wheelCtx.rotate(startAngle + sliceAngle / 2);
+    wheelCtx.textAlign = "right";
+    wheelCtx.textBaseline = "middle";
+    wheelCtx.fillStyle = "#ffffff";
+    wheelCtx.font = "bold 28px -apple-system, BlinkMacSystemFont, sans-serif";
+    wheelCtx.shadowColor = "rgba(0,0,0,0.2)";
+    wheelCtx.shadowBlur = 4;
+    wheelCtx.fillText(String(item), radius - 36, 0);
+    wheelCtx.restore();
+  });
+
+  wheelCtx.beginPath();
+  wheelCtx.arc(cx, cy, 28, 0, 2 * Math.PI);
+  wheelCtx.fillStyle = "#0f172a";
+  wheelCtx.fill();
+  wheelCtx.lineWidth = 4;
+  wheelCtx.strokeStyle = "#ffffff";
+  wheelCtx.stroke();
+}
+
+function renderStockChips() {
+  const container = document.getElementById("stockChipsContainer");
+  container.innerHTML = "";
+  stockOptions.forEach((val, idx) => {
+    const chip = document.createElement("span");
+    chip.className = "stock-chip";
+    chip.innerHTML = `${val}個 <button type="button" onclick="removeStockOption(${idx})">×</button>`;
+    container.appendChild(chip);
+  });
+  if (rouletteState === "count" && !isSpinning) {
+    currentWheelItems = [...stockOptions];
+    drawWheel(currentWheelItems, wheelRotation);
+  }
+}
+
+window.removeStockOption = function(idx) {
+  if (stockOptions.length <= 1) {
+    alert("最低1つはマスを残してください。");
+    return;
+  }
+  stockOptions.splice(idx, 1);
+  localStorage.setItem("nori_stock_options", JSON.stringify(stockOptions));
+  renderStockChips();
+};
+
+document.getElementById("addStockValBtn").onclick = () => {
+  const input = document.getElementById("newStockValInput");
+  const val = parseInt(input.value, 10);
+  if (isNaN(val) || val < 0) {
+    alert("0以上の数字を入力してください。");
+    return;
+  }
+  stockOptions.push(val);
+  localStorage.setItem("nori_stock_options", JSON.stringify(stockOptions));
+  input.value = "";
+  renderStockChips();
+};
+
+function setupMemberWheel() {
+  rouletteState = "member";
+  selectedWinner = "";
+  wheelRotation = -Math.PI / 2;
+  currentWheelItems = getFilteredMembers();
+  drawWheel(currentWheelItems, wheelRotation);
+  document.getElementById("rouletteBanner").textContent = "① まずは当選メンバーを抽選！";
+  document.getElementById("startRouletteBtn").textContent = "🚀 メンバーを抽選！";
+}
+
+document.getElementById("openRouletteModal").onclick = () => {
+  renderStockChips();
+  setupMemberWheel();
+  openModal(rouletteModal);
+};
+
+document.getElementById("resetRouletteBtn").onclick = () => {
+  if (isSpinning) return;
+  setupMemberWheel();
+};
+
+document.getElementById("closeRouletteModalBtn").onclick = () => {
+  if (isSpinning) return;
+  closeModal(rouletteModal);
+};
+
+document.getElementById("startRouletteBtn").onclick = () => {
+  if (isSpinning) return;
+  if (!currentWheelItems || currentWheelItems.length === 0) {
+    alert("抽選対象がありません。");
+    return;
+  }
+
+  isSpinning = true;
+  const btn = document.getElementById("startRouletteBtn");
+  const banner = document.getElementById("rouletteBanner");
+  btn.disabled = true;
+
+  const extraSpins = (6 + Math.random() * 3) * 2 * Math.PI;
+  const duration = 3600; 
+  const startRotation = wheelRotation;
+  const targetRotation = startRotation + extraSpins;
+  const startTime = performance.now();
+
+  const sliceAngle = (2 * Math.PI) / currentWheelItems.length;
+  let lastSliceIdx = -1;
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easeOut = 1 - Math.pow(1 - progress, 4);
+
+    wheelRotation = startRotation + (targetRotation - startRotation) * easeOut;
+    drawWheel(currentWheelItems, wheelRotation);
+
+    const pointerAngle = (3 * Math.PI) / 2; 
+    const normalizedAngle = ((pointerAngle - wheelRotation) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+    const currentIndex = Math.floor(normalizedAngle / sliceAngle) % currentWheelItems.length;
+
+    if (currentIndex !== lastSliceIdx) {
+      playTickSound();
+      lastSliceIdx = currentIndex;
+    }
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      isSpinning = false;
+      btn.disabled = false;
+      playWinSound();
+
+      const winnerItem = currentWheelItems[currentIndex];
+
+      if (rouletteState === "member") {
+        selectedWinner = winnerItem;
+        banner.textContent = `🎉 当選：${selectedWinner}！次はストック数を抽選！`;
+        
+        setTimeout(() => {
+          rouletteState = "count";
+          currentWheelItems = [...stockOptions];
+          wheelRotation = -Math.PI / 2;
+          drawWheel(currentWheelItems, wheelRotation);
+          btn.textContent = `🚀 ${selectedWinner} のストック数を抽選！`;
+        }, 900);
+
+      } else if (rouletteState === "count") {
+        const wonCount = Number(winnerItem);
+        banner.textContent = `✨ ${selectedWinner} に飯スト +${wonCount}個 追加！`;
+        btn.textContent = "もう一度最初から回す";
+        rouletteState = "member";
+
+        addMemberMestDirect(selectedWinner, wonCount);
+
+        setTimeout(() => {
+          if (!isSpinning && rouletteState === "member") {
+            currentWheelItems = getFilteredMembers();
+            drawWheel(currentWheelItems, -Math.PI / 2);
+          }
+        }, 2200);
+      }
+    }
+  }
+
+  requestAnimationFrame(animate);
 };
 
 function renderMemberListEdit() {
@@ -1766,7 +2265,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
+  const dd = String(today.getDate()).padEnd ? String(today.getDate()).padStart(2, '0') : String(today.getDate());
   document.getElementById("recordDateInput").value = `${yyyy}-${mm}-${dd}`;
 
   loadHistory();
