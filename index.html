@@ -1991,15 +1991,17 @@ document.getElementById("calcBtn").onclick = async function() {
       body: JSON.stringify(newHist) 
     });
 
-    // 2. 参加メンバー全員の飯ストを +1 加算して送信（元の仕様を復元）
-    const uniqueNames = [...new Set(snapshot.map(p => p.name))];
-    await Promise.all(uniqueNames.map(name => 
-      fetch(GAS_URL, { 
-        method: "POST", 
-        mode: "no-cors", 
-        body: JSON.stringify({ method: "UPDATE_MEST", name: name, delta: 1 }) 
-      })
-    ));
+    // 2. セッション内で最も収支が良かった（値が一番大きい）プレイヤーを1人特定して飯スト +1 を付与
+    if (snapshot.length > 0) {
+      let bestPlayer = snapshot.reduce((prev, current) => (current.val > prev.val) ? current : prev);
+      if (bestPlayer) {
+        await fetch(GAS_URL, { 
+          method: "POST", 
+          mode: "no-cors", 
+          body: JSON.stringify({ method: "UPDATE_MEST", name: bestPlayer.name, delta: 1 }) 
+        });
+      }
+    }
 
     await loadHistory();
   } catch (e) {
@@ -2251,6 +2253,7 @@ document.getElementById("startRouletteBtn").onclick = () => {
 function renderMemberListEdit() {
   const container = document.getElementById("memberListEdit");
   container.innerHTML = "";
+  storedMembers.storedMembers.forEach((m, idx) => {}); // placeholder
   storedMembers.forEach((m, idx) => {
     const row = document.createElement("div");
     row.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:#f8fafc; padding:6px 10px; border-radius:6px; border:1px solid var(--line);";
