@@ -1032,6 +1032,7 @@ window.addEditMachineRow = function(container, mName = "", mInv = "", mCsh = "")
   container.appendChild(row);
 };
 
+// ★ 安全な上書き保存（通信の競合によるデータ消失を防ぐためEDITメソッドに統合）
 document.getElementById("saveEditBtn").onclick = async function() {
   const pNodes = document.querySelectorAll("#editPlayersContainer .player");
   if(pNodes.length === 0) {
@@ -1091,17 +1092,25 @@ document.getElementById("saveEditBtn").onclick = async function() {
   document.getElementById("loading").style.display = "block";
 
   try {
-    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: editingRowIdx }) });
-    
-    const updatedHist = {
-      time: formattedDateStr, 
-      profit: totalProfit, 
-      players: players 
+    // 1回のPOSTリクエストで安全に上書き更新する
+    const updatePayload = {
+      method: "EDIT",
+      rowIdx: editingRowIdx,
+      time: formattedDateStr,
+      profit: totalProfit,
+      players: players
     };
-    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(updatedHist) });
+
+    await fetch(GAS_URL, { 
+      method: "POST", 
+      mode: "no-cors", 
+      body: JSON.stringify(updatePayload) 
+    });
+
     await loadHistory();
   } catch (e) {
     console.error(e);
+    alert("保存に失敗しました。通信環境を確認してください。");
   }
 
   document.getElementById("loading").style.display = "none";
@@ -1991,7 +2000,7 @@ document.getElementById("calcBtn").onclick = async function() {
       body: JSON.stringify(newHist) 
     });
 
-    // 2. セッション内で最も収支が良かった（値が一番大きい）プレイヤーを1人特定して飯スト +1 を付与
+    // 2. セッション内で最も成績が良かった人に自動で飯スト +1 を付与（元の仕様）
     if (snapshot.length > 0) {
       let bestPlayer = snapshot.reduce((prev, current) => (current.val > prev.val) ? current : prev);
       if (bestPlayer) {
@@ -2253,7 +2262,6 @@ document.getElementById("startRouletteBtn").onclick = () => {
 function renderMemberListEdit() {
   const container = document.getElementById("memberListEdit");
   container.innerHTML = "";
-  storedMembers.storedMembers.forEach((m, idx) => {}); // placeholder
   storedMembers.forEach((m, idx) => {
     const row = document.createElement("div");
     row.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:#f8fafc; padding:6px 10px; border-radius:6px; border:1px solid var(--line);";
