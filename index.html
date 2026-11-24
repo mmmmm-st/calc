@@ -833,7 +833,7 @@ async function loadHistory() {
   }
 }
 
-// 飯スト消費（確実にサーバーへ保存してから描画）
+// 飯スト消費
 window.updateMemberMest = async function(name, delta) {
   let currentCount = serverMestMap[name] || 0;
   if(delta < 0 && currentCount <= 0) return;
@@ -916,7 +916,7 @@ window.stockKinstFromSession = async function(sessionTransfersStr) {
   document.getElementById("loading").style.display = "none";
 };
 
-// 飯スト追加（ルーレット当選時の確実な同期処理）
+// 飯スト追加（ルーレット当選時）
 async function addMemberMestDirect(name, count) {
   if (!name || count === 0) return;
   document.getElementById("loading").style.display = "block";
@@ -1984,11 +1984,23 @@ document.getElementById("calcBtn").onclick = async function() {
   document.getElementById("loading").style.display = "block";
   
   try {
+    // 1. 精算履歴を送信
     await fetch(GAS_URL, { 
       method: "POST", 
       mode: "no-cors", 
       body: JSON.stringify(newHist) 
     });
+
+    // 2. 参加メンバー全員の飯ストを +1 加算して送信（元の仕様を復元）
+    const uniqueNames = [...new Set(snapshot.map(p => p.name))];
+    await Promise.all(uniqueNames.map(name => 
+      fetch(GAS_URL, { 
+        method: "POST", 
+        mode: "no-cors", 
+        body: JSON.stringify({ method: "UPDATE_MEST", name: name, delta: 1 }) 
+      })
+    ));
+
     await loadHistory();
   } catch (e) {
     console.error(e);
