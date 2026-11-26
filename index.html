@@ -217,8 +217,8 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   margin-bottom: 14px;
 }
 .filter-grid { display: grid; grid-template-columns: 1fr; gap: 6px; }
-@media (min-width: 480px) { .filter-grid { grid-template-columns: 1.2fr 1fr 1fr; } }
-.filter-grid select { background: #fff; font-size: 16px; padding: 6px 10px; font-weight: 600; }
+@media (min-width: 480px) { .filter-grid { grid-template-columns: 1fr 1fr 1fr 1fr; } }
+.filter-grid select { background: #fff; font-size: 15px; padding: 6px 8px; font-weight: 600; }
 
 .chart-card {
   background: #f8fafc;
@@ -278,11 +278,11 @@ svg { display: block; height: 240px; }
 .box-value { font-size: 14px; font-weight: 800; }
 
 .table-wrapper { overflow-x: auto; margin-top: 10px; border-radius: 10px; border: 1px solid var(--line); }
-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 360px; background: #fff; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 480px; background: #fff; }
 th { background: #f8fafc; color: var(--muted); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
 th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: left; }
 
-.pay-box { margin-top: 12px; border-radius: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; }
+.pay-box { margin-top: 8px; border-radius: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; }
 .pay-row { 
   display: flex; 
   justify-content: space-between; 
@@ -319,15 +319,15 @@ th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: lef
   box-shadow: 0 3px 8px -2px rgba(37, 99, 235, 0.25);
 }
 .hist-day-summary-left { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-.hist-day-per { font-size: 10px; font-weight: 700; background: rgba(255, 255, 255, 0.22); padding: 3px 6px; border-radius: 4px; }
-.session-block { background: #f8fafc; border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin-bottom: 6px; }
-.session-title { font-size: 10px; font-weight: 700; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-.hist-players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; margin-bottom: 4px; }
+.session-block { background: #f8fafc; border: 1px solid var(--line); border-radius: 10px; padding: 10px; margin-bottom: 8px; }
+.session-title { font-size: 11px; font-weight: 800; color: var(--text); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+.hist-players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; margin-bottom: 6px; }
 .hist-player-mini { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px; font-size: 11px; }
 
 .accordion-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
 .accordion-icon { font-size: 13px; font-weight: 700; color: var(--accent); }
 #historyContainer { display: none; margin-top: 12px; }
+#machineContainer { display: none; margin-top: 12px; }
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
 .modal-content { background: #fff; padding: 16px; border-radius: 16px; width: 92%; max-width: 420px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
@@ -390,6 +390,7 @@ th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: lef
     <div style="font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">🔍 表示フィルター</div>
     <div class="filter-grid">
       <select id="combinationSelect" onchange="onFilterChange()"></select>
+      <select id="machineFilterSelect" onchange="onFilterChange()"></select>
       <select id="yearSelect" onchange="onYearChange()"></select>
       <select id="monthSelect" onchange="onFilterChange()"></select>
     </div>
@@ -417,12 +418,38 @@ th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: lef
     </div>
   </div>
 
+  <!-- 個人別実績・ストック -->
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h2 style="margin:0;">個人別実績・ストック</h2>
       <button class="sub-btn" id="settleAllKinstBtn" onclick="settleAllKinst()" style="width:auto; padding:4px 10px; font-size:10px; background:#fff1f2; color:var(--red); border:1px solid #fecdd3; font-weight:700; display:none;">🧹 金スト一括精算</button>
     </div>
     <div id="personalTotals" class="personal-total-grid"></div>
+  </div>
+
+  <!-- 機種別実績（アコーディオン） -->
+  <div class="card">
+    <div class="accordion-header" onclick="toggleMachineAccordion()">
+      <h2 style="margin:0;">機種別実績</h2>
+      <span class="accordion-icon" id="machineAccordionIcon">▼ 表示する</span>
+    </div>
+    <div id="machineContainer">
+      <div class="table-wrapper" style="margin-top: 6px;">
+        <table>
+          <thead>
+            <tr>
+              <th>機種名</th>
+              <th>勝率 (勝/回)</th>
+              <th>総投資額</th>
+              <th>総回収額</th>
+              <th>平均収支</th>
+              <th>総収支</th>
+            </tr>
+          </thead>
+          <tbody id="machineTbody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -556,7 +583,18 @@ function toggleHistoryAccordion() {
   }
 }
 
-// 機種プルダウンの選択肢を更新する関数（「機種を選択」プレースホルダー付き）
+function toggleMachineAccordion() {
+  const container = document.getElementById("machineContainer");
+  const icon = document.getElementById("machineAccordionIcon");
+  if (container.style.display === "block") {
+    container.style.display = "none";
+    icon.textContent = "▼ 表示する";
+  } else {
+    container.style.display = "block";
+    icon.textContent = "▲ 閉じる";
+  }
+}
+
 function refreshAllMachineDropdowns() {
   const machineList = [...storedMachines].sort();
 
@@ -800,6 +838,7 @@ function renderAll() {
     graphsArea.style.display = "none";
     document.getElementById("history").innerHTML = "履歴はありません。";
     document.getElementById("personalTotals").innerHTML = "";
+    document.getElementById("machineTbody").innerHTML = "";
     return;
   }
   graphsArea.style.display = "block";
@@ -808,9 +847,11 @@ function renderAll() {
 }
 
 function renderFilteredContent() {
+  updateMachineFilterOptions();
   renderGrandTotals();
   renderExcelChart();
   renderPersonalTotalsAndHistory();
+  renderMachineTotals();
 }
 
 function calculateTransfers(players) {
@@ -834,12 +875,89 @@ function calculateTransfers(players) {
   return transfers;
 }
 
+function matchFilter(h, yVal, mVal) {
+  if(!h.time) return false;
+  let y = (h.time.match(/(\d{4})年/) || [])[1] || "2026";
+  let m = (h.time.match(/(\d{1,2})月/) || [])[1] || "";
+  if(yVal !== "all" && yVal !== y) return false;
+  if(mVal !== "all" && mVal !== m) return false;
+  return true;
+}
+
+function renderMachineTotals() {
+  const tbody = document.getElementById("machineTbody");
+  const selectedCombo = document.getElementById("combinationSelect").value;
+  const selectedYear = document.getElementById("yearSelect").value;
+  const selectedMonth = document.getElementById("monthSelect").value;
+  const selectedMachine = document.getElementById("machineFilterSelect").value;
+
+  tbody.innerHTML = "";
+
+  let filtered = historyData.filter(h => {
+    const names = h.players.map(p => p.name).sort().join(", ");
+    if(selectedCombo && names !== selectedCombo) return false;
+    return matchFilter(h, selectedYear, selectedMonth);
+  });
+
+  let mStats = {};
+  filtered.forEach(h => {
+    if (h.players) {
+      h.players.forEach(p => {
+        if (p.machines) {
+          p.machines.forEach(m => {
+            let mName = (m.machineName || "").trim();
+            if (!mName || mName === "機種未入力") return;
+            if (selectedMachine && selectedMachine !== "all" && mName !== selectedMachine) return;
+            
+            if (!mStats[mName]) mStats[mName] = { total: 0, investTotal: 0, cashTotal: 0, count: 0, wins: 0 };
+            let invest = Number(m.machineInvest || 0);
+            let cash = Number(m.machineCash || 0);
+            let profit = cash - invest;
+            
+            mStats[mName].total += profit;
+            mStats[mName].investTotal += invest;
+            mStats[mName].cashTotal += cash;
+            mStats[mName].count += 1;
+            if (profit >= 0) mStats[mName].wins += 1;
+          });
+        }
+      });
+    }
+  });
+
+  let sortedMachines = Object.keys(mStats).sort((a, b) => mStats[b].total - mStats[a].total);
+
+  if (sortedMachines.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--muted); padding: 12px;">該当する機種データなし</td></tr>`;
+    return;
+  }
+
+  sortedMachines.forEach(name => {
+    const s = mStats[name];
+    const winRate = s.count ? Math.round((s.wins / s.count) * 100) : 0;
+    const avgProfit = s.count ? s.total / s.count : 0;
+    const colorStyle = s.total >= 0 ? 'color: var(--green); font-weight: 800;' : 'color: var(--red); font-weight: 800;';
+
+    tbody.innerHTML += `
+      <tr>
+        <td><b>${name}</b></td>
+        <td>${winRate}% <span style="font-size:10px; color:var(--muted);">(${s.wins}/${s.count})</span></td>
+        <td>${new Intl.NumberFormat("ja-JP").format(s.investTotal)}円</td>
+        <td>${new Intl.NumberFormat("ja-JP").format(s.cashTotal)}円</td>
+        <td style="${colorStyle}">${money(avgProfit)}</td>
+        <td style="${colorStyle}">${money(s.total)}</td>
+      </tr>
+    `;
+  });
+}
+
 function renderPersonalTotalsAndHistory() {
   const personalEl = document.getElementById("personalTotals");
   const histEl = document.getElementById("history");
   const selectedCombo = document.getElementById("combinationSelect").value;
   const selectedYear = document.getElementById("yearSelect").value;
   const selectedMonth = document.getElementById("monthSelect").value;
+  const selectedMachine = document.getElementById("machineFilterSelect").value;
 
   personalEl.innerHTML = "";
   histEl.innerHTML = "";
@@ -858,17 +976,23 @@ function renderPersonalTotalsAndHistory() {
 
   let pStats = {};
   filtered.forEach(h => {
-    const fair = h.players.length ? h.players.reduce((s, p) => s + Number(p.val || 0), 0) / h.players.length : 0;
-    let transfers = calculateTransfers(h.players);
-    let netMap = {};
-    if (transfers.length) h.players.forEach(p => netMap[p.name] = (p.cash || 0) - ((p.invest || 0) + fair));
-
     h.players.forEach(p => {
-      if(!pStats[p.name]) pStats[p.name] = { total: 0, count: 0, wins: 0, netSum: 0 };
-      pStats[p.name].total += Number(p.val || 0);
+      let targetMachines = p.machines || [];
+      if (selectedMachine && selectedMachine !== "all") {
+        targetMachines = targetMachines.filter(m => (m.machineName || "").trim() === selectedMachine);
+        if (targetMachines.length === 0) return;
+      }
+
+      let pInvest = targetMachines.reduce((s, m) => s + Number(m.machineInvest || 0), 0);
+      let pCash = targetMachines.reduce((s, m) => s + Number(m.machineCash || 0), 0);
+      let pProfit = pCash - pInvest;
+
+      if (selectedMachine && selectedMachine !== "all" && pInvest === 0 && pCash === 0) return;
+
+      if(!pStats[p.name]) pStats[p.name] = { total: 0, count: 0, wins: 0 };
+      pStats[p.name].total += pProfit;
       pStats[p.name].count += 1;
-      if(Number(p.val || 0) >= 0) pStats[p.name].wins += 1;
-      pStats[p.name].netSum += (netMap[p.name] || 0);
+      if(pProfit >= 0) pStats[p.name].wins += 1;
     });
   });
 
@@ -878,14 +1002,10 @@ function renderPersonalTotalsAndHistory() {
 
   Object.keys(pStats).sort().forEach(name => {
     const s = pStats[name];
+    if (s.count === 0) return;
     const winRate = s.count ? Math.round((s.wins / s.count) * 100) : 0;
     let mestCount = serverMestMap[name] || 0;
     let kinst = serverKinstMap[name] || 0;
-    const roundedNet = Math.round(s.netSum);
-
-    let settleHtml = roundedNet > 1 ? `<div style="font-size:10px; font-weight:700; color:var(--green); margin-bottom:2px;">貢献: ${new Intl.NumberFormat("ja-JP").format(roundedNet)}円</div>` :
-                     roundedNet < -1 ? `<div style="font-size:10px; font-weight:700; color:var(--red); margin-bottom:2px;">強盗: ${new Intl.NumberFormat("ja-JP").format(-roundedNet)}円</div>` :
-                     `<div style="font-size:10px; font-weight:700; color:var(--muted); margin-bottom:2px;">平和: 0円</div>`;
 
     let kinstColor = kinst > 0 ? "var(--green)" : (kinst < 0 ? "var(--red)" : "var(--muted)");
 
@@ -896,7 +1016,6 @@ function renderPersonalTotalsAndHistory() {
         <div class="name-label">${name}</div>
         <div class="amount-value" style="color:${s.total>=0?'var(--green)':'var(--red)'}">${money(s.total)}</div>
         <div class="sub-info"><span>勝率: ${winRate}%</span><span>(${s.wins}勝/${s.count}回)</span></div>
-        ${settleHtml}
       </div>
       <div>
         <div class="mest-row">
@@ -914,32 +1033,56 @@ function renderPersonalTotalsAndHistory() {
 
   let dateGroup = {};
   filtered.forEach(h => {
-    if(!dateGroup[h.time]) dateGroup[h.time] = [];
-    dateGroup[h.time].push(h);
+    let sPlayers = h.players.filter(p => {
+      if (!selectedMachine || selectedMachine === "all") return true;
+      return (p.machines || []).some(m => (m.machineName || "").trim() === selectedMachine);
+    });
+
+    if (sPlayers.length > 0) {
+      if(!dateGroup[h.time]) dateGroup[h.time] = [];
+      dateGroup[h.time].push({ ...h, players: sPlayers });
+    }
   });
+
+  if (Object.keys(dateGroup).length === 0) {
+    histEl.innerHTML = "該当する期間・機種の履歴はありません。";
+    return;
+  }
 
   Object.keys(dateGroup).sort((a, b) => parseDateStrToObj(b) - parseDateStrToObj(a)).forEach(dateStr => {
     let sessions = dateGroup[dateStr];
-    let dayTotal = sessions.reduce((s, x) => s + Number(x.profit || 0), 0);
-    let membersSet = new Set();
-    sessions.forEach(s => s.players.forEach(p => membersSet.add(p.name)));
-    let dayPer = dayTotal / (membersSet.size || 1);
+    let dayTotal = sessions.reduce((s, x) => {
+      let sProf = x.players.reduce((ps, p) => {
+        let tM = selectedMachine && selectedMachine !== "all" ? (p.machines || []).filter(m => (m.machineName || "").trim() === selectedMachine) : (p.machines || []);
+        let inv = tM.reduce((ms, m) => ms + Number(m.machineInvest || 0), 0);
+        let csh = tM.reduce((ms, m) => ms + Number(m.machineCash || 0), 0);
+        return ps + (csh - inv);
+      }, 0);
+      return s + sProf;
+    }, 0);
+
+    let dayPer = Math.round(dayTotal / (sessions[0] ? sessions[0].players.length : 1));
 
     let sessionsHtml = "";
     sessions.forEach((s, idx) => {
-      let sProfit = Number(s.profit || 0);
-      let sPer = s.players.length ? sProfit / s.players.length : 0;
-      let transfers = calculateTransfers(s.players);
+      let sPlayersFormatted = s.players.map(p => {
+        let tM = selectedMachine && selectedMachine !== "all" ? (p.machines || []).filter(m => (m.machineName || "").trim() === selectedMachine) : (p.machines || []);
+        let inv = tM.reduce((ms, m) => ms + Number(m.machineInvest || 0), 0);
+        let csh = tM.reduce((ms, m) => ms + Number(m.machineCash || 0), 0);
+        let val = csh - inv;
+        return { name: p.name, val, invest: inv, cash: csh, machines: tM };
+      });
+
+      let sProfit = sPlayersFormatted.reduce((sum, p) => sum + p.val, 0);
+      let sPer = Math.round(sProfit / sPlayersFormatted.length);
+      let transfers = calculateTransfers(sPlayersFormatted);
 
       let pDetails = "";
-      s.players.forEach(p => {
-        let pInv = p.invest || 0, pCsh = p.cash || 0;
-        let diff = pCsh - (pInv + sPer);
-        let status = diff > 1 ? `<span style="color:var(--green); font-weight:700;">貢献: ${Math.round(diff)}円</span>` : diff < -1 ? `<span style="color:var(--red); font-weight:700;">強盗: ${Math.round(-diff)}円</span>` : `<span style="color:var(--muted); font-weight:700;">平和</span>`;
-
-        let validMachines = (p.machines || []).filter(m => m.machineName && m.machineName !== "機種未入力");
-        let mHtml = validMachines.length ? validMachines.map(m => `<div style="font-size:10px; color:var(--muted);">🎰 ${m.machineName} (投${m.machineInvest}/収${m.machineCash})</div>`).join("") :
-                    `<div style="font-size:10px; color:var(--muted);">投:${pInv} / 収:${pCsh}</div>`;
+      sPlayersFormatted.forEach(p => {
+        let mHtml = p.machines.map(m => `<div style="font-size:10px; color:var(--muted);">${m.machineName} (投${m.machineInvest}/収${m.machineCash})</div>`).join("");
+        let fair = sPer;
+        let diff = p.cash - (p.invest + fair);
+        let statusBadge = diff > 1 ? `<div style="font-size:10px; color:var(--red); font-weight:700;">強盗: +${Math.round(diff)}円</div>` : diff < -1 ? `<div style="font-size:10px; color:var(--green); font-weight:700;">貢献: ${Math.round(diff)}円</div>` : '';
 
         pDetails += `
           <div class="hist-player-mini">
@@ -947,26 +1090,43 @@ function renderPersonalTotalsAndHistory() {
               <span>${p.name}</span><span style="color:${p.val>=0?'var(--green)':'var(--red)'}">${money(p.val)}</span>
             </div>
             ${mHtml}
-            <div style="font-size:10px; text-align:right; margin-top:2px;">${status}</div>
+            ${statusBadge}
           </div>
         `;
       });
 
-      let transferHtml = "";
-      if (transfers.length) {
-        let rows = transfers.map(t => `<div class="pay-row"><span><b>${t.from}</b> → ${t.to}</span><span style="color:var(--green);font-weight:800;">${t.amount}円</span></div>`).join("");
-        transferHtml = `<div style="margin-top:4px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:6px;"><div style="font-weight:700; color:#166534; font-size:10px; margin-bottom:2px;">💸 受け渡し指示</div>${rows}<button class="sub-btn" onclick="stockKinstFromSession('${encodeURIComponent(JSON.stringify(transfers))}')" style="margin-top:4px; padding:4px; font-size:10px; background:#fff; color:var(--accent);">💰 金ストに登録</button></div>`;
+      let payRows = "";
+      let transfersParam = encodeURIComponent(JSON.stringify(transfers));
+      transfers.forEach(t => {
+        payRows += `<div class="pay-row"><span><b>${t.from}</b> → ${t.to}</span><span style="color:var(--green);font-weight:800;">${t.amount}円</span></div>`;
+      });
+
+      let payBoxHtml = "";
+      if (transfers.length > 0) {
+        payBoxHtml = `
+          <div class="pay-box">
+            <div style="font-weight: 700; color: #166534; font-size: 11px; margin-bottom: 4px;">💸 お金の受け渡し指示</div>
+            ${payRows}
+            <button class="sub-btn" onclick="stockKinstFromSession('${transfersParam}')" style="margin-top:6px; padding:4px; font-size:10px; background:#fff; color:var(--accent); border:1px solid #bbf7d0; font-weight:700;">💰 金ストに登録</button>
+          </div>
+        `;
       }
 
       sessionsHtml += `
         <div class="session-block">
-          <div class="session-title"><span>第 ${idx + 1} 回セッション</span><div style="display:flex; gap:3px;"><button class="edit-btn" onclick="editHistory(${s.rowIdx})">修正</button><button class="delete-btn" onclick="deleteHistory(${s.rowIdx})">削除</button></div></div>
-          <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; margin-bottom:4px;">
-            <span>合計: <span style="color:${sProfit>=0?'var(--green)':'var(--red)'}">${money(sProfit)}</span></span>
-            <span style="background:var(--accent-light); color:var(--accent); padding:1px 4px; border-radius:3px;">1人: ${money(sPer)}</span>
+          <div class="session-title">
+            <span>第 ${idx + 1} 回セッション</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:10px; background:var(--accent-light); color:var(--accent); padding:2px 6px; border-radius:4px;">1人: ${money(sPer)}</span>
+              <button class="edit-btn" onclick="editHistory(${s.rowIdx})">修正</button>
+              <button class="delete-btn" onclick="deleteHistory(${s.rowIdx})">削除</button>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; margin-bottom:6px;">
+            <span>${selectedMachine && selectedMachine !== "all" ? selectedMachine + ' 収支' : '合計'}: <span style="color:${sProfit>=0?'var(--green)':'var(--red)'}">${money(sProfit)}</span></span>
           </div>
           <div class="hist-players-grid">${pDetails}</div>
-          ${transferHtml}
+          ${payBoxHtml}
         </div>
       `;
     });
@@ -977,7 +1137,7 @@ function renderPersonalTotalsAndHistory() {
       <div class="hist-date-header">📅 ${dateStr}</div>
       <div class="hist-day-summary">
         <div class="hist-day-summary-left"><span style="font-size:10px;">トータル:</span><span style="font-size:13px; font-weight:900;">${money(dayTotal)}</span></div>
-        <span class="hist-day-per">1人: ${money(dayPer)}</span>
+        <div class="hist-day-per" style="font-size:10px; font-weight:700; background: rgba(255, 255, 255, 0.22); padding: 3px 6px; border-radius: 4px;">1人: ${money(dayPer)}</div>
       </div>
       ${sessionsHtml}
     `;
@@ -989,23 +1149,44 @@ function renderGrandTotals() {
   const selectedCombo = document.getElementById("combinationSelect").value;
   const selectedYear = document.getElementById("yearSelect").value;
   const selectedMonth = document.getElementById("monthSelect").value;
+  const selectedMachine = document.getElementById("machineFilterSelect").value;
 
   document.getElementById("grandTotalLabel").textContent = selectedYear !== "all" ? `${selectedYear}年${selectedMonth !== 'all' ? selectedMonth + '月' : ''}グループ収支` : "グループ累計収支";
 
-  let gTotal = 0, totalSessions = 0, winSessions = 0, totalPer = 0;
+  let gTotal = 0, totalSessions = 0, winSessions = 0, totalParticipantsCount = 0;
   historyData.forEach(h => {
     if(selectedCombo && h.players.map(p => p.name).sort().join(", ") !== selectedCombo) return;
-    if(matchFilter(h, selectedYear, selectedMonth)) {
-      const profit = Number(h.profit || 0);
-      gTotal += profit;
+    if(!matchFilter(h, selectedYear, selectedMonth)) return;
+
+    let sessionProfit = 0;
+    let hasMatch = false;
+    h.players.forEach(p => {
+      let tMachines = (p.machines || []).filter(m => {
+        let mName = (m.machineName || "").trim();
+        if (!mName || mName === "機種未入力") return false;
+        if (selectedMachine && selectedMachine !== "all" && mName !== selectedMachine) return false;
+        return true;
+      });
+      if (tMachines.length > 0 || !selectedMachine || selectedMachine === "all") {
+        hasMatch = true;
+        let inv = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineInvest || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.invest);
+        let csh = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineCash || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.cash);
+        sessionProfit += (csh - inv);
+      }
+    });
+
+    if (hasMatch) {
+      gTotal += sessionProfit;
       totalSessions++;
-      if(profit >= 0) winSessions++;
-      totalPer += h.players.length ? profit / h.players.length : 0;
+      totalParticipantsCount += h.players.length;
+      if(sessionProfit >= 0) winSessions++;
     }
   });
 
+  let avgPerPerson = totalParticipantsCount > 0 ? gTotal / totalParticipantsCount : 0;
+
   document.getElementById("grandTotalDisplay").textContent = money(gTotal);
-  document.getElementById("grandPerDisplay").textContent = `1人: ${money(totalSessions ? totalPer : 0)}`;
+  document.getElementById("grandPerDisplay").textContent = `1人: ${money(avgPerPerson)}`;
   document.getElementById("grandWinRateDisplay").textContent = `勝率: ${totalSessions ? Math.round((winSessions / totalSessions) * 100) : 0}%`;
 }
 
@@ -1028,6 +1209,7 @@ function getAvailableYearsAndMonths() {
 function updateFilterSelectOptions() {
   const comboSelect = document.getElementById("combinationSelect");
   const yearSelect = document.getElementById("yearSelect");
+  
   const currentCombo = comboSelect.value;
   const currentYear = yearSelect.value || "all";
 
@@ -1069,6 +1251,46 @@ function updateFilterSelectOptions() {
   }
 }
 
+function updateMachineFilterOptions() {
+  const machineSelect = document.getElementById("machineFilterSelect");
+  const currentMachine = machineSelect.value || "all";
+  const selectedCombo = document.getElementById("combinationSelect").value;
+  const selectedYear = document.getElementById("yearSelect").value;
+  const selectedMonth = document.getElementById("monthSelect").value;
+
+  let filtered = historyData.filter(h => {
+    const names = h.players.map(p => p.name).sort().join(", ");
+    if(selectedCombo && names !== selectedCombo) return false;
+    return matchFilter(h, selectedYear, selectedMonth);
+  });
+
+  let activeMachinesSet = new Set();
+  filtered.forEach(h => {
+    if (h.players) {
+      h.players.forEach(p => {
+        if (p.machines) {
+          p.machines.forEach(m => {
+            let mName = (m.machineName || "").trim();
+            if (mName && mName !== "機種未入力") activeMachinesSet.add(mName);
+          });
+        }
+      });
+    }
+  });
+
+  let availableMachines = Array.from(activeMachinesSet).sort();
+
+  machineSelect.innerHTML = `<option value="all">🎰 すべての機種</option>`;
+  availableMachines.forEach(mName => {
+    const opt = document.createElement("option");
+    opt.value = mName;
+    opt.textContent = `${mName}`;
+    machineSelect.appendChild(opt);
+  });
+  
+  machineSelect.value = [...machineSelect.options].some(o => o.value === currentMachine) ? currentMachine : "all";
+}
+
 function onYearChange() { updateMonthOptions(); renderFilteredContent(); }
 function onFilterChange() { renderFilteredContent(); }
 
@@ -1094,15 +1316,6 @@ function updateMonthOptions() {
   }
 }
 
-function matchFilter(h, yVal, mVal) {
-  if(!h.time) return false;
-  let y = (h.time.match(/(\d{4})年/) || [])[1] || "2026";
-  let m = (h.time.match(/(\d{1,2})月/) || [])[1] || "";
-  if(yVal !== "all" && yVal !== y) return false;
-  if(mVal !== "all" && mVal !== m) return false;
-  return true;
-}
-
 function renderExcelChart() {
   const svg = document.getElementById("excelLineChart");
   const legendContainer = document.getElementById("chartLegend");
@@ -1110,11 +1323,35 @@ function renderExcelChart() {
   if(!historyData.length) return;
 
   const selectedCombo = document.getElementById("combinationSelect").value;
-  const targetHistory = historyData.filter(h => h.players.map(p => p.name).sort().join(", ") === selectedCombo && matchFilter(h, document.getElementById("yearSelect").value, document.getElementById("monthSelect").value));
+  const selectedMachine = document.getElementById("machineFilterSelect").value;
+  
+  const targetHistory = historyData.filter(h => {
+    const names = h.players.map(p => p.name).sort().join(", ");
+    if(selectedCombo && names !== selectedCombo) return false;
+    if(!matchFilter(h, document.getElementById("yearSelect").value, document.getElementById("monthSelect").value)) return false;
+    return true;
+  });
   if(!targetHistory.length) return;
 
   let groupSum = 0;
-  let groupData = [0, ...targetHistory.map(h => groupSum += Number(h.profit || 0))];
+  let groupData = [0, ...targetHistory.map(h => {
+    let pSum = 0;
+    h.players.forEach(p => {
+      let tMachines = (p.machines || []).filter(m => {
+        let mName = (m.machineName || "").trim();
+        if (!mName || mName === "機種未入力") return false;
+        if (selectedMachine && selectedMachine !== "all" && mName !== selectedMachine) return false;
+        return true;
+      });
+      if (tMachines.length > 0 || !selectedMachine || selectedMachine === "all") {
+        let inv = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineInvest || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.invest);
+        let csh = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineCash || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.cash);
+        pSum += (csh - inv);
+      }
+    });
+    return groupSum += pSum;
+  })];
+
   let allNames = [];
   targetHistory.forEach(h => h.players.forEach(p => { if(!allNames.includes(p.name)) allNames.push(p.name); }));
 
@@ -1123,7 +1360,19 @@ function renderExcelChart() {
     let pSum = 0;
     memberSeries[name] = [0, ...targetHistory.map(h => {
       const p = h.players.find(x => x.name === name);
-      if(p) pSum += Number(p.val || 0);
+      if(p) {
+        let tMachines = (p.machines || []).filter(m => {
+          let mName = (m.machineName || "").trim();
+          if (!mName || mName === "機種未入力") return false;
+          if (selectedMachine && selectedMachine !== "all" && mName !== selectedMachine) return false;
+          return true;
+        });
+        if (tMachines.length > 0 || !selectedMachine || selectedMachine === "all") {
+          let inv = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineInvest || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.invest);
+          let csh = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineCash || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.cash);
+          pSum += (csh - inv);
+        }
+      }
       return pSum;
     })];
   });
@@ -1148,7 +1397,7 @@ function renderExcelChart() {
 
   for(let val = minVal; val <= maxVal; val += stepUnit) {
     const y = getY(val), isZero = val === 0;
-    svg.innerHTML += `<line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="${isZero ? '#64748b' : '#e2e8f0'}" stroke-width="${isZero ? '1.8' : '1'}" ${isZero ? '' : 'stroke-dasharray="3,3"'}/>`;
+    svg.innerHTML += `<line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="${isZero ? '#475569' : '#e2e8f0'}" stroke-width="${isZero ? '1.8' : '1'}" ${isZero ? '' : 'stroke-dasharray="3,3"'}/>`;
     svg.innerHTML += `<text x="${paddingLeft - 8}" y="${y + 4}" fill="${isZero ? '#0f172a' : '#64748b'}" font-size="10" text-anchor="end">${isZero ? '0' : (val / 10000) + '万'}</text>`;
   }
 
@@ -1160,16 +1409,17 @@ function renderExcelChart() {
     }
   });
 
-  const colors = ["#2563eb", "#0d9488", "#d97706", "#7c3aed", "#db2777"];
-  const drawLine = (data, color, label) => {
+  const colors = ["#f97316", "#06b6d4", "#8b5cf6", "#ec4899", "#10b981", "#eab308"];
+  const drawLine = (data, color, label, isGroup = false) => {
     let pts = data.map((val, i) => `${getX(i)},${getY(val)}`).join(" ");
-    svg.innerHTML += `<polyline fill="none" stroke="${color}" stroke-width="2.5" points="${pts}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    data.forEach((val, i) => { svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="3.5" fill="#fff" stroke="${color}" stroke-width="2"/>`; });
+    const strokeWidth = isGroup ? "3.5" : "2.5";
+    svg.innerHTML += `<polyline fill="none" stroke="${color}" stroke-width="${strokeWidth}" points="${pts}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    data.forEach((val, i) => { svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="${isGroup ? '4.5' : '3.5'}" fill="#fff" stroke="${color}" stroke-width="2"/>`; });
     legendContainer.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${color};"></div><span>${label}</span></div>`;
   };
 
-  drawLine(groupData, "var(--accent)", "ノリ打ち全体");
-  allNames.forEach((name, idx) => drawLine(memberSeries[name], colors[idx % colors.length], name));
+  drawLine(groupData, "#2563eb", "ノリ打ち全体", true);
+  allNames.forEach((name, idx) => drawLine(memberSeries[name], colors[idx % colors.length], name, false));
 }
 
 function addPlayer(selectedName = "", machines = []) {
