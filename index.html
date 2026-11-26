@@ -335,13 +335,17 @@ th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: lef
 </head>
 <body>
 <button class="float-reload-btn" onclick="location.reload()" title="ページを更新">🔄</button>
-<datalist id="machineSuggestions"></datalist>
 
 <div class="wrap">
-  <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
+  <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; position: relative;">
     <h1>🎰 ノリ打ち精算</h1>
     <div>
-      <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 6px 10px; font-size: 11px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
+      <button class="sub-btn" id="hamburgerBtn" style="width: auto; padding: 6px 10px; font-size: 14px; background: #f1f5f9; color: var(--text); border: 1.5px solid var(--line); font-weight: 700;">☰</button>
+    </div>
+    <!-- ハンバーガーメニューの中身 -->
+    <div id="hamburgerMenu" style="display: none; position: absolute; right: 16px; top: 52px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); padding: 8px; z-index: 99; min-width: 150px;">
+      <button class="sub-btn" id="openMemberModal" style="width: 100%; text-align: left; padding: 8px 10px; font-size: 12px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700; margin-bottom: 4px;">👥 メンバー管理</button>
+      <button class="sub-btn" id="openMachineModal" style="width: 100%; text-align: left; padding: 8px 10px; font-size: 12px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">🎰 機種管理</button>
     </div>
   </div>
 
@@ -448,6 +452,22 @@ th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: lef
   </div>
 </div>
 
+<!-- 機種管理モーダル -->
+<div class="modal" id="machineModal">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <h2 style="margin:0;">機種管理 (共有)</h2>
+      <span style="font-size:10px; background:var(--accent-light); color:var(--accent); padding:2px 6px; border-radius:4px; font-weight:700;">スプシ同期</span>
+    </div>
+    <div id="machineListEdit" style="margin-bottom: 12px; max-height: 200px; overflow-y: auto;"></div>
+    <div class="grid" style="margin-bottom: 10px;">
+      <div class="half"><input type="text" id="newMachineName" placeholder="新しい機種名"></div>
+      <div class="half"><button class="sub-btn" id="addMachineStoreBtn" style="background: var(--accent); color: #fff; border:none; height: 100%; padding: 8px;">＋ 共有追加</button></div>
+    </div>
+    <button class="sub-btn" id="closeMachineModalBtn" style="background: #f1f5f9; padding: 10px;">閉じる</button>
+  </div>
+</div>
+
 <div class="modal" id="editModal">
   <div class="modal-content">
     <h2>履歴の修正</h2>
@@ -472,10 +492,26 @@ let historyData = [];
 let serverMestMap = {};
 let serverKinstMap = {}; 
 let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '[]');
+let storedMachines = JSON.parse(localStorage.getItem("nori_stored_machines") || '[]');
 let sTop = 0;
 let isInitialFilterSet = false;
 let editingRowIdx = null;
 let isInitialPlayersAdded = false;
+
+// ハンバーガーメニューの開閉制御
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+const hamburgerMenu = document.getElementById("hamburgerMenu");
+
+hamburgerBtn.onclick = (e) => {
+  e.stopPropagation();
+  hamburgerMenu.style.display = hamburgerMenu.style.display === "block" ? "none" : "block";
+};
+
+document.addEventListener("click", (e) => {
+  if (!hamburgerMenu.contains(e.target) && e.target !== hamburgerBtn) {
+    hamburgerMenu.style.display = "none";
+  }
+});
 
 function openModal(el) {
   sTop = window.scrollY;
@@ -520,27 +556,19 @@ function toggleHistoryAccordion() {
   }
 }
 
-function updateMachineSuggestions() {
-  const datalist = document.getElementById("machineSuggestions");
-  if (!datalist) return;
-  let machineSet = new Set();
-  historyData.forEach(h => {
-    if (h.players) {
-      h.players.forEach(p => {
-        if (p.machines) {
-          p.machines.forEach(m => {
-            let name = (m.machineName || "").trim();
-            if (name && name !== "機種未入力") machineSet.add(name);
-          });
-        }
-      });
-    }
-  });
-  datalist.innerHTML = "";
-  Array.from(machineSet).sort().forEach(name => {
-    const opt = document.createElement("option");
-    opt.value = name;
-    datalist.appendChild(opt);
+// 機種プルダウンの選択肢を更新する関数（「機種を選択」プレースホルダー付き）
+function refreshAllMachineDropdowns() {
+  const machineList = [...storedMachines].sort();
+
+  document.querySelectorAll(".machine-name, .edit-machine-name").forEach(selectEl => {
+    const currentVal = selectEl.value;
+    let options = '<option value="">機種を選択</option>';
+    let displayList = [...machineList];
+    if (currentVal && !displayList.includes(currentVal)) displayList.push(currentVal);
+    displayList.forEach(m => {
+      options += `<option value="${m}" ${m === currentVal ? 'selected' : ''}>${m}</option>`;
+    });
+    selectEl.innerHTML = options;
   });
 }
 
@@ -582,9 +610,14 @@ async function loadHistory() {
       storedMembers = extracted.size > 0 ? Array.from(extracted) : ["Aさん", "Bさん", "Cさん"];
       localStorage.setItem("nori_stored_members", JSON.stringify(storedMembers));
     }
+
+    if (Array.isArray(jsonRes.machines) && jsonRes.machines.length > 0) {
+      storedMachines = jsonRes.machines;
+      localStorage.setItem("nori_stored_machines", JSON.stringify(storedMachines));
+    }
     
     historyData.sort((a, b) => parseDateStrToObj(a.time) - parseDateStrToObj(b.time));
-    updateMachineSuggestions();
+    refreshAllMachineDropdowns();
     refreshAllMemberDropdowns();
 
     if (!isInitialPlayersAdded) {
@@ -690,6 +723,7 @@ window.editHistory = function(rowIdx) {
       addEditPlayerRow(container, p.name, machines);
     });
   }
+  refreshAllMachineDropdowns();
   openModal(document.getElementById("editModal"));
 };
 
@@ -713,10 +747,15 @@ function addEditPlayerRow(container, selectedName = "", machines = []) {
 }
 
 window.addEditMachineRow = function(container, mName = "", mInv = "", mCsh = "") {
+  let mOptions = '<option value="">機種を選択</option>';
+  let mList = [...storedMachines].sort();
+  if (mName && !mList.includes(mName)) mList.push(mName);
+  mList.forEach(m => { mOptions += `<option value="${m}" ${m === mName ? 'selected' : ''}>${m}</option>`; });
+
   const row = document.createElement("div");
   row.className = "machine-row";
   row.innerHTML = `
-    <input class="edit-machine-name" type="text" list="machineSuggestions" placeholder="機種名" value="${mName}" style="flex: 2.2; padding: 6px; background:#fff;">
+    <select class="edit-machine-name" style="flex: 2.2; padding: 6px; background:#fff; font-size: 14px;">${mOptions}</select>
     <input class="edit-machine-invest" type="number" placeholder="投資" value="${mInv}" style="flex: 1; padding: 6px;">
     <input class="edit-machine-cash" type="number" placeholder="回収" value="${mCsh}" style="flex: 1; padding: 6px;">
     <button class="delete-btn" type="button" onclick="this.closest('.machine-row').remove()" style="padding:4px;">×</button>
@@ -1155,10 +1194,15 @@ function addPlayer(selectedName = "", machines = []) {
 }
 
 window.addMachineRow = function(container, mName = "", mInv = "", mCsh = "") {
+  let mOptions = '<option value="">機種を選択</option>';
+  let mList = [...storedMachines].sort();
+  if (mName && !mList.includes(mName)) mList.push(mName);
+  mList.forEach(m => { mOptions += `<option value="${m}" ${m === mName ? 'selected' : ''}>${m}</option>`; });
+
   const row = document.createElement("div");
   row.className = "machine-row";
   row.innerHTML = `
-    <input class="machine-name" type="text" list="machineSuggestions" placeholder="機種名" value="${mName}" style="flex: 2.2; padding: 6px; background:#fff;">
+    <select class="machine-name" style="flex: 2.2; padding: 6px; background:#fff; font-size: 14px;">${mOptions}</select>
     <input class="machine-invest" type="number" placeholder="投資" value="${mInv}" style="flex: 1; padding: 6px;">
     <input class="machine-cash" type="number" placeholder="回収" value="${mCsh}" style="flex: 1; padding: 6px;">
     <button class="delete-btn" type="button" onclick="this.closest('.machine-row').remove()" style="padding:4px;">×</button>
@@ -1240,8 +1284,13 @@ document.getElementById("calcBtn").onclick = async function() {
 
 document.getElementById("addBtn").onclick = () => addPlayer();
 
+// メンバー管理モーダル
 const memberModal = document.getElementById("memberModal");
-document.getElementById("openMemberModal").onclick = () => { renderMemberListEdit(); openModal(memberModal); };
+document.getElementById("openMemberModal").onclick = () => { 
+  hamburgerMenu.style.display = "none"; 
+  renderMemberListEdit(); 
+  openModal(memberModal); 
+};
 document.getElementById("closeModalBtn").onclick = () => closeModal(memberModal);
 
 function renderMemberListEdit() {
@@ -1272,6 +1321,45 @@ document.getElementById("addMemberStoreBtn").onclick = async () => {
   renderMemberListEdit();
   refreshAllMemberDropdowns();
   try { await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "ADD_MEMBER", name }) }); } catch(e) {}
+};
+
+// 機種管理モーダル
+const machineModal = document.getElementById("machineModal");
+document.getElementById("openMachineModal").onclick = () => {
+  hamburgerMenu.style.display = "none";
+  renderMachineListEdit();
+  openModal(machineModal);
+};
+document.getElementById("closeMachineModalBtn").onclick = () => closeModal(machineModal);
+
+function renderMachineListEdit() {
+  const container = document.getElementById("machineListEdit");
+  container.innerHTML = storedMachines.length ? "" : "<div style='font-size:12px; color:var(--muted);'>登録なし</div>";
+  storedMachines.forEach((m, idx) => {
+    container.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:#f8fafc; padding:6px 10px; border-radius:6px; border:1px solid var(--line);"><span style="font-weight:600; font-size:13px;">${m}</span><button class="delete-btn" onclick="removeStoredMachine(${idx})">削除</button></div>`;
+  });
+}
+
+window.removeStoredMachine = async function(idx) {
+  let target = storedMachines[idx];
+  if(!confirm(`「${target}」を削除しますか？`)) return;
+  storedMachines.splice(idx, 1);
+  localStorage.setItem("nori_stored_machines", JSON.stringify(storedMachines));
+  renderMachineListEdit();
+  refreshAllMachineDropdowns();
+  try { await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE_MACHINE", name: target }) }); } catch(e) {}
+};
+
+document.getElementById("addMachineStoreBtn").onclick = async () => {
+  const input = document.getElementById("newMachineName");
+  const name = input.value.trim();
+  if(!name || storedMachines.includes(name)) return;
+  storedMachines.push(name);
+  localStorage.setItem("nori_stored_machines", JSON.stringify(storedMachines));
+  input.value = "";
+  renderMachineListEdit();
+  refreshAllMachineDropdowns();
+  try { await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "ADD_MACHINE", name }) }); } catch(e) {}
 };
 
 window.addEventListener("DOMContentLoaded", () => {
