@@ -99,10 +99,6 @@ input:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-input::placeholder, select::placeholder {
-  color: #cbd5e1;
-}
-
 .player {
   background: #f8fafc;
   border: 1px solid var(--line);
@@ -133,9 +129,7 @@ input::placeholder, select::placeholder {
   align-items: center;
   margin-bottom: 6px;
 }
-.machine-row:last-child {
-  margin-bottom: 0;
-}
+.machine-row:last-child { margin-bottom: 0; }
 
 .result-label { font-size: 10px; font-weight: 600; color: var(--muted); text-align: right; }
 .result-value { font-size: 14px; font-weight: 800; text-align: right; }
@@ -179,9 +173,7 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   border: none;
   transition: transform 0.2s ease;
 }
-.float-reload-btn:active {
-  transform: scale(0.9) rotate(180deg);
-}
+.float-reload-btn:active { transform: scale(0.9) rotate(180deg); }
 
 .grand-total-box {
   background: var(--gradient);
@@ -205,12 +197,7 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 .grand-total-label { font-size: 10px; opacity: 0.85; margin-bottom: 2px; font-weight: 600; letter-spacing: 0.03em; }
 .grand-total-value { font-size: 20px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.2; }
 
-.grand-badges {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
+.grand-badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .grand-pill {
   font-size: 11px;
   font-weight: 700;
@@ -229,22 +216,9 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   padding: 12px;
   margin-bottom: 14px;
 }
-.filter-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 6px;
-}
-@media (min-width: 480px) {
-  .filter-grid {
-    grid-template-columns: 1.2fr 1fr 1fr;
-  }
-}
-.filter-grid select {
-  background: #fff;
-  font-size: 16px;
-  padding: 6px 10px;
-  font-weight: 600;
-}
+.filter-grid { display: grid; grid-template-columns: 1fr; gap: 6px; }
+@media (min-width: 480px) { .filter-grid { grid-template-columns: 1.2fr 1fr 1fr; } }
+.filter-grid select { background: #fff; font-size: 16px; padding: 6px 10px; font-weight: 600; }
 
 .chart-card {
   background: #f8fafc;
@@ -254,7 +228,6 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   overflow: hidden;
 }
 .chart-title { font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
-
 .chart-legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; font-weight: 600; margin-bottom: 8px; }
 .legend-item { display: flex; align-items: center; gap: 4px; }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
@@ -268,10 +241,7 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-svg { 
-  display: block; 
-  height: 240px;
-}
+svg { display: block; height: 240px; }
 
 .personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-bottom: 12px; }
 .personal-card { background: #f8fafc; border-radius: 12px; padding: 10px; border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
@@ -300,12 +270,7 @@ svg {
   font-weight: 700; 
   width: auto !important; 
 }
-.mest-btn:disabled {
-  background: transparent;
-  color: #cbd5e1;
-  border: none;
-  cursor: default;
-}
+.mest-btn:disabled { background: transparent; color: #cbd5e1; border: none; }
 
 .summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 12px; }
 .box { padding: 10px; border-radius: 10px; background: #f8fafc; border: 1px solid var(--line); }
@@ -316,7 +281,6 @@ svg {
 table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 360px; background: #fff; }
 th { background: #f8fafc; color: var(--muted); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
 th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: left; }
-tr:last-child td { border-bottom: none; }
 
 .pay-box { margin-top: 12px; border-radius: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; }
 .pay-row { 
@@ -341,15 +305,7 @@ tr:last-child td { border-bottom: none; }
   margin-bottom: 10px; 
   box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
-.hist-date-header {
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--text);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+.hist-date-header { font-size: 12px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
 .hist-day-summary {
   display: flex;
   align-items: center;
@@ -362,162 +318,29 @@ tr:last-child td { border-bottom: none; }
   gap: 8px;
   box-shadow: 0 3px 8px -2px rgba(37, 99, 235, 0.25);
 }
-.hist-day-summary-left {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.hist-day-per {
-  font-size: 10px;
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.22);
-  color: #ffffff;
-  padding: 3px 6px;
-  border-radius: 4px;
-  white-space: nowrap;
-}
-.session-block {
-  background: #f8fafc;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 8px;
-  margin-bottom: 6px;
-  position: relative;
-}
-.session-title {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--muted);
-  margin-bottom: 4px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.hist-players-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 6px;
-  margin-bottom: 4px;
-}
-.hist-player-mini {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 8px;
-  font-size: 11px;
-}
+.hist-day-summary-left { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.hist-day-per { font-size: 10px; font-weight: 700; background: rgba(255, 255, 255, 0.22); padding: 3px 6px; border-radius: 4px; }
+.session-block { background: #f8fafc; border: 1px solid var(--line); border-radius: 8px; padding: 8px; margin-bottom: 6px; }
+.session-title { font-size: 10px; font-weight: 700; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+.hist-players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; margin-bottom: 4px; }
+.hist-player-mini { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px; font-size: 11px; }
 
-.accordion-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-}
-.accordion-icon {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--accent);
-  transition: transform 0.2s;
-}
-#historyContainer {
-  display: none;
-  margin-top: 12px;
-}
+.accordion-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+.accordion-icon { font-size: 13px; font-weight: 700; color: var(--accent); }
+#historyContainer { display: none; margin-top: 12px; }
 
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 1000; }
 .modal-content { background: #fff; padding: 16px; border-radius: 16px; width: 92%; max-width: 420px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-
-/* ルーレットスタイル */
-.wheel-wrapper {
-  position: relative;
-  width: 250px;
-  height: 250px;
-  margin: 8px auto 14px auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.wheel-pointer {
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-top: 22px solid #ef4444;
-  z-index: 10;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
-}
-#rouletteCanvas {
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
-  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.15);
-}
-.roulette-result-banner {
-  background: var(--accent-light);
-  border: 1.5px solid var(--accent);
-  border-radius: 10px;
-  padding: 8px 12px;
-  text-align: center;
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--accent);
-  margin-bottom: 12px;
-  min-height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.stock-editor-box {
-  background: #f8fafc;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 12px;
-}
-.stock-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-.stock-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 3px 8px 3px 10px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text);
-}
-.stock-chip button {
-  background: none;
-  color: var(--red);
-  padding: 0 2px;
-  font-size: 13px;
-  width: auto;
-  line-height: 1;
-}
 </style>
 </head>
 <body>
 <button class="float-reload-btn" onclick="location.reload()" title="ページを更新">🔄</button>
-
 <datalist id="machineSuggestions"></datalist>
 
 <div class="wrap">
   <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
     <h1>🎰 ノリ打ち精算</h1>
-    <div style="display:flex; gap:6px;">
-      <button class="sub-btn" id="openRouletteModal" style="width: auto; padding: 6px 10px; font-size: 11px; background: var(--gradient); color: #fff; border: none; font-weight: 700;">🎯 飯ストルーレット</button>
+    <div>
       <button class="sub-btn" id="openMemberModal" style="width: auto; padding: 6px 10px; font-size: 11px; background: var(--accent-light); color: var(--accent); border: none; font-weight: 700;">メンバー管理</button>
     </div>
   </div>
@@ -534,7 +357,7 @@ tr:last-child td { border-bottom: none; }
   </div>
 
   <button class="main-btn" id="calcBtn">清算</button>
-  <div id="loading" style="display:none; text-align:center; padding:8px; color:var(--accent); font-weight:bold; font-size:13px;">処理中...</div>
+  <div id="loading" style="display:none; text-align:center; padding:8px; color:var(--accent); font-weight:bold; font-size:13px;">通信・同期中...</div>
 
   <div class="card" id="resultCard" style="display:none;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -596,7 +419,6 @@ tr:last-child td { border-bottom: none; }
       <button class="sub-btn" id="settleAllKinstBtn" onclick="settleAllKinst()" style="width:auto; padding:4px 10px; font-size:10px; background:#fff1f2; color:var(--red); border:1px solid #fecdd3; font-weight:700; display:none;">🧹 金スト一括精算</button>
     </div>
     <div id="personalTotals" class="personal-total-grid"></div>
-    <div style="font-size: 10px; color: var(--muted); margin-bottom: 0px;">※選択中の組み合わせ・期間に参加しているメンバーのみ表示されます。</div>
   </div>
 
   <div class="card">
@@ -610,60 +432,26 @@ tr:last-child td { border-bottom: none; }
   </div>
 </div>
 
-<!-- メンバー管理モーダル -->
+<!-- モーダル各種 -->
 <div class="modal" id="memberModal">
   <div class="modal-content">
-    <h2>メンバー管理</h2>
-    <p style="font-size: 11px; color: var(--muted); margin-bottom: 12px;">よく参加するメンバーの名前を登録できます。</p>
-    <div id="memberListEdit" style="margin-bottom: 12px; max-height: 180px; overflow-y: auto;"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <h2 style="margin:0;">メンバー管理 (共有)</h2>
+      <span style="font-size:10px; background:var(--accent-light); color:var(--accent); padding:2px 6px; border-radius:4px; font-weight:700;">スプシ同期</span>
+    </div>
+    <div id="memberListEdit" style="margin-bottom: 12px; max-height: 200px; overflow-y: auto;"></div>
     <div class="grid" style="margin-bottom: 10px;">
       <div class="half"><input type="text" id="newMemberName" placeholder="新しい名前"></div>
-      <div class="half"><button class="sub-btn" id="addMemberStoreBtn" style="background: var(--accent); color: #fff; border:none; height: 100%; padding: 8px;">追加</button></div>
+      <div class="half"><button class="sub-btn" id="addMemberStoreBtn" style="background: var(--accent); color: #fff; border:none; height: 100%; padding: 8px;">＋ 共有追加</button></div>
     </div>
     <button class="sub-btn" id="closeModalBtn" style="background: #f1f5f9; padding: 10px;">閉じる</button>
   </div>
 </div>
 
-<!-- 飯ストルーレットモーダル -->
-<div class="modal" id="rouletteModal">
-  <div class="modal-content">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-      <h2 style="margin:0;">🎯 飯ストルーレット</h2>
-      <button class="sub-btn" id="resetRouletteBtn" style="width:auto; padding:4px 8px; font-size:10px;">最初から</button>
-    </div>
-
-    <div class="roulette-result-banner" id="rouletteBanner">① まずは当選メンバーを抽選！</div>
-    
-    <div class="wheel-wrapper">
-      <div class="wheel-pointer"></div>
-      <canvas id="rouletteCanvas" width="500" height="500"></canvas>
-    </div>
-
-    <button class="main-btn" id="startRouletteBtn" style="margin-bottom: 10px;">🚀 ルーレットを回す！</button>
-
-    <div class="stock-editor-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-        <span style="font-size:11px; font-weight:700; color:var(--muted);">⚙️ ストック数のマス設定（自由に追加・削除）</span>
-      </div>
-      <div class="stock-chips" id="stockChipsContainer"></div>
-      <div style="display:flex; gap:6px;">
-        <input type="number" id="newStockValInput" placeholder="個数 (例: 1)" style="padding:6px 8px; font-size:14px; background:#fff;">
-        <button class="sub-btn" id="addStockValBtn" style="width:auto; padding:6px 12px; font-size:12px; background:var(--accent); color:#fff; border:none; white-space:nowrap;">＋ 追加</button>
-      </div>
-    </div>
-
-    <button class="sub-btn" id="closeRouletteModalBtn" style="background: #f1f5f9; padding: 10px;">閉じる</button>
-  </div>
-</div>
-
-<!-- 履歴修正モーダル -->
 <div class="modal" id="editModal">
   <div class="modal-content">
     <h2>履歴の修正</h2>
-    <div style="margin-bottom: 10px;">
-      <label>実践日</label>
-      <input type="date" id="editDateInput">
-    </div>
+    <div style="margin-bottom: 10px;"><label>実践日</label><input type="date" id="editDateInput"></div>
     <div id="editPlayersContainer" style="margin-bottom: 12px; max-height: 280px; overflow-y: auto;"></div>
     <div style="display: flex; gap: 8px;">
       <button class="sub-btn" id="closeEditModalBtn" style="background: #f1f5f9; flex: 1; padding: 10px;">キャンセル</button>
@@ -683,69 +471,20 @@ function money(v){
 let historyData = [];
 let serverMestMap = {};
 let serverKinstMap = {}; 
-let lastShareMessage = "";
-let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '["Aさん", "Bさん", "Cさん"]');
-let stockOptions = JSON.parse(localStorage.getItem("nori_stock_options") || '[1, 2, 3, 4, 5, 6]');
+let storedMembers = JSON.parse(localStorage.getItem("nori_stored_members") || '[]');
 let sTop = 0;
 let isInitialFilterSet = false;
 let editingRowIdx = null;
+let isInitialPlayersAdded = false;
 
-// --- Web Audio API による効果音生成 ---
-let audioCtx = null;
-function getAudioContext() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-  return audioCtx;
-}
-
-function playTickSound() {
-  try {
-    const ctx = getAudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(650, ctx.currentTime);
-    gain.gain.setValueAtTime(0.06, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.06);
-  } catch(e) {}
-}
-
-function playWinSound() {
-  try {
-    const ctx = getAudioContext();
-    const notes = [523.25, 659.25, 783.99, 1046.50];
-    notes.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.11);
-      gain.gain.setValueAtTime(0.12, ctx.currentTime + idx * 0.11);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.11 + 0.35);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(ctx.currentTime + idx * 0.11);
-      osc.stop(ctx.currentTime + idx * 0.11 + 0.35);
-    });
-  } catch(e) {}
-}
-
-function openModal(modalEl) {
+function openModal(el) {
   sTop = window.scrollY;
   document.body.classList.add("modal-open");
   document.body.style.top = `-${sTop}px`;
-  modalEl.style.display = "flex";
+  el.style.display = "flex";
 }
-
-function closeModal(modalEl) {
-  modalEl.style.display = "none";
+function closeModal(el) {
+  el.style.display = "none";
   document.body.classList.remove("modal-open");
   document.body.style.top = "";
   window.scrollTo(0, sTop);
@@ -756,9 +495,7 @@ function cleanTimeStr(rawTime) {
   let str = String(rawTime);
   if (str.includes("T") || str.includes("-")) {
     let d = new Date(str);
-    if (!isNaN(d.getTime())) {
-      return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-    }
+    if (!isNaN(d.getTime())) return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
   }
   return str;
 }
@@ -766,9 +503,7 @@ function cleanTimeStr(rawTime) {
 function parseDateStrToObj(dateStr) {
   if (!dateStr) return new Date(0);
   let match = dateStr.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
-  if (match) {
-    return new Date(match[1], match[2] - 1, match[3]);
-  }
+  if (match) return new Date(match[1], match[2] - 1, match[3]);
   let d = new Date(dateStr);
   return isNaN(d.getTime()) ? new Date(0) : d;
 }
@@ -792,12 +527,10 @@ function updateMachineSuggestions() {
   historyData.forEach(h => {
     if (h.players) {
       h.players.forEach(p => {
-        if (p.machines && Array.isArray(p.machines)) {
+        if (p.machines) {
           p.machines.forEach(m => {
             let name = (m.machineName || "").trim();
-            if (name && name !== "機種未入力") {
-              machineSet.add(name);
-            }
+            if (name && name !== "機種未入力") machineSet.add(name);
           });
         }
       });
@@ -811,33 +544,75 @@ function updateMachineSuggestions() {
   });
 }
 
+function refreshAllMemberDropdowns() {
+  document.querySelectorAll(".name-select, .edit-name-select").forEach(selectEl => {
+    const currentVal = selectEl.value;
+    let options = '<option value="">選択してください</option>';
+    let displayList = [...storedMembers];
+    if (currentVal && !displayList.includes(currentVal)) displayList.push(currentVal);
+    displayList.forEach(m => {
+      options += `<option value="${m}" ${m === currentVal ? 'selected' : ''}>${m}</option>`;
+    });
+    selectEl.innerHTML = options;
+  });
+}
+
 async function loadHistory() {
   const historyEl = document.getElementById("history");
   try {
     const res = await fetch(GAS_URL);
     let jsonRes = await res.json();
     
-    historyData = (jsonRes.history || []).map(item => ({ ...item, time: cleanTimeStr(item.time) }));
+    historyData = (jsonRes.history || []).map(item => ({ 
+      ...item, 
+      time: cleanTimeStr(item.time) 
+    }));
+    
     serverMestMap = jsonRes.mestMap || {};
     serverKinstMap = jsonRes.kinstMap || {};
+
+    if (Array.isArray(jsonRes.members) && jsonRes.members.length > 0) {
+      storedMembers = jsonRes.members;
+      localStorage.setItem("nori_stored_members", JSON.stringify(storedMembers));
+    } else {
+      let extracted = new Set(storedMembers);
+      historyData.forEach(h => {
+        if (h.players) h.players.forEach(p => { if (p.name) extracted.add(p.name); });
+      });
+      storedMembers = extracted.size > 0 ? Array.from(extracted) : ["Aさん", "Bさん", "Cさん"];
+      localStorage.setItem("nori_stored_members", JSON.stringify(storedMembers));
+    }
     
     historyData.sort((a, b) => parseDateStrToObj(a.time) - parseDateStrToObj(b.time));
     updateMachineSuggestions();
+    refreshAllMemberDropdowns();
+
+    if (!isInitialPlayersAdded) {
+      const playersDiv = document.getElementById("players");
+      if (playersDiv && playersDiv.children.length === 0) {
+        addPlayer(storedMembers[0] || "Aさん");
+        if (storedMembers[1]) addPlayer(storedMembers[1]);
+      }
+      isInitialPlayersAdded = true;
+    }
+
     renderAll();
   } catch (e) { 
+    console.error("Load error:", e);
     historyEl.innerHTML = "履歴の読み込みに失敗しました。";
-    historyData = [];
-    serverMestMap = {};
-    serverKinstMap = {};
+    if (storedMembers.length === 0) storedMembers = ["Aさん", "Bさん", "Cさん"];
+    if (!isInitialPlayersAdded) {
+      addPlayer(storedMembers[0]);
+      if (storedMembers[1]) addPlayer(storedMembers[1]);
+      isInitialPlayersAdded = true;
+    }
     renderAll();
   }
 }
 
-// 飯スト消費
 window.updateMemberMest = async function(name, delta) {
   let currentCount = serverMestMap[name] || 0;
   if(delta < 0 && currentCount <= 0) return;
-  
   if(!confirm(`「${name}」の飯ストを1つ消費しますか？`)) return;
 
   document.getElementById("loading").style.display = "block";
@@ -845,45 +620,26 @@ window.updateMemberMest = async function(name, delta) {
   renderPersonalTotalsAndHistory();
 
   try {
-    await fetch(GAS_URL, { 
-      method: "POST", 
-      mode: "no-cors", 
-      body: JSON.stringify({ method: "UPDATE_MEST", name: name, delta: delta }) 
-    });
-  } catch(e) {
-    console.error(e);
-  }
+    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "UPDATE_MEST", name, delta }) });
+  } catch(e) {}
   document.getElementById("loading").style.display = "none";
 };
 
-// ★金スト一括精算
 window.settleAllKinst = async function() {
-  if(!confirm("未清算の金スト（全員分）をすべて精算（リセット）して 0円 にしますか？")) return;
-
+  if(!confirm("未清算の金ストをすべて精算して 0円 にしますか？")) return;
   document.getElementById("loading").style.display = "block";
-
   let updates = [];
   for (let name in serverKinstMap) {
     let amt = serverKinstMap[name];
     if (amt !== 0) {
-      updates.push({ name: name, delta: -amt });
+      updates.push({ name, delta: -amt });
       serverKinstMap[name] = 0;
     }
   }
-
   renderPersonalTotalsAndHistory();
-
   try {
-    await Promise.all(updates.map(u => 
-      fetch(GAS_URL, { 
-        method: "POST", 
-        mode: "no-cors", 
-        body: JSON.stringify({ method: "UPDATE_KINST", name: u.name, delta: u.delta }) 
-      })
-    ));
-  } catch(e) {
-    console.error(e);
-  }
+    await Promise.all(updates.map(u => fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "UPDATE_KINST", name: u.name, delta: u.delta }) })));
+  } catch(e) {}
   document.getElementById("loading").style.display = "none";
 };
 
@@ -891,96 +647,49 @@ window.stockKinstFromSession = async function(sessionTransfersStr) {
   try {
     let transfers = JSON.parse(decodeURIComponent(sessionTransfersStr));
     if(!transfers || transfers.length === 0) return;
-
-    let summaryText = transfers.map(t => `${t.from} → ${t.to}: ${t.amount}円`).join("\n");
-    if(!confirm(`以下の受け渡し内容をそれぞれの金ストとして未清算ストックに登録しますか？\n\n${summaryText}`)) return;
+    if(!confirm("以下の受け渡し内容をそれぞれの金ストとして登録しますか？")) return;
 
     document.getElementById("loading").style.display = "block";
-
     let requests = [];
     for (let t of transfers) {
       serverKinstMap[t.from] = (serverKinstMap[t.from] || 0) - t.amount;
       serverKinstMap[t.to] = (serverKinstMap[t.to] || 0) + t.amount;
-
       requests.push(fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "UPDATE_KINST", name: t.from, delta: -t.amount }) }));
       requests.push(fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "UPDATE_KINST", name: t.to, delta: t.amount }) }));
     }
-
     await Promise.all(requests);
     renderPersonalTotalsAndHistory();
-    alert("金ストに登録しました！");
-  } catch(e) {
-    console.error(e);
-    alert("金ストへの登録に失敗しました。");
-  }
+    alert("登録しました！");
+  } catch(e) {}
   document.getElementById("loading").style.display = "none";
 };
 
-// 飯スト追加（ルーレット当選時）
-async function addMemberMestDirect(name, count) {
-  if (!name || count === 0) return;
-  document.getElementById("loading").style.display = "block";
-  serverMestMap[name] = (serverMestMap[name] || 0) + count;
-  renderPersonalTotalsAndHistory();
-  try {
-    await fetch(GAS_URL, { 
-      method: "POST", 
-      mode: "no-cors", 
-      body: JSON.stringify({ method: "UPDATE_MEST", name: name, delta: count }) 
-    });
-  } catch(e) {
-    console.error(e);
-  }
-  document.getElementById("loading").style.display = "none";
-}
-
 async function deleteHistory(rowIdx) {
   if(!confirm("この回の履歴を削除しますか？")) return;
-  
   document.getElementById("loading").style.display = "block";
   try {
-    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx: rowIdx }) });
+    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE", rowIdx }) });
     await loadHistory();
-  } catch(e) {
-    console.error(e);
-  }
+  } catch(e) {}
   document.getElementById("loading").style.display = "none";
 }
 
 window.editHistory = function(rowIdx) {
   const target = historyData.find(h => h.rowIdx === rowIdx);
-  if (!target) {
-    alert("該当する履歴が見つかりませんでした。");
-    return;
-  }
-
+  if (!target) return;
   editingRowIdx = rowIdx;
-
   let match = target.time.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
-  if (match) {
-    let y = match[1];
-    let m = String(match[2]).padStart(2, '0');
-    let d = String(match[3]).padStart(2, '0');
-    document.getElementById("editDateInput").value = `${y}-${m}-${d}`;
-  } else {
-    document.getElementById("editDateInput").value = "";
-  }
+  document.getElementById("editDateInput").value = match ? `${match[1]}-${String(match[2]).padStart(2,'0')}-${String(match[3]).padStart(2,'0')}` : "";
 
   const container = document.getElementById("editPlayersContainer");
   container.innerHTML = "";
-  
-  if (target.players && target.players.length > 0) {
+  if (target.players) {
     target.players.forEach(p => {
-      let inv = p.invest !== undefined ? p.invest : 0;
-      let csh = p.cash !== undefined ? p.cash : 0;
       let machines = p.machines || [];
-      if (machines.length === 0 && (inv > 0 || csh > 0)) {
-        machines = [{ machineName: "", machineInvest: inv, machineCash: csh }];
-      }
+      if (machines.length === 0) machines = [{ machineName: "", machineInvest: p.invest || 0, machineCash: p.cash || 0 }];
       addEditPlayerRow(container, p.name, machines);
     });
   }
-
   openModal(document.getElementById("editModal"));
 };
 
@@ -988,147 +697,70 @@ function addEditPlayerRow(container, selectedName = "", machines = []) {
   const div = document.createElement("div");
   div.className = "player";
   let options = '<option value="">選択してください</option>';
-  storedMembers.forEach(m => {
-    const selected = (m === selectedName) ? 'selected' : '';
-    options += `<option value="${m}" ${selected}>${m}</option>`;
-  });
+  let list = [...storedMembers];
+  if (selectedName && !list.includes(selectedName)) list.push(selectedName);
+  list.forEach(m => { options += `<option value="${m}" ${m === selectedName ? 'selected' : ''}>${m}</option>`; });
 
   div.innerHTML = `
-    <div style="margin-bottom: 6px;">
-      <label>名前</label>
-      <select class="edit-name-select" style="background:#fff; padding: 6px 8px;">${options}</select>
-    </div>
-    <div style="margin-top:4px;">
-      <label>打った機種・投資・回収</label>
-      <div class="machine-list-box edit-machine-container"></div>
-      <button class="sub-btn" type="button" onclick="addEditMachineRow(this.closest('.player').querySelector('.edit-machine-container'))" style="margin-top:4px; padding:4px; font-size:11px; background:#fff; color:var(--accent);">＋ 機種を追加</button>
-    </div>
-    <div style="margin-top:6px; display:flex; justify-content:flex-end;">
-      <button class="delete-btn" onclick="this.closest('.player').remove()">このメンバーを外す</button>
-    </div>
+    <div style="margin-bottom: 6px;"><label>名前</label><select class="edit-name-select" style="background:#fff; padding: 6px 8px;">${options}</select></div>
+    <div><label>打った機種・投資・回収</label><div class="machine-list-box edit-machine-container"></div>
+    <button class="sub-btn" type="button" onclick="addEditMachineRow(this.closest('.player').querySelector('.edit-machine-container'))" style="margin-top:4px; padding:4px; font-size:11px; background:#fff; color:var(--accent);">＋ 機種を追加</button></div>
+    <div style="margin-top:6px; display:flex; justify-content:flex-end;"><button class="delete-btn" onclick="this.closest('.player').remove()">外す</button></div>
   `;
   container.appendChild(div);
-
   const mContainer = div.querySelector('.edit-machine-container');
-  if(machines && machines.length > 0) {
-    machines.forEach(mObj => {
-      let mNameVal = (mObj.machineName === "機種未入力") ? "" : (mObj.machineName || "");
-      addEditMachineRow(mContainer, mNameVal, mObj.machineInvest !== undefined ? mObj.machineInvest : "", mObj.machineCash !== undefined ? mObj.machineCash : "");
-    });
-  } else {
-    addEditMachineRow(mContainer, "", "", "");
-  }
+  machines.forEach(m => addEditMachineRow(mContainer, m.machineName === "機種未入力" ? "" : (m.machineName || ""), m.machineInvest || "", m.machineCash || ""));
 }
 
 window.addEditMachineRow = function(container, mName = "", mInv = "", mCsh = "") {
   const row = document.createElement("div");
   row.className = "machine-row";
   row.innerHTML = `
-    <input class="edit-machine-name" type="text" list="machineSuggestions" placeholder="機種名を入力" value="${mName}" style="flex: 2.2; padding: 6px 8px; background:#fff;">
-    <input class="edit-machine-invest" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="投資" value="${mInv}" style="flex: 1; padding: 6px 6px;">
-    <input class="edit-machine-cash" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="回収" value="${mCsh}" style="flex: 1; padding: 6px 6px;">
-    <button class="delete-btn" type="button" onclick="this.closest('.machine-row').remove()" style="padding:4px 6px;">×</button>
+    <input class="edit-machine-name" type="text" list="machineSuggestions" placeholder="機種名" value="${mName}" style="flex: 2.2; padding: 6px; background:#fff;">
+    <input class="edit-machine-invest" type="number" placeholder="投資" value="${mInv}" style="flex: 1; padding: 6px;">
+    <input class="edit-machine-cash" type="number" placeholder="回収" value="${mCsh}" style="flex: 1; padding: 6px;">
+    <button class="delete-btn" type="button" onclick="this.closest('.machine-row').remove()" style="padding:4px;">×</button>
   `;
   container.appendChild(row);
 };
 
-// ★ 安全な上書き保存（通信の競合によるデータ消失を防ぐためEDITメソッドに統合）
 document.getElementById("saveEditBtn").onclick = async function() {
   const pNodes = document.querySelectorAll("#editPlayersContainer .player");
-  if(pNodes.length === 0) {
-    alert("参加者を1人以上設定してください");
-    return;
-  }
-
   let players = [];
-  let hasError = false;
-
   pNodes.forEach(node => {
     const name = node.querySelector(".edit-name-select").value;
-
-    let machines = [];
-    let invest = 0;
-    let cash = 0;
-
+    let machines = [], invest = 0, cash = 0;
     node.querySelectorAll(".machine-row").forEach(mRow => {
       const mName = mRow.querySelector(".edit-machine-name").value.trim();
-      const mInvStr = mRow.querySelector(".edit-machine-invest").value;
-      const mCshStr = mRow.querySelector(".edit-machine-cash").value;
-      const mInv = mInvStr === "" ? 0 : +mInvStr;
-      const mCsh = mCshStr === "" ? 0 : +mCshStr;
-
-      if(mName || mInvStr !== "" || mCshStr !== "") {
-        machines.push({ 
-          machineName: mName, 
-          machineInvest: mInv, 
-          machineCash: mCsh 
-        });
-        invest += mInv;
-        cash += mCsh;
-      }
+      const mInv = +mRow.querySelector(".edit-machine-invest").value || 0;
+      const mCsh = +mRow.querySelector(".edit-machine-cash").value || 0;
+      machines.push({ machineName: mName, machineInvest: mInv, machineCash: mCsh });
+      invest += mInv; cash += mCsh;
     });
-
-    if(!name) hasError = true;
-    const individualProfit = cash - invest;
-    players.push({ name, val: individualProfit, invest, cash, machines });
+    players.push({ name, val: cash - invest, invest, cash, machines });
   });
 
-  if(hasError) {
-    alert("名前が未選択の参加者がいます。");
-    return;
-  }
-
   const totalProfit = players.reduce((s, p) => s + p.val, 0);
-  const dateInputVal = document.getElementById("editDateInput").value;
-  let formattedDateStr = "";
-  if (dateInputVal) {
-    let parts = dateInputVal.split("-");
-    formattedDateStr = `${parts[0]}年${Number(parts[1])}月${Number(parts[2])}日`;
-  } else {
-    formattedDateStr = "日付不明";
-  }
+  const dateVal = document.getElementById("editDateInput").value;
+  const formattedDate = dateVal ? `${dateVal.split('-')[0]}年${Number(dateVal.split('-')[1])}月${Number(dateVal.split('-')[2])}日` : "日付不明";
 
   closeModal(document.getElementById("editModal"));
   document.getElementById("loading").style.display = "block";
-
   try {
-    // 1回のPOSTリクエストで安全に上書き更新する
-    const updatePayload = {
-      method: "EDIT",
-      rowIdx: editingRowIdx,
-      time: formattedDateStr,
-      profit: totalProfit,
-      players: players
-    };
-
-    await fetch(GAS_URL, { 
-      method: "POST", 
-      mode: "no-cors", 
-      body: JSON.stringify(updatePayload) 
-    });
-
+    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "EDIT", rowIdx: editingRowIdx, time: formattedDate, profit: totalProfit, players }) });
     await loadHistory();
-  } catch (e) {
-    console.error(e);
-    alert("保存に失敗しました。通信環境を確認してください。");
-  }
-
+  } catch(e) {}
   document.getElementById("loading").style.display = "none";
 };
 
-document.getElementById("closeEditModalBtn").onclick = () => {
-  closeModal(document.getElementById("editModal"));
-};
+document.getElementById("closeEditModalBtn").onclick = () => closeModal(document.getElementById("editModal"));
 
 function renderAll() {
   const graphsArea = document.getElementById("graphsArea");
-  if(!Array.isArray(historyData) || historyData.length === 0){
+  if(!historyData.length){
     graphsArea.style.display = "none";
     document.getElementById("history").innerHTML = "履歴はありません。";
     document.getElementById("personalTotals").innerHTML = "";
-    document.getElementById("grandTotalDisplay").textContent = "0円";
-    document.getElementById("grandPerDisplay").textContent = "1人: 0円";
-    document.getElementById("grandWinRateDisplay").textContent = "勝率: 0%";
     return;
   }
   graphsArea.style.display = "block";
@@ -1143,32 +775,21 @@ function renderFilteredContent() {
 }
 
 function calculateTransfers(players) {
-  if (!players || players.length === 0) return [];
-  const totalProfit = players.reduce((sum, p) => sum + Number(p.val || 0), 0);
-  const fairProfitPerPerson = totalProfit / players.length;
-
+  if (!players.length) return [];
+  const fair = players.reduce((sum, p) => sum + Number(p.val || 0), 0) / players.length;
   let receive = [], pay = [];
   players.forEach(p => {
-    const invest = p.invest !== undefined ? Number(p.invest) : 0;
-    const cash = p.cash !== undefined ? Number(p.cash) : 0;
-    const targetAmount = invest + fairProfitPerPerson;
-    const diff = cash - targetAmount; 
-
-    if(diff > 1) {
-      pay.push({ name: p.name, amount: diff });
-    } else if(diff < -1) {
-      receive.push({ name: p.name, amount: -diff });
-    }
+    const diff = (p.cash || 0) - ((p.invest || 0) + fair);
+    if(diff > 1) pay.push({ name: p.name, amount: diff });
+    else if(diff < -1) receive.push({ name: p.name, amount: -diff });
   });
-
   let transfers = [];
   pay.forEach(p => {
     receive.forEach(r => {
       if(p.amount <= 0 || r.amount <= 0) return;
       const move = Math.min(p.amount, r.amount);
       transfers.push({ from: p.name, to: r.name, amount: Math.round(move) });
-      p.amount -= move; 
-      r.amount -= move;
+      p.amount -= move; r.amount -= move;
     });
   });
   return transfers;
@@ -1177,89 +798,57 @@ function calculateTransfers(players) {
 function renderPersonalTotalsAndHistory() {
   const personalEl = document.getElementById("personalTotals");
   const histEl = document.getElementById("history");
-  const comboSelect = document.getElementById("combinationSelect");
-  const yearSelect = document.getElementById("yearSelect");
-  const monthSelect = document.getElementById("monthSelect");
+  const selectedCombo = document.getElementById("combinationSelect").value;
+  const selectedYear = document.getElementById("yearSelect").value;
+  const selectedMonth = document.getElementById("monthSelect").value;
 
   personalEl.innerHTML = "";
   histEl.innerHTML = "";
 
-  const selectedCombo = comboSelect ? comboSelect.value : "";
-  const selectedYear = yearSelect ? yearSelect.value : "all";
-  const selectedMonth = monthSelect ? monthSelect.value : "all";
-
-  let filteredHistory = historyData.filter(h => {
+  let filtered = historyData.filter(h => {
     const names = h.players.map(p => p.name).sort().join(", ");
     if(selectedCombo && names !== selectedCombo) return false;
     return matchFilter(h, selectedYear, selectedMonth);
   });
 
-  if(filteredHistory.length === 0) {
-    personalEl.innerHTML = "<div style='font-size:11px; color:var(--muted); grid-column: 1/-1;'>該当するメンバー・期間の実績はありません。</div>";
+  if(!filtered.length) {
+    personalEl.innerHTML = "<div style='font-size:11px; color:var(--muted); grid-column: 1/-1;'>該当実績なし</div>";
     histEl.innerHTML = "該当する期間の履歴はありません。";
     return;
   }
 
   let pStats = {};
-  filteredHistory.forEach((h) => {
-    const totalProfit = h.players.reduce((sum, p) => sum + Number(p.val || 0), 0);
-    const fairProfitPerPerson = h.players.length > 0 ? totalProfit / h.players.length : 0;
-
+  filtered.forEach(h => {
+    const fair = h.players.length ? h.players.reduce((s, p) => s + Number(p.val || 0), 0) / h.players.length : 0;
     let transfers = calculateTransfers(h.players);
-    let sessionNetMap = {};
-    h.players.forEach(p => sessionNetMap[p.name] = 0);
-
-    if (transfers.length > 0) {
-      h.players.forEach(p => {
-        let pInv = p.invest !== undefined ? Number(p.invest) : 0;
-        let pCsh = p.cash !== undefined ? Number(p.cash) : 0;
-        const targetAmount = pInv + fairProfitPerPerson;
-        let netDiff = pCsh - targetAmount;
-        sessionNetMap[p.name] = netDiff;
-      });
-    }
+    let netMap = {};
+    if (transfers.length) h.players.forEach(p => netMap[p.name] = (p.cash || 0) - ((p.invest || 0) + fair));
 
     h.players.forEach(p => {
-      if(!pStats[p.name]) {
-        pStats[p.name] = { total: 0, count: 0, wins: 0, netTransferSum: 0 };
-      }
-      pStats[p.name].total += Number(p.val);
+      if(!pStats[p.name]) pStats[p.name] = { total: 0, count: 0, wins: 0, netSum: 0 };
+      pStats[p.name].total += Number(p.val || 0);
       pStats[p.name].count += 1;
-      if(Number(p.val) >= 0) {
-        pStats[p.name].wins += 1;
-      }
-      pStats[p.name].netTransferSum += (sessionNetMap[p.name] || 0);
+      if(Number(p.val || 0) >= 0) pStats[p.name].wins += 1;
+      pStats[p.name].netSum += (netMap[p.name] || 0);
     });
   });
 
-  let hasAnyKinst = Object.values(serverKinstMap).some(v => v !== 0);
-  const settleAllBtn = document.getElementById("settleAllKinstBtn");
-  if(settleAllBtn) {
-    settleAllBtn.style.display = hasAnyKinst ? "block" : "none";
-  }
+  let hasKinst = Object.values(serverKinstMap).some(v => v !== 0);
+  const settleBtn = document.getElementById("settleAllKinstBtn");
+  if(settleBtn) settleBtn.style.display = hasKinst ? "block" : "none";
 
   Object.keys(pStats).sort().forEach(name => {
     const s = pStats[name];
-    const winRate = s.count > 0 ? Math.round((s.wins / s.count) * 100) : 0;
+    const winRate = s.count ? Math.round((s.wins / s.count) * 100) : 0;
     let mestCount = serverMestMap[name] || 0;
-    let kinstAmount = serverKinstMap[name] || 0;
-    const canConsumeMest = mestCount > 0;
+    let kinst = serverKinstMap[name] || 0;
+    const roundedNet = Math.round(s.netSum);
 
-    let settleSummaryHtml = "";
-    const roundedNet = Math.round(s.netTransferSum);
-    if (roundedNet > 1) {
-      settleSummaryHtml = `<div style="font-size:10px; font-weight:700; color:var(--green); margin-bottom:2px;">貢献: ${new Intl.NumberFormat("ja-JP").format(roundedNet)}円</div>`;
-    } else if (roundedNet < -1) {
-      settleSummaryHtml = `<div style="font-size:10px; font-weight:700; color:var(--red); margin-bottom:2px;">強盗: ${new Intl.NumberFormat("ja-JP").format(Math.round(-roundedNet))}円</div>`;
-    } else {
-      settleSummaryHtml = `<div style="font-size:10px; font-weight:700; color:var(--muted); margin-bottom:2px;">平和: 0円</div>`;
-    }
+    let settleHtml = roundedNet > 1 ? `<div style="font-size:10px; font-weight:700; color:var(--green); margin-bottom:2px;">貢献: ${new Intl.NumberFormat("ja-JP").format(roundedNet)}円</div>` :
+                     roundedNet < -1 ? `<div style="font-size:10px; font-weight:700; color:var(--red); margin-bottom:2px;">強盗: ${new Intl.NumberFormat("ja-JP").format(-roundedNet)}円</div>` :
+                     `<div style="font-size:10px; font-weight:700; color:var(--muted); margin-bottom:2px;">平和: 0円</div>`;
 
-    let kinstColor = kinstAmount > 0 ? "var(--green)" : (kinstAmount < 0 ? "var(--red)" : "var(--muted)");
-
-    let mestBtnHtml = canConsumeMest 
-      ? `<button class="mest-btn" onclick="updateMemberMest('${name}', -1)">消費</button>` 
-      : `<button class="mest-btn" disabled>-</button>`;
+    let kinstColor = kinst > 0 ? "var(--green)" : (kinst < 0 ? "var(--red)" : "var(--muted)");
 
     const pCard = document.createElement("div");
     pCard.className = "personal-card";
@@ -1267,19 +856,16 @@ function renderPersonalTotalsAndHistory() {
       <div>
         <div class="name-label">${name}</div>
         <div class="amount-value" style="color:${s.total>=0?'var(--green)':'var(--red)'}">${money(s.total)}</div>
-        <div class="sub-info">
-          <span>勝率: ${winRate}%</span>
-          <span>(${s.wins}勝/${s.count}回)</span>
-        </div>
-        ${settleSummaryHtml}
+        <div class="sub-info"><span>勝率: ${winRate}%</span><span>(${s.wins}勝/${s.count}回)</span></div>
+        ${settleHtml}
       </div>
       <div>
         <div class="mest-row">
           <span class="mest-text">飯スト: <b style="color:var(--accent);">${mestCount}</b></span>
-          ${mestBtnHtml}
+          ${mestCount > 0 ? `<button class="mest-btn" onclick="updateMemberMest('${name}', -1)">消費</button>` : `<button class="mest-btn" disabled>-</button>`}
         </div>
         <div class="mest-row" style="border-top:none; margin-top:2px; padding-top:2px;">
-          <span class="mest-text">金スト: <b style="color:${kinstColor};">${new Intl.NumberFormat("ja-JP").format(kinstAmount)}円</b></span>
+          <span class="mest-text">金スト: <b style="color:${kinstColor};">${new Intl.NumberFormat("ja-JP").format(kinst)}円</b></span>
           <span style="font-size:10px; color:var(--muted);">-</span>
         </div>
       </div>
@@ -1287,140 +873,60 @@ function renderPersonalTotalsAndHistory() {
     personalEl.appendChild(pCard);
   });
 
-  let dateGroupMap = {};
-  filteredHistory.forEach(h => {
-    let dKey = h.time || "日付不明";
-    if (!dateGroupMap[dKey]) {
-      dateGroupMap[dKey] = [];
-    }
-    dateGroupMap[dKey].push(h);
+  let dateGroup = {};
+  filtered.forEach(h => {
+    if(!dateGroup[h.time]) dateGroup[h.time] = [];
+    dateGroup[h.time].push(h);
   });
 
-  let sortedDates = Object.keys(dateGroupMap).sort((a, b) => parseDateStrToObj(b) - parseDateStrToObj(a));
-
-  sortedDates.forEach(dateStr => {
-    let sessions = dateGroupMap[dateStr];
-    
-    let dayTotalProfit = 0;
-    let uniqueMembers = new Set();
-    sessions.forEach(s => {
-      dayTotalProfit += Number(s.profit || 0);
-      if (s.players) {
-        s.players.forEach(p => uniqueMembers.add(p.name));
-      }
-    });
-    let memberCount = uniqueMembers.size > 0 ? uniqueMembers.size : 1;
-    let dayPerProfit = dayTotalProfit / memberCount;
+  Object.keys(dateGroup).sort((a, b) => parseDateStrToObj(b) - parseDateStrToObj(a)).forEach(dateStr => {
+    let sessions = dateGroup[dateStr];
+    let dayTotal = sessions.reduce((s, x) => s + Number(x.profit || 0), 0);
+    let membersSet = new Set();
+    sessions.forEach(s => s.players.forEach(p => membersSet.add(p.name)));
+    let dayPer = dayTotal / (membersSet.size || 1);
 
     let sessionsHtml = "";
     sessions.forEach((s, idx) => {
       let sProfit = Number(s.profit || 0);
-      let sPer = s.players.length > 0 ? sProfit / s.players.length : 0;
-      const fairProfitPerPerson = sPer;
-
+      let sPer = s.players.length ? sProfit / s.players.length : 0;
       let transfers = calculateTransfers(s.players);
-      let hasTransfers = transfers.length > 0;
 
       let pDetails = "";
       s.players.forEach(p => {
-        let pInv = p.invest !== undefined ? Number(p.invest) : 0;
-        let pCsh = p.cash !== undefined ? Number(p.cash) : 0;
-        
-        let statusHtml = "";
-        if (hasTransfers) {
-          const targetAmount = pInv + fairProfitPerPerson;
-          let netDiff = pCsh - targetAmount;
+        let pInv = p.invest || 0, pCsh = p.cash || 0;
+        let diff = pCsh - (pInv + sPer);
+        let status = diff > 1 ? `<span style="color:var(--green); font-weight:700;">貢献: ${Math.round(diff)}円</span>` : diff < -1 ? `<span style="color:var(--red); font-weight:700;">強盗: ${Math.round(-diff)}円</span>` : `<span style="color:var(--muted); font-weight:700;">平和</span>`;
 
-          if (netDiff > 1) {
-            statusHtml = `<span style="color:var(--green); font-weight:700;">貢献: ${new Intl.NumberFormat("ja-JP").format(Math.round(netDiff))}円</span>`;
-          } else if (netDiff < -1) {
-            statusHtml = `<span style="color:var(--red); font-weight:700;">強盗: ${new Intl.NumberFormat("ja-JP").format(Math.round(-netDiff))}円</span>`;
-          } else {
-            statusHtml = `<span style="color:var(--muted); font-weight:700;">平和: 0円</span>`;
-          }
-        }
-
-        let machinesList = p.machines || [];
-        let validMachines = machinesList.filter(m => {
-          let mName = (m.machineName || "").trim();
-          return mName && mName !== "機種未入力";
-        });
-
-        let detailsHtml = "";
-        if (validMachines.length > 0) {
-          let listHtml = "";
-          validMachines.forEach(m => {
-            let mNameDisplay = m.machineName ? `🎰 ${m.machineName}` : "🎰 機種未入力";
-            listHtml += `
-              <div style="margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #f1f5f9;">
-                <div style="font-size:11px; color:var(--text); margin-bottom: 2px;">${mNameDisplay}</div>
-                <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px;">
-                  <span>投資:${new Intl.NumberFormat("ja-JP").format(m.machineInvest)}</span>
-                  <span>回収:${new Intl.NumberFormat("ja-JP").format(m.machineCash)}</span>
-                </div>
-              </div>
-            `;
-          });
-          detailsHtml = `<div style="margin-top:4px;">${listHtml}</div>`;
-        } else {
-          detailsHtml = `
-            <div style="display:flex; justify-content:space-between; color:var(--muted); font-size:10px; margin-top:4px; margin-bottom:2px; white-space:nowrap;">
-              <span>投資:${new Intl.NumberFormat("ja-JP").format(pInv)}</span>
-              <span>回収:${new Intl.NumberFormat("ja-JP").format(pCsh)}</span>
-            </div>
-          `;
-        }
+        let validMachines = (p.machines || []).filter(m => m.machineName && m.machineName !== "機種未入力");
+        let mHtml = validMachines.length ? validMachines.map(m => `<div style="font-size:10px; color:var(--muted);">🎰 ${m.machineName} (投${m.machineInvest}/収${m.machineCash})</div>`).join("") :
+                    `<div style="font-size:10px; color:var(--muted);">投:${pInv} / 収:${pCsh}</div>`;
 
         pDetails += `
           <div class="hist-player-mini">
-            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; margin-bottom:4px; font-size:12px;">
-              <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:60%;">${p.name}</span>
-              <span style="color:${p.val>=0?'var(--green)':'var(--red)'}; white-space:nowrap;">${money(p.val)}</span>
+            <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:2px;">
+              <span>${p.name}</span><span style="color:${p.val>=0?'var(--green)':'var(--red)'}">${money(p.val)}</span>
             </div>
-            ${detailsHtml}
-            ${hasTransfers ? `<div style="font-size:10px; text-align:right; margin-top:4px; border-top:1px dashed var(--line); padding-top:2px;">${statusHtml}</div>` : ''}
+            ${mHtml}
+            <div style="font-size:10px; text-align:right; margin-top:2px;">${status}</div>
           </div>
         `;
       });
 
       let transferHtml = "";
-      let kinstBtnHtml = "";
-      if (hasTransfers) {
-        let rows = "";
-        transfers.forEach(t => {
-          rows += `<div class="pay-row"><span><b>${t.from}</b> → ${t.to}</span><span style="color:var(--green); font-weight:800;">${new Intl.NumberFormat("ja-JP").format(t.amount)}円</span></div>`;
-        });
-        
-        let encodedTransfers = encodeURIComponent(JSON.stringify(transfers));
-        kinstBtnHtml = `
-          <button class="sub-btn" onclick="stockKinstFromSession('${encodedTransfers}')" style="margin-top:6px; padding:6px 8px; font-size:11px; background:#fff; color:var(--accent); font-weight:700; border:1px solid var(--accent);">💰 この回の受け渡しを金ストに登録する</button>
-        `;
-
-        transferHtml = `
-          <div style="margin-top:4px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:6px 8px;">
-            <div style="font-weight:700; color:#166534; font-size:10px; margin-bottom:2px;">💸 お金の受け渡し指示</div>
-            ${rows}
-            ${kinstBtnHtml}
-          </div>
-        `;
+      if (transfers.length) {
+        let rows = transfers.map(t => `<div class="pay-row"><span><b>${t.from}</b> → ${t.to}</span><span style="color:var(--green);font-weight:800;">${t.amount}円</span></div>`).join("");
+        transferHtml = `<div style="margin-top:4px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:6px;"><div style="font-weight:700; color:#166534; font-size:10px; margin-bottom:2px;">💸 受け渡し指示</div>${rows}<button class="sub-btn" onclick="stockKinstFromSession('${encodeURIComponent(JSON.stringify(transfers))}')" style="margin-top:4px; padding:4px; font-size:10px; background:#fff; color:var(--accent);">💰 金ストに登録</button></div>`;
       }
 
       sessionsHtml += `
         <div class="session-block">
-          <div class="session-title">
-            <span>第 ${idx + 1} 回セッション</span>
-            <div style="display:flex; gap:3px;">
-              <button class="edit-btn" onclick="editHistory(${s.rowIdx})">修正</button>
-              <button class="delete-btn" onclick="deleteHistory(${s.rowIdx})">削除</button>
-            </div>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; font-size:11px; font-weight:700;">
+          <div class="session-title"><span>第 ${idx + 1} 回セッション</span><div style="display:flex; gap:3px;"><button class="edit-btn" onclick="editHistory(${s.rowIdx})">修正</button><button class="delete-btn" onclick="deleteHistory(${s.rowIdx})">削除</button></div></div>
+          <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; margin-bottom:4px;">
             <span>合計: <span style="color:${sProfit>=0?'var(--green)':'var(--red)'}">${money(sProfit)}</span></span>
-            <span class="hist-per-badge" style="background:var(--accent-light); color:var(--accent); padding:1px 4px; border-radius:3px; font-size:10px;">1人: ${money(sPer)}</span>
+            <span style="background:var(--accent-light); color:var(--accent); padding:1px 4px; border-radius:3px;">1人: ${money(sPer)}</span>
           </div>
-          <div class="hist-players-grid">
-            ${pDetails}
-          </div>
+          <div class="hist-players-grid">${pDetails}</div>
           ${transferHtml}
         </div>
       `;
@@ -1431,11 +937,8 @@ function renderPersonalTotalsAndHistory() {
     box.innerHTML = `
       <div class="hist-date-header">📅 ${dateStr}</div>
       <div class="hist-day-summary">
-        <div class="hist-day-summary-left">
-          <span style="font-size:10px; opacity:0.9;">トータル:</span>
-          <span style="font-size:13px; font-weight:900; white-space:nowrap;">${money(dayTotalProfit)}</span>
-        </div>
-        <span class="hist-day-per">1人: ${money(dayPerProfit)}</span>
+        <div class="hist-day-summary-left"><span style="font-size:10px;">トータル:</span><span style="font-size:13px; font-weight:900;">${money(dayTotal)}</span></div>
+        <span class="hist-day-per">1人: ${money(dayPer)}</span>
       </div>
       ${sessionsHtml}
     `;
@@ -1444,79 +947,43 @@ function renderPersonalTotalsAndHistory() {
 }
 
 function renderGrandTotals() {
-  const grandEl = document.getElementById("grandTotalDisplay");
-  const grandPerEl = document.getElementById("grandPerDisplay");
-  const grandWinRateEl = document.getElementById("grandWinRateDisplay");
-  const grandLabelEl = document.getElementById("grandTotalLabel");
-  const comboSelect = document.getElementById("combinationSelect");
-  const yearSelect = document.getElementById("yearSelect");
-  const monthSelect = document.getElementById("monthSelect");
+  const selectedCombo = document.getElementById("combinationSelect").value;
+  const selectedYear = document.getElementById("yearSelect").value;
+  const selectedMonth = document.getElementById("monthSelect").value;
 
-  const selectedCombo = comboSelect ? comboSelect.value : "";
-  const selectedYear = yearSelect ? yearSelect.value : "all";
-  const selectedMonth = monthSelect ? monthSelect.value : "all";
+  document.getElementById("grandTotalLabel").textContent = selectedYear !== "all" ? `${selectedYear}年${selectedMonth !== 'all' ? selectedMonth + '月' : ''}グループ収支` : "グループ累計収支";
 
-  let labelStr = "グループ累計収支";
-  if(selectedYear !== "all") {
-    labelStr = selectedMonth !== "all" ? `${selectedYear}年${selectedMonth}月のグループ収支` : `${selectedYear}年のグループ累計収支`;
-  }
-  grandLabelEl.textContent = labelStr;
-
-  let gTotal = 0;
-  let totalSessions = 0;
-  let winSessions = 0;
-  let totalPerSum = 0;
-
-  if(Array.isArray(historyData)) {
-    historyData.forEach(h => {
-      const names = h.players.map(p => p.name).sort().join(", ");
-      if(selectedCombo && names !== selectedCombo) return;
-      if(matchFilter(h, selectedYear, selectedMonth)) {
-        const profit = Number(h.profit || 0);
-        gTotal += profit;
-        totalSessions += 1;
-        if(profit >= 0) {
-          winSessions += 1;
-        }
-        const sPer = h.players.length > 0 ? profit / h.players.length : 0;
-        totalPerSum += sPer;
-      }
-    });
-  }
-
-  const avgPerProfit = totalSessions > 0 ? totalPerSum : 0;
-  const groupWinRate = totalSessions > 0 ? Math.round((winSessions / totalSessions) * 100) : 0;
-
-  grandEl.textContent = money(gTotal);
-  grandPerEl.textContent = `1人: ${money(avgPerProfit)}`;
-  grandWinRateEl.textContent = `勝率: ${groupWinRate}% (${winSessions}/${totalSessions})`;
-}
-
-function getAvailableYearsAndMonths() {
-  let yearsSet = new Set();
-  let yearMonthMap = {};
-
+  let gTotal = 0, totalSessions = 0, winSessions = 0, totalPer = 0;
   historyData.forEach(h => {
-    if(!h.time) return;
-    let timeStr = String(h.time);
-    let yMatch = timeStr.match(/(\d{4})年/);
-    let year = yMatch ? yMatch[1] : "2026";
-    yearsSet.add(year);
-
-    if(!yearMonthMap[year]) yearMonthMap[year] = new Set();
-    let mMatch = timeStr.match(/(\d{1,2})月/);
-    if(mMatch) {
-      yearMonthMap[year].add(mMatch[1]);
+    if(selectedCombo && h.players.map(p => p.name).sort().join(", ") !== selectedCombo) return;
+    if(matchFilter(h, selectedYear, selectedMonth)) {
+      const profit = Number(h.profit || 0);
+      gTotal += profit;
+      totalSessions++;
+      if(profit >= 0) winSessions++;
+      totalPer += h.players.length ? profit / h.players.length : 0;
     }
   });
 
-  let years = Array.from(yearsSet).sort().reverse();
-  let formattedMap = {};
-  Object.keys(yearMonthMap).forEach(y => {
-    formattedMap[y] = Array.from(yearMonthMap[y]).sort((a,b)=>Number(b)-Number(a));
-  });
+  document.getElementById("grandTotalDisplay").textContent = money(gTotal);
+  document.getElementById("grandPerDisplay").textContent = `1人: ${money(totalSessions ? totalPer : 0)}`;
+  document.getElementById("grandWinRateDisplay").textContent = `勝率: ${totalSessions ? Math.round((winSessions / totalSessions) * 100) : 0}%`;
+}
 
-  return { years, yearMonthMap: formattedMap };
+function getAvailableYearsAndMonths() {
+  let yearsSet = new Set(), yearMonthMap = {};
+  historyData.forEach(h => {
+    if(!h.time) return;
+    let y = (h.time.match(/(\d{4})年/) || [])[1] || "2026";
+    yearsSet.add(y);
+    if(!yearMonthMap[y]) yearMonthMap[y] = new Set();
+    let m = (h.time.match(/(\d{1,2})月/) || [])[1];
+    if(m) yearMonthMap[y].add(m);
+  });
+  let years = Array.from(yearsSet).sort().reverse();
+  let formatted = {};
+  Object.keys(yearMonthMap).forEach(y => formatted[y] = Array.from(yearMonthMap[y]).sort((a,b)=>Number(b)-Number(a)));
+  return { years, yearMonthMap: formatted };
 }
 
 function updateFilterSelectOptions() {
@@ -1525,21 +992,18 @@ function updateFilterSelectOptions() {
   const currentCombo = comboSelect.value;
   const currentYear = yearSelect.value || "all";
 
-  let combos = {}; 
+  let combos = {};
   historyData.forEach(h => {
-    const names = h.players.map(p => p.name).sort().join(", ");
-    if(names) {
-      combos[names] = `👥 ${names} (${h.players.length}人)`;
-    }
+    let names = h.players.map(p => p.name).sort().join(", ");
+    if(names) combos[names] = `👥 ${names} (${h.players.length}人)`;
   });
 
-  const comboKeys = Object.keys(combos);
   comboSelect.innerHTML = "";
-  comboKeys.forEach((key, index) => {
+  Object.keys(combos).forEach((key, idx) => {
     const opt = document.createElement("option");
     opt.value = key;
     opt.textContent = combos[key];
-    if(key === currentCombo || (!currentCombo && index === 0)) opt.selected = true;
+    if(key === currentCombo || (!currentCombo && idx === 0)) opt.selected = true;
     comboSelect.appendChild(opt);
   });
 
@@ -1554,45 +1018,20 @@ function updateFilterSelectOptions() {
 
   if (!isInitialFilterSet) {
     const now = new Date();
-    const currentYearStr = String(now.getFullYear());
-    const currentMonthStr = String(now.getMonth() + 1);
-
-    if ([...yearSelect.options].some(o => o.value === currentYearStr)) {
-      yearSelect.value = currentYearStr;
-    } else if (years.length > 0) {
-      yearSelect.value = years[0];
-    } else {
-      yearSelect.value = "all";
-    }
-
+    const curY = String(now.getFullYear());
+    const curM = String(now.getMonth() + 1);
+    yearSelect.value = [...yearSelect.options].some(o => o.value === curY) ? curY : (years[0] || "all");
     updateMonthOptions();
-
-    const monthSel = document.getElementById("monthSelect");
-    if ([...monthSel.options].some(o => o.value === currentMonthStr)) {
-      monthSel.value = currentMonthStr;
-    } else {
-      monthSel.value = "all";
-    }
-
+    document.getElementById("monthSelect").value = [...document.getElementById("monthSelect").options].some(o => o.value === curM) ? curM : "all";
     isInitialFilterSet = true;
   } else {
-    if([...yearSelect.options].some(o => o.value === currentYear)) {
-      yearSelect.value = currentYear;
-    } else {
-      yearSelect.value = "all";
-    }
+    yearSelect.value = [...yearSelect.options].some(o => o.value === currentYear) ? currentYear : "all";
     updateMonthOptions();
   }
 }
 
-function onYearChange() {
-  updateMonthOptions();
-  renderFilteredContent();
-}
-
-function onFilterChange() {
-  renderFilteredContent();
-}
+function onYearChange() { updateMonthOptions(); renderFilteredContent(); }
+function onFilterChange() { renderFilteredContent(); }
 
 function updateMonthOptions() {
   const yearSel = document.getElementById("yearSelect");
@@ -1605,705 +1044,240 @@ function updateMonthOptions() {
     monthSel.innerHTML = `<option value="all">📄 すべての月</option>`;
     monthSel.value = "all";
   } else {
-    monthSel.innerHTML = `<option value="all">📄 ${selectedYear}年すべての月</option>`;
-    let months = yearMonthMap[selectedYear] || [];
-    months.forEach(m => {
+    monthSel.innerHTML = `<option value="all">📄 すべての月</option>`;
+    (yearMonthMap[selectedYear] || []).forEach(m => {
       const opt = document.createElement("option");
       opt.value = m;
       opt.textContent = `${m}月`;
       monthSel.appendChild(opt);
     });
-
-    if([...monthSel.options].some(o => o.value === currentMonth)) {
-      monthSel.value = currentMonth;
-    } else {
-      monthSel.value = "all";
-    }
+    monthSel.value = [...monthSel.options].some(o => o.value === currentMonth) ? currentMonth : "all";
   }
 }
 
-function matchFilter(h, yearVal, monthVal) {
+function matchFilter(h, yVal, mVal) {
   if(!h.time) return false;
-  let timeStr = String(h.time);
-  let yM = timeStr.match(/(\d{4})年/);
-  let year = yM ? yM[1] : "2026";
-  let mM = timeStr.match(/(\d{1,2})月/);
-  let month = mM ? mM[1] : "";
-
-  if(yearVal !== "all" && yearVal !== year) return false;
-  if(monthVal !== "all" && monthVal !== month) return false;
+  let y = (h.time.match(/(\d{4})年/) || [])[1] || "2026";
+  let m = (h.time.match(/(\d{1,2})月/) || [])[1] || "";
+  if(yVal !== "all" && yVal !== y) return false;
+  if(mVal !== "all" && mVal !== m) return false;
   return true;
 }
 
 function renderExcelChart() {
   const svg = document.getElementById("excelLineChart");
   const legendContainer = document.getElementById("chartLegend");
-  const comboSelect = document.getElementById("combinationSelect");
-  const yearSelect = document.getElementById("yearSelect");
-  const monthSelect = document.getElementById("monthSelect");
-  
-  svg.innerHTML = "";
-  legendContainer.innerHTML = "";
+  svg.innerHTML = ""; legendContainer.innerHTML = "";
+  if(!historyData.length) return;
 
-  if(!historyData || historyData.length === 0 || comboSelect.options.length === 0) return;
-
-  const selectedCombo = comboSelect.value;
-  const selectedYear = yearSelect.value;
-  const selectedMonth = monthSelect.value;
-
-  let targetHistory = historyData.filter(h => {
-    const names = h.players.map(p => p.name).sort().join(", ");
-    if(names !== selectedCombo) return false;
-    return matchFilter(h, selectedYear, selectedMonth);
-  });
-
-  if(targetHistory.length === 0) return;
+  const selectedCombo = document.getElementById("combinationSelect").value;
+  const targetHistory = historyData.filter(h => h.players.map(p => p.name).sort().join(", ") === selectedCombo && matchFilter(h, document.getElementById("yearSelect").value, document.getElementById("monthSelect").value));
+  if(!targetHistory.length) return;
 
   let groupSum = 0;
-  let rawGroupData = targetHistory.map(h => groupSum += Number(h.profit || 0));
-  const groupData = [0, ...rawGroupData];
-
+  let groupData = [0, ...targetHistory.map(h => groupSum += Number(h.profit || 0))];
   let allNames = [];
-  targetHistory.forEach(h => {
-    h.players.forEach(p => {
-      if(!allNames.includes(p.name)) allNames.push(p.name);
-    });
-  });
+  targetHistory.forEach(h => h.players.forEach(p => { if(!allNames.includes(p.name)) allNames.push(p.name); }));
 
   let memberSeries = {};
   allNames.forEach(name => {
     let pSum = 0;
-    let rawSeries = targetHistory.map(h => {
+    memberSeries[name] = [0, ...targetHistory.map(h => {
       const p = h.players.find(x => x.name === name);
       if(p) pSum += Number(p.val || 0);
       return pSum;
-    });
-    memberSeries[name] = [0, ...rawSeries];
+    })];
   });
 
   let allValues = [...groupData];
   allNames.forEach(name => allValues.push(...memberSeries[name]));
 
-  const totalPoints = groupData.length;
-  const width = Math.max(580, totalPoints * 52);
-  const height = 240;
-  const paddingLeft = 52;
-  const paddingRight = 50;
-  const paddingTop = 20;
-  const paddingBottom = 28;
-
+  const width = Math.max(580, groupData.length * 52), height = 240, paddingLeft = 52, paddingRight = 50, paddingTop = 20, paddingBottom = 28;
   svg.style.width = `${width}px`;
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
-  let rawMin = Math.min(0, ...allValues);
-  let rawMax = Math.max(0, ...allValues);
-  let rawSpan = Math.max(rawMax - rawMin, 20000);
-
-  let rawStep = rawSpan / 4;
-  let stepUnit = 10000;
-  if (rawStep > 100000) stepUnit = 100000;
-  else if (rawStep > 50000) stepUnit = 50000;
-  else if (rawStep > 20000) stepUnit = 25000;
-  else if (rawStep > 10000) stepUnit = 20000;
-  else if (rawStep > 5000) stepUnit = 10000;
-  else stepUnit = 5000;
-
-  let minVal = Math.floor(rawMin / stepUnit) * stepUnit;
-  let maxVal = Math.ceil(rawMax / stepUnit) * stepUnit;
-  if (maxVal === minVal) maxVal += stepUnit;
+  let minVal = Math.min(0, ...allValues), maxVal = Math.max(0, ...allValues);
+  let step = Math.max((maxVal - minVal) / 4, 10000);
+  let stepUnit = step > 50000 ? 50000 : step > 20000 ? 25000 : 10000;
+  minVal = Math.floor(minVal / stepUnit) * stepUnit;
+  maxVal = Math.ceil(maxVal / stepUnit) * stepUnit;
+  if(maxVal === minVal) maxVal += stepUnit;
   let range = maxVal - minVal;
 
-  const getX = (i) => paddingLeft + (i / (Math.max(totalPoints - 1, 1))) * (width - paddingLeft - paddingRight);
+  const getX = (i) => paddingLeft + (i / Math.max(groupData.length - 1, 1)) * (width - paddingLeft - paddingRight);
   const getY = (val) => height - paddingBottom - ((val - minVal) / range) * (height - paddingTop - paddingBottom);
 
-  for(let val = minVal; val <= maxVal + 1; val += stepUnit) {
-    const y = getY(val);
-    const isZero = (val === 0);
+  for(let val = minVal; val <= maxVal; val += stepUnit) {
+    const y = getY(val), isZero = val === 0;
     svg.innerHTML += `<line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="${isZero ? '#64748b' : '#e2e8f0'}" stroke-width="${isZero ? '1.8' : '1'}" ${isZero ? '' : 'stroke-dasharray="3,3"'}/>`;
-    
-    let labelText = "";
-    if (isZero) {
-      labelText = "0";
-    } else if (Math.abs(val) >= 10000) {
-      labelText = (val / 10000) + "万";
-    } else {
-      labelText = (val / 1000) + "千";
-    }
-
-    svg.innerHTML += `<text x="${paddingLeft - 8}" y="${y + 4}" fill="${isZero ? '#0f172a' : '#64748b'}" font-weight="${isZero ? '800' : '500'}" font-size="10" text-anchor="end">${labelText}</text>`;
+    svg.innerHTML += `<text x="${paddingLeft - 8}" y="${y + 4}" fill="${isZero ? '#0f172a' : '#64748b'}" font-size="10" text-anchor="end">${isZero ? '0' : (val / 10000) + '万'}</text>`;
   }
-
-  let xStep = 1;
-  if (totalPoints > 16) xStep = 3;
-  else if (totalPoints > 9) xStep = 2;
 
   groupData.forEach((val, i) => {
     const x = getX(i);
-    svg.innerHTML += `<line x1="${x}" y1="${paddingTop}" x2="${x}" y2="${height - paddingBottom}" stroke="#f1f5f9" stroke-width="1"/>`;
-    
-    if (i > 0 && (i === totalPoints - 1 || i % xStep === 0)) {
-      let h = targetHistory[i - 1];
-      let dateStr = "";
-      if (h && h.time) {
-        let m = h.time.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
-        if (m) {
-          dateStr = `${m[2]}/${m[3]}`;
-        } else {
-          dateStr = h.time.split(' ')[0];
-        }
-      } else {
-        dateStr = `#${i}`;
-      }
-      svg.innerHTML += `<text x="${x}" y="${height - 8}" fill="#64748b" font-size="10" font-weight="600" text-anchor="middle">${dateStr}</text>`;
+    if (i > 0 && (i === groupData.length - 1 || i % (groupData.length > 16 ? 3 : 2) === 0)) {
+      let m = (targetHistory[i-1].time || "").match(/(\d{1,2})月(\d{1,2})日/);
+      svg.innerHTML += `<text x="${x}" y="${height - 8}" fill="#64748b" font-size="10" text-anchor="middle">${m ? m[1]+'/'+m[2] : '#'+i}</text>`;
     }
   });
 
-  const colors = ["#2563eb", "#0d9488", "#d97706", "#7c3aed", "#db2777", "#059669"];
-
-  const drawLineAndDots = (data, color, label) => {
-    if(data.length === 0) return;
-    let points = [];
-    data.forEach((val, i) => points.push(`${getX(i)},${getY(val)}`));
-
-    if(data.length > 1) {
-      svg.innerHTML += `<polyline fill="none" stroke="${color}" stroke-width="2.5" points="${points.join(" ")}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    }
-    data.forEach((val, i) => {
-      svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="4" fill="#fff" stroke="${color}" stroke-width="2"/>`;
-    });
-
-    legendContainer.innerHTML += `
-      <div class="legend-item">
-        <div class="legend-dot" style="background: ${color};"></div>
-        <span>${label}</span>
-      </div>
-    `;
+  const colors = ["#2563eb", "#0d9488", "#d97706", "#7c3aed", "#db2777"];
+  const drawLine = (data, color, label) => {
+    let pts = data.map((val, i) => `${getX(i)},${getY(val)}`).join(" ");
+    svg.innerHTML += `<polyline fill="none" stroke="${color}" stroke-width="2.5" points="${pts}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    data.forEach((val, i) => { svg.innerHTML += `<circle cx="${getX(i)}" cy="${getY(val)}" r="3.5" fill="#fff" stroke="${color}" stroke-width="2"/>`; });
+    legendContainer.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${color};"></div><span>${label}</span></div>`;
   };
 
-  drawLineAndDots(groupData, "var(--accent)", "ノリ打ち全体");
-  allNames.forEach((name, idx) => {
-    const color = colors[(idx + 1) % colors.length];
-    drawLineAndDots(memberSeries[name], color, name);
-  });
+  drawLine(groupData, "var(--accent)", "ノリ打ち全体");
+  allNames.forEach((name, idx) => drawLine(memberSeries[name], colors[idx % colors.length], name));
 }
 
-function addPlayer(selectedName = "", machines = []){
+function addPlayer(selectedName = "", machines = []) {
   const div = document.createElement("div");
   div.className = "player";
   let options = '<option value="">選択してください</option>';
-  storedMembers.forEach(m => {
-    const selected = (m === selectedName) ? 'selected' : '';
-    options += `<option value="${m}" ${selected}>${m}</option>`;
-  });
+  storedMembers.forEach(m => { options += `<option value="${m}" ${m === selectedName ? 'selected' : ''}>${m}</option>`; });
 
   div.innerHTML = `
     <div class="player-top">
-      <div style="width:55%;">
-        <label>名前</label>
-        <select class="name-select" style="padding: 6px 8px;">${options}</select>
-      </div>
-      <div style="width:40%;">
-        <div class="result-label">個人の収支</div>
-        <div class="result-value">-</div>
-      </div>
+      <div style="width:55%;"><label>名前</label><select class="name-select" style="padding: 6px 8px;">${options}</select></div>
+      <div style="width:40%;"><div class="result-label">個人の収支</div><div class="result-value">-</div></div>
     </div>
-    <div style="margin-top:4px;">
-      <label>打った機種・投資・回収</label>
-      <div class="machine-list-box machine-container"></div>
-      <button class="sub-btn" type="button" onclick="addMachineRow(this.closest('.player').querySelector('.machine-container'))" style="margin-top:4px; padding:5px; font-size:12px; background:#fff; color:var(--accent);">＋ 機種を追加</button>
-    </div>
-    <div style="margin-top:6px; display:flex; justify-content:flex-end;">
-      <button class="delete-btn" onclick="this.closest('.player').remove()">削除</button>
-    </div>`;
+    <div><label>打った機種・投資・回収</label><div class="machine-list-box machine-container"></div>
+    <button class="sub-btn" type="button" onclick="addMachineRow(this.closest('.player').querySelector('.machine-container'))" style="margin-top:4px; padding:5px; font-size:12px; background:#fff; color:var(--accent);">＋ 機種を追加</button></div>
+    <div style="margin-top:6px; display:flex; justify-content:flex-end;"><button class="delete-btn" onclick="this.closest('.player').remove()">削除</button></div>
+  `;
   document.getElementById("players").appendChild(div);
-
   const mContainer = div.querySelector('.machine-container');
-  if(machines && machines.length > 0) {
-    machines.forEach(mObj => {
-      addMachineRow(mContainer, mObj.machineName || "", mObj.machineInvest !== undefined ? mObj.machineInvest : "", mObj.machineCash !== undefined ? mObj.machineCash : "");
-    });
-  } else {
-    addMachineRow(mContainer, "", "", "");
-  }
+  if(machines.length) machines.forEach(m => addMachineRow(mContainer, m.machineName || "", m.machineInvest || "", m.machineCash || ""));
+  else addMachineRow(mContainer);
 }
 
 window.addMachineRow = function(container, mName = "", mInv = "", mCsh = "") {
   const row = document.createElement("div");
   row.className = "machine-row";
   row.innerHTML = `
-    <input class="machine-name" type="text" list="machineSuggestions" placeholder="機種名を入力" value="${mName}" style="flex: 2.2; padding: 6px 8px; background:#fff;">
-    <input class="machine-invest" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="投資" value="${mInv}" style="flex: 1; padding: 6px 6px;">
-    <input class="machine-cash" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="回収" value="${mCsh}" style="flex: 1; padding: 6px 6px;">
-    <button class="delete-btn" type="button" onclick="this.closest('.machine-row').remove()" style="padding:4px 6px;">×</button>
+    <input class="machine-name" type="text" list="machineSuggestions" placeholder="機種名" value="${mName}" style="flex: 2.2; padding: 6px; background:#fff;">
+    <input class="machine-invest" type="number" placeholder="投資" value="${mInv}" style="flex: 1; padding: 6px;">
+    <input class="machine-cash" type="number" placeholder="回収" value="${mCsh}" style="flex: 1; padding: 6px;">
+    <button class="delete-btn" type="button" onclick="this.closest('.machine-row').remove()" style="padding:4px;">×</button>
   `;
   container.appendChild(row);
 };
 
 document.getElementById("calcBtn").onclick = async function() {
   const pNodes = document.querySelectorAll("#players .player");
-  if(pNodes.length === 0) {
-    alert("参加者を1人以上追加してください");
-    return;
-  }
+  if(!pNodes.length) return alert("参加者を追加してください");
 
   let players = [];
-  let hasError = false;
-
   pNodes.forEach(node => {
     const name = node.querySelector(".name-select").value;
-
-    let machines = [];
-    let invest = 0;
-    let cash = 0;
-
+    let machines = [], invest = 0, cash = 0;
     node.querySelectorAll(".machine-row").forEach(mRow => {
       const mName = mRow.querySelector(".machine-name").value.trim();
-      const mInvStr = mRow.querySelector(".machine-invest").value;
-      const mCshStr = mRow.querySelector(".machine-cash").value;
-      const mInv = mInvStr === "" ? 0 : +mInvStr;
-      const mCsh = mCshStr === "" ? 0 : +mCshStr;
-
-      if(mName || mInvStr !== "" || mCshStr !== "") {
-        machines.push({ 
-          machineName: mName, 
-          machineInvest: mInv, 
-          machineCash: mCsh 
-        });
-        invest += mInv;
-        cash += mCsh;
-      }
+      const mInv = +mRow.querySelector(".machine-invest").value || 0;
+      const mCsh = +mRow.querySelector(".machine-cash").value || 0;
+      machines.push({ machineName: mName, machineInvest: mInv, machineCash: mCsh });
+      invest += mInv; cash += mCsh;
     });
-
-    if(!name) hasError = true;
     players.push({ name, invest, cash, machines, node });
   });
-
-  if(hasError) {
-    alert("名前が未選択の参加者がいます。");
-    return;
-  }
 
   const totalInvest = players.reduce((s, p) => s + p.invest, 0);
   const totalCash = players.reduce((s, p) => s + p.cash, 0);
   const totalProfit = totalCash - totalInvest;
-  const fairProfitPerPerson = totalProfit / players.length;
+  const fair = totalProfit / players.length;
 
   document.getElementById("resultCard").style.display = "block";
   document.getElementById("profitTotal").textContent = money(totalProfit);
-  document.getElementById("perProfit").textContent = money(fairProfitPerPerson);
-  document.getElementById("investTotal").textContent = new Intl.NumberFormat("ja-JP").format(totalInvest) + "円";
-  document.getElementById("cashTotal").textContent = new Intl.NumberFormat("ja-JP").format(totalCash) + "円";
+  document.getElementById("perProfit").textContent = money(fair);
+  document.getElementById("investTotal").textContent = totalInvest + "円";
+  document.getElementById("cashTotal").textContent = totalCash + "円";
   
   const tbody = document.getElementById("tbody"); tbody.innerHTML = "";
   const payList = document.getElementById("payList"); payList.innerHTML = "";
   let receive = [], pay = [], snapshot = [];
 
   players.forEach(p => {
-    const individualProfit = p.cash - p.invest;
-    const targetAmount = p.invest + fairProfitPerPerson;
-    const diff = p.cash - targetAmount; 
+    const indProfit = p.cash - p.invest;
+    const diff = p.cash - (p.invest + fair);
+    p.node.querySelector(".result-value").textContent = money(indProfit);
+    p.node.querySelector(".result-value").style.color = indProfit >= 0 ? "var(--green)" : "var(--red)";
 
-    const resVal = p.node.querySelector(".result-value");
-    resVal.textContent = money(individualProfit);
-    resVal.style.color = individualProfit >= 0 ? "var(--green)" : "var(--red)";
+    if(diff > 1) pay.push({ name: p.name, amount: diff });
+    else if(diff < -1) receive.push({ name: p.name, amount: -diff });
 
-    if(diff > 1) {
-      pay.push({ name: p.name, amount: diff });
-    } else if(diff < -1) {
-      receive.push({ name: p.name, amount: -diff });
-    }
-
-    let settleStatusText = "";
-    let settleColor = "var(--text)";
-    if (diff > 1) {
-      settleStatusText = `貢献: ${new Intl.NumberFormat("ja-JP").format(Math.round(diff))}円`;
-      settleColor = "var(--green)";
-    } else if (diff < -1) {
-      settleStatusText = `強盗: ${new Intl.NumberFormat("ja-JP").format(Math.round(-diff))}円`;
-      settleColor = "var(--red)";
-    } else {
-      settleStatusText = `平和: 0円`;
-      settleColor = "var(--muted)";
-    }
-    
-    let machineSummaryText = "";
-    if (p.machines && p.machines.length > 0) {
-      machineSummaryText = p.machines.map(m => {
-        let namePart = m.machineName ? `${m.machineName}:` : "";
-        return `${namePart}投${m.machineInvest}/収${m.machineCash}`;
-      }).join(", ");
-    }
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td><b>${p.name}</b>${machineSummaryText ? `<br><span style="font-size:10px; color:var(--muted);">${machineSummaryText}</span>` : ''}</td><td>${new Intl.NumberFormat("ja-JP").format(p.invest)}円</td><td>${new Intl.NumberFormat("ja-JP").format(p.cash)}円</td><td style="color:${individualProfit>=0?'var(--green)':'var(--red)'}; font-weight:600;">${money(individualProfit)}</td><td style="font-weight:800; color:${settleColor}">${settleStatusText}</td>`;
-    tbody.appendChild(tr);
-    snapshot.push({ name: p.name, val: individualProfit, invest: p.invest, cash: p.cash, machines: p.machines });
+    tbody.innerHTML += `<tr><td><b>${p.name}</b></td><td>${p.invest}円</td><td>${p.cash}円</td><td style="color:${indProfit>=0?'var(--green':'var(--red)'}">${money(indProfit)}</td><td style="font-weight:800;">${diff > 1 ? '貢献' : diff < -1 ? '強盗' : '平和'}</td></tr>`;
+    snapshot.push({ name: p.name, val: indProfit, invest: p.invest, cash: p.cash, machines: p.machines });
   });
 
-  let lines = [`【ノリ打ち精算レポート】`, ``, `■ 今回の収支`];
-  snapshot.forEach(p => {
-    let lineStr = `・${p.name}：${money(p.val)}`;
-    if(p.machines && p.machines.length > 0) {
-      let mStrs = p.machines.map(m => {
-        let namePart = m.machineName ? `${m.machineName}` : "";
-        return `${namePart ? namePart + ' ' : ''}(投${m.machineInvest}/収${m.machineCash})`;
-      }).join(" ");
-      lineStr += ` [${mStrs}]`;
-    }
-    lines.push(lineStr);
-  });
-  lines.push(`合計：${money(totalProfit)}（1人あたり：${money(fairProfitPerPerson)}）`);
-  lines.push(``);
-  lines.push(`■ お金の受け渡し（貢献・強盗）`);
-  
   let hasPay = false;
   pay.forEach(p => {
     receive.forEach(r => {
       if(p.amount <= 0 || r.amount <= 0) return;
       const move = Math.min(p.amount, r.amount);
-      payList.innerHTML += `<div class="pay-row"><span><b>${p.name}</b> → ${r.name}</span><span style="color:var(--green);font-weight:800;">${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円</span></div>`;
-      lines.push(`・${p.name}（貢献）→ ${r.name}（強盗）：${new Intl.NumberFormat("ja-JP").format(Math.round(move))}円`);
+      payList.innerHTML += `<div class="pay-row"><span><b>${p.name}</b> → ${r.name}</span><span style="color:var(--green);font-weight:800;">${Math.round(move)}円</span></div>`;
       p.amount -= move; r.amount -= move; hasPay = true;
     });
   });
+  if(!hasPay) payList.innerHTML = `<div style="padding:4px; color:var(--muted);">受け渡しなし (平和)</div>`;
 
-  if(!hasPay) {
-    payList.innerHTML = `<div style="padding:4px; color:var(--muted); font-size:12px;">受け渡しの必要はありません (平和)</div>`;
-    lines.push("平和 (移動なし)");
-  }
-  
-  lastShareMessage = lines.join("\n");
-
-  const dateInputVal = document.getElementById("recordDateInput").value;
-  let formattedDateStr = "";
-  if (dateInputVal) {
-    let parts = dateInputVal.split("-");
-    formattedDateStr = `${parts[0]}年${Number(parts[1])}月${Number(parts[2])}日`;
-  } else {
-    let now = new Date();
-    formattedDateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
-  }
-
-  const newHist = {
-    time: formattedDateStr, 
-    profit: totalProfit, 
-    players: snapshot 
-  };
+  const dateVal = document.getElementById("recordDateInput").value;
+  const formattedDate = dateVal ? `${dateVal.split('-')[0]}年${Number(dateVal.split('-')[1])}月${Number(dateVal.split('-')[2])}日` : "日付不明";
 
   document.getElementById("loading").style.display = "block";
-  
   try {
-    // 1. 精算履歴を送信
-    await fetch(GAS_URL, { 
-      method: "POST", 
-      mode: "no-cors", 
-      body: JSON.stringify(newHist) 
-    });
-
-    // 2. セッション内で最も成績が良かった人に自動で飯スト +1 を付与（元の仕様）
-    if (snapshot.length > 0) {
-      let bestPlayer = snapshot.reduce((prev, current) => (current.val > prev.val) ? current : prev);
-      if (bestPlayer) {
-        await fetch(GAS_URL, { 
-          method: "POST", 
-          mode: "no-cors", 
-          body: JSON.stringify({ method: "UPDATE_MEST", name: bestPlayer.name, delta: 1 }) 
-        });
-      }
+    await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ time: formattedDate, profit: totalProfit, players: snapshot }) });
+    if (snapshot.length) {
+      let best = snapshot.reduce((prev, curr) => curr.val > prev.val ? curr : prev);
+      await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "UPDATE_MEST", name: best.name, delta: 1 }) });
     }
-
     await loadHistory();
-  } catch (e) {
-    console.error(e);
-  }
-
+  } catch(e) {}
   document.getElementById("loading").style.display = "none";
-};
-
-document.getElementById("copyResultBtn").onclick = async () => {
-  try {
-    await navigator.clipboard.writeText(lastShareMessage);
-    alert("精算結果をコピーしました！");
-  } catch (e) {
-    alert("以下の内容をコピーしてください:\n\n" + lastShareMessage);
-  }
 };
 
 document.getElementById("addBtn").onclick = () => addPlayer();
 
-// メンバー管理モーダル
-const modal = document.getElementById("memberModal");
-document.getElementById("openMemberModal").onclick = () => {
-  renderMemberListEdit();
-  openModal(modal);
-};
-document.getElementById("closeModalBtn").onclick = () => {
-  closeModal(modal);
-};
-
-// ==========================================
-// 🎯 飯ストルーレットエンジン
-// ==========================================
-const rouletteModal = document.getElementById("rouletteModal");
-const wheelCanvas = document.getElementById("rouletteCanvas");
-const wheelCtx = wheelCanvas.getContext("2d");
-
-const wheelColors = [
-  "#ff6b6b", "#4ecdc4", "#45b7d1", "#ffa07a", 
-  "#98d8c8", "#f7dc6f", "#bb8fce", "#f1948a"
-];
-
-let rouletteState = "member"; 
-let selectedWinner = "";
-let wheelRotation = 0; 
-let isSpinning = false;
-let currentWheelItems = [];
-
-function getFilteredMembers() {
-  const comboSelect = document.getElementById("combinationSelect");
-  const selectedCombo = comboSelect ? comboSelect.value : "";
-  if (!selectedCombo) return storedMembers;
-  const list = selectedCombo.split(", ").map(s => s.trim()).filter(Boolean);
-  return list.length > 0 ? list : storedMembers;
-}
-
-function drawWheel(items, rotationAngle) {
-  const cx = wheelCanvas.width / 2;
-  const cy = wheelCanvas.height / 2;
-  const radius = cx - 8;
-
-  wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-  if (!items || items.length === 0) return;
-
-  const sliceAngle = (2 * Math.PI) / items.length;
-
-  items.forEach((item, i) => {
-    const startAngle = rotationAngle + i * sliceAngle;
-    const endAngle = startAngle + sliceAngle;
-
-    wheelCtx.beginPath();
-    wheelCtx.moveTo(cx, cy);
-    wheelCtx.arc(cx, cy, radius, startAngle, endAngle);
-    wheelCtx.closePath();
-    wheelCtx.fillStyle = wheelColors[i % wheelColors.length];
-    wheelCtx.fill();
-
-    wheelCtx.lineWidth = 4;
-    wheelCtx.strokeStyle = "#ffffff";
-    wheelCtx.stroke();
-
-    wheelCtx.save();
-    wheelCtx.translate(cx, cy);
-    wheelCtx.rotate(startAngle + sliceAngle / 2);
-    wheelCtx.textAlign = "right";
-    wheelCtx.textBaseline = "middle";
-    wheelCtx.fillStyle = "#ffffff";
-    wheelCtx.font = "bold 28px -apple-system, BlinkMacSystemFont, sans-serif";
-    wheelCtx.shadowColor = "rgba(0,0,0,0.2)";
-    wheelCtx.shadowBlur = 4;
-    wheelCtx.fillText(String(item), radius - 36, 0);
-    wheelCtx.restore();
-  });
-
-  wheelCtx.beginPath();
-  wheelCtx.arc(cx, cy, 28, 0, 2 * Math.PI);
-  wheelCtx.fillStyle = "#0f172a";
-  wheelCtx.fill();
-  wheelCtx.lineWidth = 4;
-  wheelCtx.strokeStyle = "#ffffff";
-  wheelCtx.stroke();
-}
-
-function renderStockChips() {
-  const container = document.getElementById("stockChipsContainer");
-  container.innerHTML = "";
-  stockOptions.forEach((val, idx) => {
-    const chip = document.createElement("span");
-    chip.className = "stock-chip";
-    chip.innerHTML = `${val}個 <button type="button" onclick="removeStockOption(${idx})">×</button>`;
-    container.appendChild(chip);
-  });
-  if (rouletteState === "count" && !isSpinning) {
-    currentWheelItems = [...stockOptions];
-    drawWheel(currentWheelItems, wheelRotation);
-  }
-}
-
-window.removeStockOption = function(idx) {
-  if (stockOptions.length <= 1) {
-    alert("最低1つはマスを残してください。");
-    return;
-  }
-  stockOptions.splice(idx, 1);
-  localStorage.setItem("nori_stock_options", JSON.stringify(stockOptions));
-  renderStockChips();
-};
-
-document.getElementById("addStockValBtn").onclick = () => {
-  const input = document.getElementById("newStockValInput");
-  const val = parseInt(input.value, 10);
-  if (isNaN(val) || val < 0) {
-    alert("0以上の数字を入力してください。");
-    return;
-  }
-  stockOptions.push(val);
-  localStorage.setItem("nori_stock_options", JSON.stringify(stockOptions));
-  input.value = "";
-  renderStockChips();
-};
-
-function setupMemberWheel() {
-  rouletteState = "member";
-  selectedWinner = "";
-  wheelRotation = -Math.PI / 2;
-  currentWheelItems = getFilteredMembers();
-  drawWheel(currentWheelItems, wheelRotation);
-  document.getElementById("rouletteBanner").textContent = "① まずは当選メンバーを抽選！";
-  document.getElementById("startRouletteBtn").textContent = "🚀 メンバーを抽選！";
-}
-
-document.getElementById("openRouletteModal").onclick = () => {
-  renderStockChips();
-  setupMemberWheel();
-  openModal(rouletteModal);
-};
-
-document.getElementById("resetRouletteBtn").onclick = () => {
-  if (isSpinning) return;
-  setupMemberWheel();
-};
-
-document.getElementById("closeRouletteModalBtn").onclick = () => {
-  if (isSpinning) return;
-  closeModal(rouletteModal);
-};
-
-document.getElementById("startRouletteBtn").onclick = () => {
-  if (isSpinning) return;
-  if (!currentWheelItems || currentWheelItems.length === 0) {
-    alert("抽選対象がありません。");
-    return;
-  }
-
-  isSpinning = true;
-  const btn = document.getElementById("startRouletteBtn");
-  const banner = document.getElementById("rouletteBanner");
-  btn.disabled = true;
-
-  const extraSpins = (6 + Math.random() * 3) * 2 * Math.PI;
-  const duration = 3600; 
-  const startRotation = wheelRotation;
-  const targetRotation = startRotation + extraSpins;
-  const startTime = performance.now();
-
-  const sliceAngle = (2 * Math.PI) / currentWheelItems.length;
-  let lastSliceIdx = -1;
-
-  function animate(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const easeOut = 1 - Math.pow(1 - progress, 4);
-
-    wheelRotation = startRotation + (targetRotation - startRotation) * easeOut;
-    drawWheel(currentWheelItems, wheelRotation);
-
-    const pointerAngle = (3 * Math.PI) / 2; 
-    const normalizedAngle = ((pointerAngle - wheelRotation) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-    const currentIndex = Math.floor(normalizedAngle / sliceAngle) % currentWheelItems.length;
-
-    if (currentIndex !== lastSliceIdx) {
-      playTickSound();
-      lastSliceIdx = currentIndex;
-    }
-
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      isSpinning = false;
-      btn.disabled = false;
-      playWinSound();
-
-      const winnerItem = currentWheelItems[currentIndex];
-
-      if (rouletteState === "member") {
-        selectedWinner = winnerItem;
-        banner.textContent = `🎉 当選：${selectedWinner}！次はストック数を抽選！`;
-        
-        setTimeout(() => {
-          rouletteState = "count";
-          currentWheelItems = [...stockOptions];
-          wheelRotation = -Math.PI / 2;
-          drawWheel(currentWheelItems, wheelRotation);
-          btn.textContent = `🚀 ${selectedWinner} のストック数を抽選！`;
-        }, 900);
-
-      } else if (rouletteState === "count") {
-        const wonCount = Number(winnerItem);
-        const targetMember = selectedWinner;
-        banner.textContent = `✨ ${targetMember} に飯スト +${wonCount}個 追加！`;
-        btn.textContent = "もう一度最初から回す";
-        rouletteState = "member";
-
-        addMemberMestDirect(targetMember, wonCount);
-
-        setTimeout(() => {
-          if (!isSpinning && rouletteState === "member") {
-            currentWheelItems = getFilteredMembers();
-            drawWheel(currentWheelItems, -Math.PI / 2);
-          }
-        }, 2200);
-      }
-    }
-  }
-
-  requestAnimationFrame(animate);
-};
+const memberModal = document.getElementById("memberModal");
+document.getElementById("openMemberModal").onclick = () => { renderMemberListEdit(); openModal(memberModal); };
+document.getElementById("closeModalBtn").onclick = () => closeModal(memberModal);
 
 function renderMemberListEdit() {
   const container = document.getElementById("memberListEdit");
-  container.innerHTML = "";
+  container.innerHTML = storedMembers.length ? "" : "<div style='font-size:12px; color:var(--muted);'>登録なし</div>";
   storedMembers.forEach((m, idx) => {
-    const row = document.createElement("div");
-    row.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:#f8fafc; padding:6px 10px; border-radius:6px; border:1px solid var(--line);";
-    row.innerHTML = `<span style="font-weight:600; font-size:13px;">${m}</span><button class="delete-btn" onclick="removeStoredMember(${idx})">削除</button>`;
-    container.appendChild(row);
+    container.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; background:#f8fafc; padding:6px 10px; border-radius:6px; border:1px solid var(--line);"><span style="font-weight:600; font-size:13px;">${m}</span><button class="delete-btn" onclick="removeStoredMember(${idx})">削除</button></div>`;
   });
 }
 
-window.removeStoredMember = function(idx) {
+window.removeStoredMember = async function(idx) {
+  let target = storedMembers[idx];
+  if(!confirm(`「${target}」を削除しますか？`)) return;
   storedMembers.splice(idx, 1);
   localStorage.setItem("nori_stored_members", JSON.stringify(storedMembers));
   renderMemberListEdit();
+  refreshAllMemberDropdowns();
+  try { await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "DELETE_MEMBER", name: target }) }); } catch(e) {}
 };
 
-document.getElementById("addMemberStoreBtn").onclick = () => {
-  const nameInput = document.getElementById("newMemberName");
-  const name = nameInput.value.trim();
-  if(!name) return;
-  if(storedMembers.includes(name)) {
-    alert("すでに登録されています");
-    return;
-  }
+document.getElementById("addMemberStoreBtn").onclick = async () => {
+  const input = document.getElementById("newMemberName");
+  const name = input.value.trim();
+  if(!name || storedMembers.includes(name)) return;
   storedMembers.push(name);
   localStorage.setItem("nori_stored_members", JSON.stringify(storedMembers));
-  nameInput.value = "";
+  input.value = "";
   renderMemberListEdit();
+  refreshAllMemberDropdowns();
+  try { await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ method: "ADD_MEMBER", name }) }); } catch(e) {}
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  document.getElementById("recordDateInput").value = `${yyyy}-${mm}-${dd}`;
-
+  let today = new Date();
+  document.getElementById("recordDateInput").value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
   loadHistory();
-  if(storedMembers.length > 0) {
-    addPlayer(storedMembers[0]);
-    if(storedMembers[1]) addPlayer(storedMembers[1]);
-  } else {
-    addPlayer();
-  }
 });
 </script>
 </body>
