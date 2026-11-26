@@ -629,10 +629,24 @@ async function loadHistory() {
     const res = await fetch(GAS_URL);
     let jsonRes = await res.json();
     
-    historyData = (jsonRes.history || []).map(item => ({ 
-      ...item, 
-      time: cleanTimeStr(item.time) 
-    }));
+    // 【互換性修正】古い形式（配列直接）と新しい形式（playersキーあり）の両方を正しく正規化する
+    historyData = (jsonRes.history || []).map(item => {
+      let normalizedPlayers = [];
+      if (Array.isArray(item.players)) {
+        normalizedPlayers = item.players.map(p => ({
+          name: p.name,
+          val: Number(p.val || 0),
+          invest: Number(p.invest || 0),
+          cash: Number(p.cash || 0),
+          machines: Array.isArray(p.machines) ? p.machines : []
+        }));
+      }
+      return { 
+        ...item, 
+        time: cleanTimeStr(item.time),
+        players: normalizedPlayers
+      }; 
+    });
     
     serverMestMap = jsonRes.mestMap || {};
     serverKinstMap = jsonRes.kinstMap || {};
@@ -985,7 +999,7 @@ function renderPersonalTotalsAndHistory() {
 
       let pInvest = targetMachines.reduce((s, m) => s + Number(m.machineInvest || 0), 0);
       let pCash = targetMachines.reduce((s, m) => s + Number(m.machineCash || 0), 0);
-      let pProfit = pCash - pInvest;
+      let pProfit = targetMachines.length > 0 ? (pCash - pInvest) : Number(p.val || 0);
 
       if (selectedMachine && selectedMachine !== "all" && pInvest === 0 && pCash === 0) return;
 
@@ -1056,7 +1070,7 @@ function renderPersonalTotalsAndHistory() {
         let tM = selectedMachine && selectedMachine !== "all" ? (p.machines || []).filter(m => (m.machineName || "").trim() === selectedMachine) : (p.machines || []);
         let inv = tM.reduce((ms, m) => ms + Number(m.machineInvest || 0), 0);
         let csh = tM.reduce((ms, m) => ms + Number(m.machineCash || 0), 0);
-        return ps + (csh - inv);
+        return ps + (tM.length > 0 ? (csh - inv) : Number(p.val || 0));
       }, 0);
       return s + sProf;
     }, 0);
@@ -1069,7 +1083,7 @@ function renderPersonalTotalsAndHistory() {
         let tM = selectedMachine && selectedMachine !== "all" ? (p.machines || []).filter(m => (m.machineName || "").trim() === selectedMachine) : (p.machines || []);
         let inv = tM.reduce((ms, m) => ms + Number(m.machineInvest || 0), 0);
         let csh = tM.reduce((ms, m) => ms + Number(m.machineCash || 0), 0);
-        let val = csh - inv;
+        let val = tM.length > 0 ? (csh - inv) : Number(p.val || 0);
         return { name: p.name, val, invest: inv, cash: csh, machines: tM };
       });
 
@@ -1081,7 +1095,7 @@ function renderPersonalTotalsAndHistory() {
       sPlayersFormatted.forEach(p => {
         let mHtml = p.machines.map(m => `<div style="font-size:10px; color:var(--muted);">${m.machineName} (投${m.machineInvest}/収${m.machineCash})</div>`).join("");
         let fair = sPer;
-        let diff = p.cash - (p.invest + fair);
+        let diff = p.machines.length > 0 ? (p.cash - (p.invest + fair)) : 0;
         let statusBadge = diff > 1 ? `<div style="font-size:10px; color:var(--red); font-weight:700;">強盗: +${Math.round(diff)}円</div>` : diff < -1 ? `<div style="font-size:10px; color:var(--green); font-weight:700;">貢献: ${Math.round(diff)}円</div>` : '';
 
         pDetails += `
@@ -1169,9 +1183,7 @@ function renderGrandTotals() {
       });
       if (tMachines.length > 0 || !selectedMachine || selectedMachine === "all") {
         hasMatch = true;
-        let inv = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineInvest || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.invest);
-        let csh = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineCash || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.cash);
-        sessionProfit += (csh - inv);
+        sessionProfit += tMachines.length > 0 ? (tMachines.reduce((s, m) => s + Number(m.machineCash || 0), 0) - tMachines.reduce((s, m) => s + Number(m.machineInvest || 0), 0)) : Number(p.val || 0);
       }
     });
 
@@ -1344,9 +1356,7 @@ function renderExcelChart() {
         return true;
       });
       if (tMachines.length > 0 || !selectedMachine || selectedMachine === "all") {
-        let inv = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineInvest || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.invest);
-        let csh = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineCash || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.cash);
-        pSum += (csh - inv);
+        pSum += tMachines.length > 0 ? (tMachines.reduce((s, m) => s + Number(m.machineCash || 0), 0) - tMachines.reduce((s, m) => s + Number(m.machineInvest || 0), 0)) : Number(p.val || 0);
       }
     });
     return groupSum += pSum;
@@ -1368,9 +1378,7 @@ function renderExcelChart() {
           return true;
         });
         if (tMachines.length > 0 || !selectedMachine || selectedMachine === "all") {
-          let inv = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineInvest || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.invest);
-          let csh = tMachines.length > 0 ? tMachines.reduce((s, m) => s + Number(m.machineCash || 0), 0) : (selectedMachine && selectedMachine !== "all" ? 0 : p.cash);
-          pSum += (csh - inv);
+          pSum += tMachines.length > 0 ? (tMachines.reduce((s, m) => s + Number(m.machineCash || 0), 0) - tMachines.reduce((s, m) => s + Number(m.machineInvest || 0), 0)) : Number(p.val || 0);
         }
       }
       return pSum;
