@@ -629,7 +629,6 @@ async function loadHistory() {
     const res = await fetch(GAS_URL);
     let jsonRes = await res.json();
     
-    // 【互換性修正】古い形式（配列直接）と新しい形式（playersキーあり）の両方を正しく正規化する
     historyData = (jsonRes.history || []).map(item => {
       let normalizedPlayers = [];
       if (Array.isArray(item.players)) {
@@ -1167,9 +1166,17 @@ function renderGrandTotals() {
 
   document.getElementById("grandTotalLabel").textContent = selectedYear !== "all" ? `${selectedYear}年${selectedMonth !== 'all' ? selectedMonth + '月' : ''}グループ収支` : "グループ累計収支";
 
-  let gTotal = 0, totalSessions = 0, winSessions = 0, totalParticipantsCount = 0;
+  let gTotal = 0, totalSessions = 0, winSessions = 0;
+  let fixedMemberCount = 0;
+
+  if (selectedCombo) {
+    // メンバーの組み合わせフィルターで絞り込まれている場合は、そのメンバーの人数（例：2人）を固定の割る数とする
+    fixedMemberCount = selectedCombo.split(",").length;
+  }
+
   historyData.forEach(h => {
-    if(selectedCombo && h.players.map(p => p.name).sort().join(", ") !== selectedCombo) return;
+    const names = h.players.map(p => p.name).sort().join(", ");
+    if(selectedCombo && names !== selectedCombo) return;
     if(!matchFilter(h, selectedYear, selectedMonth)) return;
 
     let sessionProfit = 0;
@@ -1190,12 +1197,16 @@ function renderGrandTotals() {
     if (hasMatch) {
       gTotal += sessionProfit;
       totalSessions++;
-      totalParticipantsCount += h.players.length;
+      if(!selectedCombo && fixedMemberCount === 0) {
+        fixedMemberCount = h.players.length; // フォールバック
+      }
       if(sessionProfit >= 0) winSessions++;
     }
   });
 
-  let avgPerPerson = totalParticipantsCount > 0 ? gTotal / totalParticipantsCount : 0;
+  // 【修正】フィルターで絞り込まれた人数（例えば2人）できれいに割り算する
+  let divisor = fixedMemberCount > 0 ? fixedMemberCount : 1;
+  let avgPerPerson = gTotal / divisor;
 
   document.getElementById("grandTotalDisplay").textContent = money(gTotal);
   document.getElementById("grandPerDisplay").textContent = `1人: ${money(avgPerPerson)}`;
