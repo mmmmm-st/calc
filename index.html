@@ -232,30 +232,32 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 .legend-item { display: flex; align-items: center; gap: 4px; }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-.chart-fit-wrap {
-  position: relative;
+/* グラフの外枠（左の固定軸＋右のスクロールグラフを横並びにする） */
+.chart-outer-wrap {
+  display: flex;
   width: 100%;
   background: #fff;
   border-radius: 10px;
   border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+/* 左側に固定する縦軸エリア */
+.chart-y-axis-box {
+  flex-shrink: 0;
+  width: 52px;
+  background: #fff;
+  border-right: 1px solid var(--line);
+  z-index: 2;
+}
+
+/* 右側の横スクロールするグラフ本体エリア */
+.chart-fit-wrap {
+  flex: 1;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 svg { display: block; height: 240px; }
-
-/* 【修正】グラフの縦軸固定用の背景オーバーレイ */
-.chart-fixed-axis {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 52px;
-  height: 240px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(2px);
-  pointer-events: none;
-  z-index: 5;
-  border-right: 1px solid var(--line);
-}
 
 .personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-bottom: 12px; }
 .personal-card { background: #f8fafc; border-radius: 12px; padding: 10px; border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
@@ -296,7 +298,7 @@ table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 480p
 th { background: #f8fafc; color: var(--muted); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
 th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: left; }
 
-/* 【修正】機種別実績の「機種名」列を左側にピン留め固定するスタイル */
+/* 機種別実績の「機種名」列を左側にピン留め固定するスタイル */
 .sticky-table { border-collapse: separate; border-spacing: 0; }
 .sticky-table th:first-child,
 .sticky-table td:first-child {
@@ -441,10 +443,13 @@ th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: lef
     <div class="chart-card" id="graphsArea" style="display:none;">
       <div class="chart-title">📈 収支推移グラフ</div>
       <div class="chart-legend" id="chartLegend"></div>
-      <div class="chart-fit-wrap">
-        <!-- グラフの縦軸を固定表示するオーバーレイ -->
-        <div class="chart-fixed-axis"></div>
-        <svg id="excelLineChart"></svg>
+      <div class="chart-outer-wrap">
+        <div class="chart-y-axis-box">
+          <svg id="excelYAxisSvg" width="52" height="240"></svg>
+        </div>
+        <div class="chart-fit-wrap">
+          <svg id="excelLineChart"></svg>
+        </div>
       </div>
     </div>
   </div>
@@ -1242,12 +1247,10 @@ function renderGrandTotals() {
   document.getElementById("grandWinRateDisplay").textContent = `勝率: ${totalSessions ? Math.round((winSessions / totalSessions) * 100) : 0}%`;
 }
 
-// 【修正】指定された機種のデータが存在する年と月だけを抽出するヘルパー関数
 function getAvailableYearsAndMonthsForMachine(machineName) {
   let yearsSet = new Set(), yearMonthMap = {};
   historyData.forEach(h => {
     if(!h.time) return;
-    // 機種フィルターが選択されている場合、その履歴に該当機種が含まれているかチェック
     if (machineName && machineName !== "all") {
       let hasThisMachine = false;
       if (h.players) {
@@ -1301,7 +1304,6 @@ function updateFilterSelectOptions() {
     comboSelect.appendChild(opt);
   });
 
-  // 機種セレクトの候補更新
   let activeMachinesSet = new Set();
   historyData.forEach(h => {
     if (h.players) {
@@ -1325,7 +1327,6 @@ function updateFilterSelectOptions() {
   });
   machineSelect.value = [...machineSelect.options].some(o => o.value === currentMachine) ? currentMachine : "all";
 
-  // 機種フィルターに基づいて年・月の選択肢を構築
   let { years, yearMonthMap } = getAvailableYearsAndMonthsForMachine(machineSelect.value);
   yearSelect.innerHTML = `<option value="all">📅 全期間</option>`;
   years.forEach(y => {
@@ -1350,7 +1351,6 @@ function updateFilterSelectOptions() {
 }
 
 function updateMachineFilterOptions() {
-  // 機種選択が変わったときに年・月の選択肢をその機種のデータが存在するものに絞り込む
   const machineSelect = document.getElementById("machineFilterSelect");
   const yearSelect = document.getElementById("yearSelect");
   const currentYear = yearSelect.value;
@@ -1402,8 +1402,11 @@ function updateMonthOptions() {
 
 function renderExcelChart() {
   const svg = document.getElementById("excelLineChart");
+  const yAxisSvg = document.getElementById("excelYAxisSvg");
   const legendContainer = document.getElementById("chartLegend");
-  svg.innerHTML = ""; legendContainer.innerHTML = "";
+  svg.innerHTML = "";
+  yAxisSvg.innerHTML = "";
+  legendContainer.innerHTML = "";
   if(!historyData.length) return;
 
   const selectedCombo = document.getElementById("combinationSelect").value;
@@ -1460,9 +1463,16 @@ function renderExcelChart() {
   let allValues = [...groupData];
   allNames.forEach(name => allValues.push(...memberSeries[name]));
 
-  const width = Math.max(580, groupData.length * 52), height = 240, paddingLeft = 52, paddingRight = 50, paddingTop = 20, paddingBottom = 28;
+  const width = Math.max(540, groupData.length * 52);
+  const height = 240;
+  const paddingLeft = 16;
+  const paddingRight = 36;
+  const paddingTop = 20;
+  const paddingBottom = 28;
+
   svg.style.width = `${width}px`;
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  yAxisSvg.setAttribute("viewBox", `0 0 52 ${height}`);
 
   let minVal = Math.min(0, ...allValues), maxVal = Math.max(0, ...allValues);
   let step = Math.max((maxVal - minVal) / 4, 10000);
@@ -1477,8 +1487,8 @@ function renderExcelChart() {
 
   for(let val = minVal; val <= maxVal; val += stepUnit) {
     const y = getY(val), isZero = val === 0;
-    svg.innerHTML += `<line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" stroke="${isZero ? '#475569' : '#e2e8f0'}" stroke-width="${isZero ? '1.8' : '1'}" ${isZero ? '' : 'stroke-dasharray="3,3"'}/>`;
-    svg.innerHTML += `<text x="${paddingLeft - 8}" y="${y + 4}" fill="${isZero ? '#0f172a' : '#64748b'}" font-size="10" text-anchor="end">${isZero ? '0' : (val / 10000) + '万'}</text>`;
+    yAxisSvg.innerHTML += `<text x="44" y="${y + 4}" fill="${isZero ? '#0f172a' : '#64748b'}" font-size="10" font-weight="${isZero ? '700' : '500'}" text-anchor="end">${isZero ? '0' : (val / 10000) + '万'}</text>`;
+    svg.innerHTML += `<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="${isZero ? '#475569' : '#e2e8f0'}" stroke-width="${isZero ? '1.8' : '1'}" ${isZero ? '' : 'stroke-dasharray="3,3"'}/>`;
   }
 
   groupData.forEach((val, i) => {
