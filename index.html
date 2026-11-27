@@ -233,15 +233,29 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
 .chart-fit-wrap {
+  position: relative;
   width: 100%;
   background: #fff;
   border-radius: 10px;
   border: 1px solid var(--line);
-  padding: 6px 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 svg { display: block; height: 240px; }
+
+/* 【修正】グラフの縦軸固定用の背景オーバーレイ */
+.chart-fixed-axis {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 52px;
+  height: 240px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+  z-index: 5;
+  border-right: 1px solid var(--line);
+}
 
 .personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-bottom: 12px; }
 .personal-card { background: #f8fafc; border-radius: 12px; padding: 10px; border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
@@ -281,6 +295,21 @@ svg { display: block; height: 240px; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 480px; background: #fff; }
 th { background: #f8fafc; color: var(--muted); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
 th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+
+/* 【修正】機種別実績の「機種名」列を左側にピン留め固定するスタイル */
+.sticky-table { border-collapse: separate; border-spacing: 0; }
+.sticky-table th:first-child,
+.sticky-table td:first-child {
+  position: sticky;
+  left: 0;
+  background-color: #ffffff;
+  z-index: 2;
+  box-shadow: 2px 0 5px -2px rgba(0,0,0,0.06);
+}
+.sticky-table th:first-child {
+  background-color: #f8fafc;
+  z-index: 3;
+}
 
 .pay-box { margin-top: 8px; border-radius: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px; }
 .pay-row { 
@@ -390,7 +419,7 @@ th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: lef
     <div style="font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">🔍 表示フィルター</div>
     <div class="filter-grid">
       <select id="combinationSelect" onchange="onFilterChange()"></select>
-      <select id="machineFilterSelect" onchange="onFilterChange()"></select>
+      <select id="machineFilterSelect" onchange="onMachineFilterChange()"></select>
       <select id="yearSelect" onchange="onYearChange()"></select>
       <select id="monthSelect" onchange="onFilterChange()"></select>
     </div>
@@ -413,6 +442,8 @@ th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: lef
       <div class="chart-title">📈 収支推移グラフ</div>
       <div class="chart-legend" id="chartLegend"></div>
       <div class="chart-fit-wrap">
+        <!-- グラフの縦軸を固定表示するオーバーレイ -->
+        <div class="chart-fixed-axis"></div>
         <svg id="excelLineChart"></svg>
       </div>
     </div>
@@ -435,7 +466,7 @@ th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: lef
     </div>
     <div id="machineContainer">
       <div class="table-wrapper" style="margin-top: 6px;">
-        <table>
+        <table class="sticky-table">
           <thead>
             <tr>
               <th>機種名</th>
@@ -1170,7 +1201,6 @@ function renderGrandTotals() {
   let fixedMemberCount = 0;
 
   if (selectedCombo) {
-    // メンバーの組み合わせフィルターで絞り込まれている場合は、そのメンバーの人数（例：2人）を固定の割る数とする
     fixedMemberCount = selectedCombo.split(",").length;
   }
 
@@ -1198,13 +1228,12 @@ function renderGrandTotals() {
       gTotal += sessionProfit;
       totalSessions++;
       if(!selectedCombo && fixedMemberCount === 0) {
-        fixedMemberCount = h.players.length; // フォールバック
+        fixedMemberCount = h.players.length;
       }
       if(sessionProfit >= 0) winSessions++;
     }
   });
 
-  // 【修正】フィルターで絞り込まれた人数（例えば2人）できれいに割り算する
   let divisor = fixedMemberCount > 0 ? fixedMemberCount : 1;
   let avgPerPerson = gTotal / divisor;
 
@@ -1213,28 +1242,49 @@ function renderGrandTotals() {
   document.getElementById("grandWinRateDisplay").textContent = `勝率: ${totalSessions ? Math.round((winSessions / totalSessions) * 100) : 0}%`;
 }
 
-function getAvailableYearsAndMonths() {
+// 【修正】指定された機種のデータが存在する年と月だけを抽出するヘルパー関数
+function getAvailableYearsAndMonthsForMachine(machineName) {
   let yearsSet = new Set(), yearMonthMap = {};
   historyData.forEach(h => {
     if(!h.time) return;
+    // 機種フィルターが選択されている場合、その履歴に該当機種が含まれているかチェック
+    if (machineName && machineName !== "all") {
+      let hasThisMachine = false;
+      if (h.players) {
+        h.players.forEach(p => {
+          if (p.machines) {
+            p.machines.forEach(m => {
+              if ((m.machineName || "").trim() === machineName) hasThisMachine = true;
+            });
+          }
+        });
+      }
+      if (!hasThisMachine) return;
+    }
+
     let y = (h.time.match(/(\d{4})年/) || [])[1] || "2026";
     yearsSet.add(y);
     if(!yearMonthMap[y]) yearMonthMap[y] = new Set();
     let m = (h.time.match(/(\d{1,2})月/) || [])[1];
     if(m) yearMonthMap[y].add(m);
   });
+
   let years = Array.from(yearsSet).sort().reverse();
   let formatted = {};
-  Object.keys(yearMonthMap).forEach(y => formatted[y] = Array.from(yearMonthMap[y]).sort((a,b)=>Number(b)-Number(a)));
+  Object.keys(yearMonthMap).forEach(y => {
+    formatted[y] = Array.from(yearMonthMap[y]).sort((a, b) => Number(b) - Number(a));
+  });
   return { years, yearMonthMap: formatted };
 }
 
 function updateFilterSelectOptions() {
   const comboSelect = document.getElementById("combinationSelect");
   const yearSelect = document.getElementById("yearSelect");
+  const machineSelect = document.getElementById("machineFilterSelect");
   
   const currentCombo = comboSelect.value;
   const currentYear = yearSelect.value || "all";
+  const currentMachine = machineSelect.value || "all";
 
   let combos = {};
   historyData.forEach(h => {
@@ -1251,7 +1301,32 @@ function updateFilterSelectOptions() {
     comboSelect.appendChild(opt);
   });
 
-  let { years } = getAvailableYearsAndMonths();
+  // 機種セレクトの候補更新
+  let activeMachinesSet = new Set();
+  historyData.forEach(h => {
+    if (h.players) {
+      h.players.forEach(p => {
+        if (p.machines) {
+          p.machines.forEach(m => {
+            let mName = (m.machineName || "").trim();
+            if (mName && mName !== "機種未入力") activeMachinesSet.add(mName);
+          });
+        }
+      });
+    }
+  });
+  let availableMachines = Array.from(activeMachinesSet).sort();
+  machineSelect.innerHTML = `<option value="all">🎰 すべての機種</option>`;
+  availableMachines.forEach(mName => {
+    const opt = document.createElement("option");
+    opt.value = mName;
+    opt.textContent = `${mName}`;
+    machineSelect.appendChild(opt);
+  });
+  machineSelect.value = [...machineSelect.options].some(o => o.value === currentMachine) ? currentMachine : "all";
+
+  // 機種フィルターに基づいて年・月の選択肢を構築
+  let { years, yearMonthMap } = getAvailableYearsAndMonthsForMachine(machineSelect.value);
   yearSelect.innerHTML = `<option value="all">📅 全期間</option>`;
   years.forEach(y => {
     const opt = document.createElement("option");
@@ -1275,43 +1350,28 @@ function updateFilterSelectOptions() {
 }
 
 function updateMachineFilterOptions() {
+  // 機種選択が変わったときに年・月の選択肢をその機種のデータが存在するものに絞り込む
   const machineSelect = document.getElementById("machineFilterSelect");
-  const currentMachine = machineSelect.value || "all";
-  const selectedCombo = document.getElementById("combinationSelect").value;
-  const selectedYear = document.getElementById("yearSelect").value;
-  const selectedMonth = document.getElementById("monthSelect").value;
-
-  let filtered = historyData.filter(h => {
-    const names = h.players.map(p => p.name).sort().join(", ");
-    if(selectedCombo && names !== selectedCombo) return false;
-    return matchFilter(h, selectedYear, selectedMonth);
-  });
-
-  let activeMachinesSet = new Set();
-  filtered.forEach(h => {
-    if (h.players) {
-      h.players.forEach(p => {
-        if (p.machines) {
-          p.machines.forEach(m => {
-            let mName = (m.machineName || "").trim();
-            if (mName && mName !== "機種未入力") activeMachinesSet.add(mName);
-          });
-        }
-      });
-    }
-  });
-
-  let availableMachines = Array.from(activeMachinesSet).sort();
-
-  machineSelect.innerHTML = `<option value="all">🎰 すべての機種</option>`;
-  availableMachines.forEach(mName => {
-    const opt = document.createElement("option");
-    opt.value = mName;
-    opt.textContent = `${mName}`;
-    machineSelect.appendChild(opt);
-  });
+  const yearSelect = document.getElementById("yearSelect");
+  const currentYear = yearSelect.value;
   
-  machineSelect.value = [...machineSelect.options].some(o => o.value === currentMachine) ? currentMachine : "all";
+  let { years, yearMonthMap } = getAvailableYearsAndMonthsForMachine(machineSelect.value);
+  
+  yearSelect.innerHTML = `<option value="all">📅 全期間</option>`;
+  years.forEach(y => {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = `📁 ${y}年`;
+    yearSelect.appendChild(opt);
+  });
+
+  yearSelect.value = [...yearSelect.options].some(o => o.value === currentYear) ? currentYear : (years[0] || "all");
+  updateMonthOptions();
+}
+
+function onMachineFilterChange() {
+  updateMachineFilterOptions();
+  renderFilteredContent();
 }
 
 function onYearChange() { updateMonthOptions(); renderFilteredContent(); }
@@ -1320,9 +1380,10 @@ function onFilterChange() { renderFilteredContent(); }
 function updateMonthOptions() {
   const yearSel = document.getElementById("yearSelect");
   const monthSel = document.getElementById("monthSelect");
+  const machineSel = document.getElementById("machineFilterSelect");
   const selectedYear = yearSel.value;
   const currentMonth = monthSel.value;
-  let { yearMonthMap } = getAvailableYearsAndMonths();
+  let { yearMonthMap } = getAvailableYearsAndMonthsForMachine(machineSel.value);
 
   if(selectedYear === "all") {
     monthSel.innerHTML = `<option value="all">📄 すべての月</option>`;
