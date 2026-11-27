@@ -232,10 +232,13 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 .legend-item { display: flex; align-items: center; gap: 4px; }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-/* グラフの外枠（左の固定軸＋右のスクロールグラフを横並びにする） */
+/* スマホ崩壊を防ぐ頑丈なグラフ外枠レイアウト */
 .chart-outer-wrap {
   display: flex;
+  align-items: stretch;
   width: 100%;
+  max-width: 100%;
+  height: 240px;
   background: #fff;
   border-radius: 10px;
   border: 1px solid var(--line);
@@ -244,20 +247,30 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* 左側に固定する縦軸エリア */
 .chart-y-axis-box {
-  flex-shrink: 0;
+  flex: 0 0 52px;
   width: 52px;
+  height: 240px;
   background: #fff;
   border-right: 1px solid var(--line);
   z-index: 2;
 }
 
-/* 右側の横スクロールするグラフ本体エリア */
+/* 右側のスクロールするグラフ本体エリア（min-width:0 がiOS Safariで必須） */
 .chart-fit-wrap {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 240px;
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
 }
-svg { display: block; height: 240px; }
+
+.chart-y-axis-box svg,
+.chart-fit-wrap svg {
+  display: block;
+  height: 240px;
+  max-width: none;
+}
 
 .personal-total-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-bottom: 12px; }
 .personal-card { background: #f8fafc; border-radius: 12px; padding: 10px; border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; }
@@ -1531,7 +1544,7 @@ function addPlayer(selectedName = "", machines = []) {
   const mContainer = div.querySelector('.machine-container');
   if(machines.length) machines.forEach(m => addMachineRow(mContainer, m.machineName || "", m.machineInvest || "", m.machineCash || ""));
   else addMachineRow(mContainer);
-}
+};
 
 window.addMachineRow = function(container, mName = "", mInv = "", mCsh = "") {
   let mOptions = '<option value="">機種を選択</option>';
